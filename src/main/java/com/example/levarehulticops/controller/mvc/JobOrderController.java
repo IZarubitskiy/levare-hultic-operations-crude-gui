@@ -2,6 +2,7 @@
 package com.example.levarehulticops.controller.mvc;
 
 import com.example.levarehulticops.entity.JobOrder;
+import com.example.levarehulticops.entity.enums.JobOrderStatus;
 import com.example.levarehulticops.service.JobOrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

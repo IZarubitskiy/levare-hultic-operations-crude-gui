@@ -61,7 +61,7 @@ public class ItemServiceImpl implements ItemService {
             Pageable pageable
     ) {
         return repo
-                .findByConditionAndOwnership(condition, ownerships, pageable);
+                .findByItemConditionAndOwnershipIn(condition, ownerships, pageable);
     }
 
     @Override
@@ -69,6 +69,6 @@ public class ItemServiceImpl implements ItemService {
             List<ItemCondition> conditions,
             Pageable pageable
     ) {
-        return repo.findByConditionIn(conditions, pageable);
+        return repo.findByItemConditionIn(conditions, pageable);
     }
 }

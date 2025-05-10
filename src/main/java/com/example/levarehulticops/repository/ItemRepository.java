@@ -10,8 +10,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface ItemRepository extends JpaRepository<Item, Long> {
-    Page<Item> findByConditionAndOwnership(ItemCondition cond,
+    Page<Item> findByItemConditionAndOwnershipIn(ItemCondition cond,
                                            List<Client> ownerships, Pageable pg);
-    Page<Item> findByConditionIn(List<ItemCondition> conds, Pageable pg);
+    Page<Item> findByItemConditionIn(List<ItemCondition> conds, Pageable pg);
 
 }

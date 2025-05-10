@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Edit JobOrder</title>
+</head>
+<body>
+<div th:insert="fragments/header :: header"></div>
+
+<h1>Edit Job Order</h1>
+<form th:action="@{'/joborders/' + ${jobOrder.id} + '/edit'}"
+      th:object="${jobOrder}" method="post">
+    <label>Number: <input th:field="*{jobOrderNumber}" /></label><br/>
+    <label>Client:
+        <select th:field="*{client}">
+            <option th:each="c : ${T(com.example.levarehulticops.entity.enums.Client).values()}"
+                    th:value="${c}" th:text="${c}"/>
+        </select>
+    </label><br/>
+    <label>Ownership:
+        <select th:field="*{ownership}">
+            <option th:each="o : ${T(com.example.levarehulticops.entity.enums.Ownership).values()}"
+                    th:value="${o}" th:text="${o}"/>
+        </select>
+    </label><br/>
+    <label>Status:
+        <select th:field="*{status}">
+            <option th:each="s : ${T(com.example.levarehulticops.entity.enums.JobOrderStatus).values()}"
+                    th:value="${s}" th:text="${s}"/>
+        </select>
+    </label><br/>
+    <label>Comments:<br/>
+        <textarea th:field="*{comments}" rows="4"></textarea>
+    </label><br/>
+    <button type="submit">Update</button>
+</form>
+
+<div th:insert="fragments/footer :: footer"></div>
+</body>
+</html>
