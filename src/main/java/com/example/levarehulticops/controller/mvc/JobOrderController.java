@@ -62,4 +62,21 @@ public class JobOrderController {
         jobOrderService.delete(id);
         return "redirect:/joborders";
     }
+    /**
+     * Страница со всеми JobOrder в статусе IN_PROGRESS
+     */
+    @GetMapping("/in-progress")
+    public String inProgress(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            Model model) {
+        // Получаем только IN_PROGRESS
+        Page<JobOrder> pg = jobOrderService.getByStatus(
+                JobOrderStatus.IN_PROGRESS,
+                PageRequest.of(page, size)
+        );
+        model.addAttribute("page", pg);
+        return "joborders/in-progress";
+    }
+
 }

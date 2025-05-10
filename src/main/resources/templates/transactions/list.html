@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Transactions</title>
+</head>
+<body>
+<div th:insert="fragments/header :: header"></div>
+
+<h1>Transaction History</h1>
+
+<table border="1" cellpadding="5">
+    <thead>
+    <tr>
+        <th>#</th>
+        <th>Timestamp</th>
+        <th>Entity</th>
+        <th>Entity ID</th>
+        <th>Field</th>
+        <th>Old Value</th>
+        <th>New Value</th>
+        <th>User</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="tx,iter : ${page.content}">
+        <td th:text="${iter.index + 1}">1</td>
+        <td th:text="${tx.timestamp}">2025-05-10T12:00</td>
+        <td th:text="${tx.entityName}">WorkOrder</td>
+        <td th:text="${tx.entityId}">123</td>
+        <td th:text="${tx.fieldName}">status</td>
+        <td th:text="${tx.oldValue}">CREATED</td>
+        <td th:text="${tx.newValue}">IN_PROGRESS</td>
+        <td th:text="${tx.username}">jdoe</td>
+        <td>
+            <a th:href="@{'/transactions/' + ${tx.id}}">View</a>
+        </td>
+    </tr>
+    <tr th:if="${page.content.empty}">
+        <td colspan="9"><em>No transactions found</em></td>
+    </tr>
+    </tbody>
+</table>
+
+<div>
+    <ul>
+        <li th:if="${page.hasPrevious()}">
+            <a th:href="@{/transactions(page=${page.number-1},size=${page.size})}">← Prev</a>
+        </li>
+        <li th:if="${page.hasNext()}">
+            <a th:href="@{/transactions(page=${page.number+1},size=${page.size})}">Next →</a>
+        </li>
+    </ul>
+</div>
+
+<div th:insert="fragments/footer :: footer"></div>
+</body>
+</html>

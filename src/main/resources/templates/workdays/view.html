@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>View WorkDay</title>
+</head>
+<body>
+<div th:insert="fragments/header :: header"></div>
+<h1>Work Day Details</h1>
+
+<dl>
+    <dt>Date:</dt>
+    <dd th:text="${workDay.date}">2025-05-10</dd>
+
+    <dt>Employees:</dt>
+    <dd>
+        <ul>
+            <li th:each="emp : ${workDay.employees}">
+                <a th:href="@{'/employees/' + ${emp.id}}"
+                   th:text="${emp.name}">John Doe</a>
+            </li>
+            <li th:if="${workDay.employees.empty}"><em>None</em></li>
+        </ul>
+    </dd>
+
+    <dt>Job Orders:</dt>
+    <dd>
+        <ul>
+            <li th:each="jo : ${workDay.jobOrders}">
+                <a th:href="@{'/joborders/' + ${jo.id}}"
+                   th:text="${jo.jobOrderNumber}">JO-001</a>
+            </li>
+            <li th:if="${workDay.jobOrders.empty}"><em>None</em></li>
+        </ul>
+    </dd>
+</dl>
+
+<a th:href="@{/workdays}">Back to list</a>
+
+<div th:insert="fragments/footer :: footer"></div>
+</body>
+</html>

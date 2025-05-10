@@ -1,6 +1,8 @@
 package com.example.levarehulticops.service.impl;
 
 import com.example.levarehulticops.entity.Item;
+import com.example.levarehulticops.entity.enums.Client;
+import com.example.levarehulticops.entity.enums.ItemCondition;
 import com.example.levarehulticops.repository.ItemRepository;
 import com.example.levarehulticops.service.ItemService;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -49,5 +52,23 @@ public class ItemServiceImpl implements ItemService {
     @Transactional(readOnly = true)
     public Page<Item> getAll(Pageable pageable) {
         return repo.findAll(pageable);
+    }
+
+    @Override
+    public Page<Item> findByConditionAndOwnership(
+            ItemCondition condition,
+            List<Client> ownerships,
+            Pageable pageable
+    ) {
+        return repo
+                .findByConditionAndOwnership(condition, ownerships, pageable);
+    }
+
+    @Override
+    public Page<Item> findByConditionIn(
+            List<ItemCondition> conditions,
+            Pageable pageable
+    ) {
+        return repo.findByConditionIn(conditions, pageable);
     }
 }

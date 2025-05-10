@@ -8,5 +8,6 @@ public enum Client {
     METCO,
     KETCO,
     RETCO,
-    RETS
+    RETS,
+    CORP
 }

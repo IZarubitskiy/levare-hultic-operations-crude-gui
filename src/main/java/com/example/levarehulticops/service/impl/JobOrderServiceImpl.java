@@ -2,6 +2,7 @@
 package com.example.levarehulticops.service.impl;
 
 import com.example.levarehulticops.entity.JobOrder;
+import com.example.levarehulticops.entity.enums.JobOrderStatus;
 import com.example.levarehulticops.repository.JobOrderRepository;
 import com.example.levarehulticops.service.JobOrderService;
 import lombok.RequiredArgsConstructor;
@@ -50,5 +51,10 @@ public class JobOrderServiceImpl implements JobOrderService {
     @Transactional(readOnly = true)
     public Page<JobOrder> getAll(Pageable pageable) {
         return repo.findAll(pageable);
+    }
+
+    @Override
+    public Page<JobOrder> getByStatus(JobOrderStatus status, Pageable pageable) {
+        return repo.findByStatus(status, pageable);
     }
 }

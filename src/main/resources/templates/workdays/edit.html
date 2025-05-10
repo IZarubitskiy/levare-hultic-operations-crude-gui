@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Edit WorkDay</title>
+</head>
+<body>
+<div th:insert="fragments/header :: header"></div>
+<h1>Edit Work Day</h1>
+
+<form th:action="@{'/workdays/' + ${workDay.id} + '/edit'}"
+      th:object="${workDay}" method="post">
+    <label>Date: <input type="date" th:field="*{date}" /></label><br/>
+
+    <label>Employees:<br/>
+        <select th:field="*{employeeIds}" multiple size="5">
+            <option th:each="e : ${employees}"
+                    th:value="${e.id}"
+                    th:text="${e.name}"
+                    th:selected="${workDay.employees.contains(e)}"/>
+        </select>
+    </label><br/>
+
+    <label>Job Orders:<br/>
+        <select th:field="*{jobOrderIds}" multiple size="5">
+            <option th:each="jo : ${jobOrders}"
+                    th:value="${jo.id}"
+                    th:text="${jo.jobOrderNumber}"
+                    th:selected="${workDay.jobOrders.contains(jo)}"/>
+        </select>
+    </label><br/>
+
+    <button type="submit">Update</button>
+</form>
+
+<div th:insert="fragments/footer :: footer"></div>
+</body>
+</html>

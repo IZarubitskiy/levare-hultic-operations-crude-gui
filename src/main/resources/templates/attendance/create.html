@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><title>Create Attendance</title></head>
+<body>
+<div th:insert="fragments/header :: header"></div>
+<h1>Create Attendance</h1>
+<form th:action="@{/attendances}" th:object="${attendance}" method="post">
+    <label>Work Day:
+        <select th:field="*{workDay.id}">
+            <option th:each="wd : ${workDays}"
+                    th:value="${wd.id}"
+                    th:text="${wd.date}"/>
+        </select>
+    </label><br/>
+    <label>Employee:
+        <select th:field="*{employee.id}">
+            <option th:each="e : ${employees}"
+                    th:value="${e.id}"
+                    th:text="${e.name}"/>
+        </select>
+    </label><br/>
+    <label>Status:
+        <select th:field="*{status}">
+            <option th:each="s : ${T(com.example.levarehulticops.entity.enums.AttendanceStatus).values()}"
+                    th:value="${s}" th:text="${s}"/>
+        </select>
+    </label><br/>
+    <label>Comments:<br/>
+        <textarea th:field="*{comments}" rows="3"></textarea>
+    </label><br/>
+    <button type="submit">Save</button>
+</form>
+<div th:insert="fragments/footer :: footer"></div>
+</body>
+</html>

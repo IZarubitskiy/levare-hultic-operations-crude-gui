@@ -1,13 +1,21 @@
 package com.example.levarehulticops.controller.mvc;
 
 import com.example.levarehulticops.entity.Item;
+import com.example.levarehulticops.entity.enums.Client;
+import com.example.levarehulticops.entity.enums.ItemCondition;
 import com.example.levarehulticops.service.ItemService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/items")
@@ -59,5 +67,64 @@ public class ItemController {
     public String delete(@PathVariable Long id) {
         itemService.delete(id);
         return "redirect:/items";
+    }
+
+    @GetMapping("/outstanding")
+    public String outstanding(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            Model model) {
+
+        Pageable pg = PageRequest.of(page, size);
+
+        // собираем все Ownership кроме RET и CORP
+        List<Client> own = Arrays.stream(Client.values())
+                .filter(o -> o != Client.RETS && o != Client.CORP)
+                .collect(Collectors.toList());
+
+        model.addAttribute("page",
+                itemService.findByConditionAndOwnership(ItemCondition.USED, own, pg));
+        return "items/outstanding";
+    }
+
+    @GetMapping("/rne")
+    public String rne(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            Model model) {
+        Pageable pg = PageRequest.of(page, size);
+        model.addAttribute("page",
+                itemService.findByConditionAndOwnership(
+                        ItemCondition.USED,
+                        Collections.singletonList(Client.RETS),
+                        pg));
+        return "items/rne";
+    }
+
+    @GetMapping("/corporate")
+    public String corporate(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            Model model) {
+        Pageable pg = PageRequest.of(page, size);
+        model.addAttribute("page",
+                itemService.findByConditionAndOwnership(
+                        ItemCondition.USED,
+                        Collections.singletonList(Client.CORP),
+                        pg));
+        return "items/corporate";
+    }
+
+    @GetMapping("/stock")
+    public String stock(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            Model model) {
+        Pageable pg = PageRequest.of(page, size);
+        model.addAttribute("page",
+                itemService.findByConditionIn(
+                        Arrays.asList(ItemCondition.REPAIRED, ItemCondition.NEW),
+                        pg));
+        return "items/stock";
     }
 }

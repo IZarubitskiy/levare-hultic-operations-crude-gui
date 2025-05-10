@@ -5,7 +5,7 @@ package com.example.levarehulticops.entity.enums;
  */
 public enum JobOrderStatus {
     CREATED,
-    IN_PROCESS,
+    IN_PROGRESS,
     CANCELLED,
     DONE
 }
