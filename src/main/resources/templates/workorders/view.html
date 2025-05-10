@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>View WorkOrder</title>
+</head>
+<body>
+<div th:insert="fragments/header :: header"></div>
+
+<h1>Work Order Details</h1>
+<dl>
+    <dt>Number:</dt>
+    <dd th:text="${workOrder.workOrderNumber}"></dd>
+    <dt>Client:</dt>
+    <dd th:text="${workOrder.client}"></dd>
+    <dt>Well:</dt>
+    <dd th:text="${workOrder.well}"></dd>
+    <dt>Request Date:</dt>
+    <dd th:text="${workOrder.requestDate}"></dd>
+    <dt>Delivery Date:</dt>
+    <dd th:text="${workOrder.deliveryDate}"></dd>
+    <dt>Status:</dt>
+    <dd th:text="${workOrder.status}"></dd>
+    <dt>Requestor:</dt>
+    <dd th:text="${workOrder.requestor.name}"></dd>
+    <dt>Comments:</dt>
+    <dd th:text="${workOrder.comments}"></dd>
+</dl>
+
+<a th:href="@{/workorders}">Back to list</a>
+
+<div th:insert="fragments/footer :: footer"></div>
+</body>
+</html>

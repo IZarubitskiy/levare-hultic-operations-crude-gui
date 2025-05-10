@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title th:replace="~{::title}">App</title>
+</head>
+<body>
+<!-- Мы объявляем фрагмент с именем "header" -->
+<div th:fragment="header">
+    <nav>
+        <a th:href="@{/workorders}">Work Orders</a> |
+        <a th:href="@{/joborders}">Job Orders</a> |
+        <a th:href="@{/items}">Items</a>
+    </nav>
+    <hr/>
+</div>
+</body>
+</html>
