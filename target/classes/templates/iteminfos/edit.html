@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Edit ItemInfo</title>
+</head>
+<body>
+<div th:insert="fragments/header :: header"></div>
+<h1>Edit Part</h1>
+<form th:action="@{'/iteminfos/' + ${info.partNumber} + '/edit'}"
+      th:object="${info}" method="post">
+    <label>Part Number: <input th:field="*{partNumber}" readonly/></label><br/>
+    <label>Description:<br/><textarea th:field="*{description}" rows="4"></textarea></label><br/>
+    <button type="submit">Update</button>
+</form>
+<div th:insert="fragments/footer :: footer"></div>
+</body>
+</html>
