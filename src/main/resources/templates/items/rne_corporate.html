@@ -2,12 +2,12 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"/>
-    <title>Outstanding Items</title>
+    <title>RNE Corporate Items</title>
 </head>
 <body>
 <div th:insert="fragments/header :: header"></div>
 
-<h1>Outstanding Items (USED, ON_STOCK, not RETS/CORP)</h1>
+<h1>RNE Corporate Items (USED, ON_STOCK, CORP)</h1>
 <table border="1" cellpadding="5" cellspacing="0">
     <thead>
     <tr>
@@ -34,20 +34,20 @@
         <td th:text="${item.itemInfo.itemType}">PUMP</td>
         <td th:text="${item.clientPartNumber}">CPN-001</td>
         <td th:text="${item.serialNumber}">SN-0001</td>
-        <td th:text="${item.ownership}">OTHER</td>
+        <td th:text="${item.ownership}">CORP</td>
         <td th:text="${item.itemCondition}">USED</td>
         <td th:text="${item.itemStatus}">ON_STOCK</td>
         <td th:text="${item.jobOrderId}">null</td>
-        <td th:text="${item.comments}">Outstanding item</td>
+        <td th:text="${item.comments}">RNE Corporate item</td>
     </tr>
     </tbody>
 </table>
 
 <div>
     <span th:text="'Page ' + ${page.number + 1} + ' of ' + ${page.totalPages}">Page info</span>
-    <a th:href="@{/items/outstanding(page=${page.number - 1},size=${page.size})}"
+    <a th:href="@{/items/rne_corporate(page=${page.number - 1},size=${page.size})}"
        th:if="${page.hasPrevious()}">Prev</a>
-    <a th:href="@{/items/outstanding(page=${page.number + 1},size=${page.size})}"
+    <a th:href="@{/items/rne_corporate(page=${page.number + 1},size=${page.size})}"
        th:if="${page.hasNext()}">Next</a>
 </div>
 

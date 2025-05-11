@@ -1,0 +1,7 @@
+package com.example.levarehulticops.workorders.repository;
+
+import com.example.levarehulticops.workorders.entity.WorkOrder;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface WorkOrderRepository extends JpaRepository<WorkOrder, Long> {
+}

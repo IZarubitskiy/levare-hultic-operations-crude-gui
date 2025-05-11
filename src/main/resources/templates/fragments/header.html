@@ -5,12 +5,16 @@
     <title th:replace="~{::title}">App</title>
 </head>
 <body>
-<!-- Мы объявляем фрагмент с именем "header" -->
 <div th:fragment="header">
     <nav>
         <a th:href="@{/workorders}">Work Orders</a> |
         <a th:href="@{/joborders}">Job Orders</a> |
-        <a th:href="@{/items}">Items</a>
+        <!-- Новая навигация для Items -->
+        <a th:href="@{/items/stock_egypt}">Stock</a> |
+        <a th:href="@{/items/rne}">RNE</a> |
+        <a th:href="@{/items/outstanding}">Outstanding</a>
+        <a th:href="@{/items/stock_corporate}">Stock Corporate</a>
+        <a th:href="@{/items/rne_corporate}">RNE Corporate</a> |
     </nav>
     <hr/>
 </div>
