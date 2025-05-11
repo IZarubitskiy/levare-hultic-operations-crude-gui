@@ -1,5 +1,8 @@
 package com.example.levarehulticops.service;
 
+import com.example.levarehulticops.dto.ItemCreateRequest;
+import com.example.levarehulticops.dto.ItemReadDto;
+import com.example.levarehulticops.dto.ItemUpdateRequest;
 import com.example.levarehulticops.entity.Item;
 import com.example.levarehulticops.entity.enums.Client;
 import com.example.levarehulticops.entity.enums.ItemCondition;
@@ -9,11 +12,11 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface ItemService {
-    Item create(Item item);
-    Item update(Item item);
+    ItemReadDto createItem(ItemCreateRequest dto);
+    ItemReadDto update(Long id, ItemUpdateRequest dto);
     void delete(Long id);
-    Item getById(Long id);
-    Page<Item> getAll(Pageable pageable);
+    ItemReadDto getById(Long id);
+    Page<ItemReadDto> getAll(Pageable pageable);
     /**
      * Все Items с условием и списком Ownership.
      */

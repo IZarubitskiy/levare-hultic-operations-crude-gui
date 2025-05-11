@@ -6,8 +6,7 @@ import com.example.levarehulticops.entity.enums.ItemStatus;
 import com.example.levarehulticops.entity.enums.ItemType;
 
 /**
- * DTO for reading Item details when loading a WorkOrder.
- * Provides full equipment data for display without JobOrder information.
+ * DTO for reading Item details.
  */
 public record ItemReadDto(
         /** Item ID */
@@ -34,6 +33,10 @@ public record ItemReadDto(
         /** Current status of the item */
         ItemStatus itemStatus,
 
+        /** Current JobOrder ID of the item */
+        Long jobOrderId,
+
         /** Free-form comments */
         String comments
+
 ) {}

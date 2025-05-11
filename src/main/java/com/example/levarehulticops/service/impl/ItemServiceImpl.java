@@ -1,8 +1,14 @@
 package com.example.levarehulticops.service.impl;
 
+import com.example.levarehulticops.dto.ItemCreateRequest;
+import com.example.levarehulticops.dto.ItemReadDto;
+import com.example.levarehulticops.dto.ItemUpdateRequest;
 import com.example.levarehulticops.entity.Item;
+import com.example.levarehulticops.entity.ItemInfo;
 import com.example.levarehulticops.entity.enums.Client;
 import com.example.levarehulticops.entity.enums.ItemCondition;
+import com.example.levarehulticops.mapper.ItemMapper;
+import com.example.levarehulticops.repository.ItemInfoRepository;
 import com.example.levarehulticops.repository.ItemRepository;
 import com.example.levarehulticops.service.ItemService;
 import lombok.RequiredArgsConstructor;
@@ -18,40 +24,67 @@ import java.util.List;
 @RequiredArgsConstructor
 @Transactional
 public class ItemServiceImpl implements ItemService {
-    private final ItemRepository repo;
+    private final ItemRepository itemRepository;
+    private final ItemInfoRepository itemInfoRepository;
+    private final ItemMapper itemMapper;
 
     @Override
-    public Item create(Item item) {
-        return repo.save(item);
+    public ItemReadDto createItem(ItemCreateRequest dto) {
+        String partNumber = dto.itemInfoPartNumber();
+        ItemInfo info = itemInfoRepository.findById(partNumber)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "ItemInfo not found, partNumber=" + partNumber));
+
+        String clientPart = info.getClientPartNumbers()
+                .getOrDefault(dto.ownership(), info.getPartNumber());
+
+        Item item = new Item();
+        item.setItemInfo(info);
+        item.setClientPartNumber(clientPart);
+        item.setSerialNumber(dto.serialNumber());
+        item.setOwnership(dto.ownership());
+        item.setItemType(dto.itemType());
+        item.setItemCondition(dto.itemCondition());
+        item.setItemStatus(dto.itemStatus());
+        item.setComments(dto.comments());
+        Item saved = itemRepository.save(item);
+
+        return itemMapper.toReadDto(saved);
     }
 
     @Override
-    public Item update(Item item) {
-        if (!repo.existsById(item.getId())) {
-            throw new EntityNotFoundException("Item not found: " + item.getId());
-        }
-        return repo.save(item);
+    public ItemReadDto update(Long id, ItemUpdateRequest dto) {
+        Item item = itemRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Item not found: " + id));
+
+        // Apply non-null updates to the entity
+        itemMapper.updateEntityFromDto(dto, item);
+
+        Item updated = itemRepository.save(item);
+        return itemMapper.toReadDto(updated);
     }
 
     @Override
     public void delete(Long id) {
-        if (!repo.existsById(id)) {
+        if (!itemRepository.existsById(id)) {
             throw new EntityNotFoundException("Item not found: " + id);
         }
-        repo.deleteById(id);
+        itemRepository.deleteById(id);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Item getById(Long id) {
-        return repo.findById(id)
+    public ItemReadDto getById(Long id) {
+        Item item = itemRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Item not found: " + id));
+        return itemMapper.toReadDto(item);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Page<Item> getAll(Pageable pageable) {
-        return repo.findAll(pageable);
+    public Page<ItemReadDto> getAll(Pageable pageable) {
+        return itemRepository.findAll(pageable)
+                .map(itemMapper::toReadDto);
     }
 
     @Override
@@ -60,7 +93,7 @@ public class ItemServiceImpl implements ItemService {
             List<Client> ownerships,
             Pageable pageable
     ) {
-        return repo
+        return itemRepository
                 .findByItemConditionAndOwnershipIn(condition, ownerships, pageable);
     }
 
@@ -69,6 +102,6 @@ public class ItemServiceImpl implements ItemService {
             List<ItemCondition> conditions,
             Pageable pageable
     ) {
-        return repo.findByItemConditionIn(conditions, pageable);
+        return itemRepository.findByItemConditionIn(conditions, pageable);
     }
 }

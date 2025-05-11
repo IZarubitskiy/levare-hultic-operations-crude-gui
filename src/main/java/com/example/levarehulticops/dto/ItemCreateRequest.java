@@ -15,7 +15,7 @@ import java.util.Optional;
 public record ItemCreateRequest(
         /** Part number reference (catalog entry) */
         @NotNull(message = "ItemInfo ID must not be null")
-        Long itemInfoId,
+        String itemInfoPartNumber,
 
         /** Client-specific part number */
         @NotBlank(message = "Client part number must not be blank")

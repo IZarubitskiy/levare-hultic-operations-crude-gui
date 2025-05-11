@@ -33,9 +33,6 @@ public record ItemUpdateRequest(
         Long jobOrderId,
 
         /** Free-form comments */
-        String comments,
+        String comments
 
-        /** Current version for optimistic locking */
-        @NotNull(message = "Version must not be null")
-        Long version
 ) {}

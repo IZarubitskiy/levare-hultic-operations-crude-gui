@@ -1,53 +1,73 @@
 package com.example.levarehulticops.mapper;
 
-import org.mapstruct.*;
+import org.springframework.stereotype.Component;
 import com.example.levarehulticops.entity.JobOrder;
-import com.example.levarehulticops.dto.*;
+import com.example.levarehulticops.dto.JobOrderCreateRequest;
+import com.example.levarehulticops.dto.JobOrderUpdateRequest;
+import com.example.levarehulticops.dto.JobOrderStatusChangeDto;
+import com.example.levarehulticops.dto.JobOrderReadDto;
+import com.example.levarehulticops.dto.ItemReadDto;
+import com.example.levarehulticops.dto.EmployeeDto;
+import com.example.levarehulticops.entity.Item;
+import com.example.levarehulticops.entity.Employee;
+import java.util.stream.Collectors;
 
 /**
- * Mapper for converting between JobOrder entity and its DTOs.
+ * Manual mapper for JobOrder ↔ DTOs.
  */
-@Mapper(
-        componentModel = "spring",
-        uses = {
-                ItemMapper.class,          // maps Item ↔ ItemReadDto
-                EmployeeMapper.class       // maps Employee ↔ EmployeeDto
+@Component
+public class JobOrderMapper {
+
+    private final ItemMapper itemMapper;
+    private final EmployeeMapper employeeMapper;
+
+    public JobOrderMapper(ItemMapper itemMapper,
+                          EmployeeMapper employeeMapper) {
+        this.itemMapper = itemMapper;
+        this.employeeMapper = employeeMapper;
+    }
+
+    /** Entity → Read DTO */
+    public JobOrderReadDto toReadDto(JobOrder jo) {
+        ItemReadDto itemDto = itemMapper.toReadDto(jo.getItem());
+        EmployeeDto respDto = employeeMapper.toDto(jo.getResponsibleEmployee());
+
+        return new JobOrderReadDto(
+                jo.getId(),
+                jo.getWorkOrder().getId(),
+                itemDto,
+                jo.getStatus(),
+                respDto,
+                jo.getComments(),
+                jo.getVersion()
+        );
+    }
+
+    /** Create DTO → new Entity */
+    public JobOrder toEntity(JobOrderCreateRequest dto) {
+        JobOrder jo = new JobOrder();
+        // relationships (workOrder, item, responsibleEmployee) set in service
+        jo.setComments(dto.comments());
+        // initial status set in service or defaults to CREATED
+        return jo;
+    }
+
+    /** Update DTO → existing Entity */
+    public void updateEntityFromDto(JobOrderUpdateRequest dto, JobOrder jo) {
+        // allowed: responsibleEmployee and comments (others in service)
+        if (dto.responsibleEmployeeId() != null) {
+            Employee e = new Employee();
+            e.setId(dto.responsibleEmployeeId());
+            jo.setResponsibleEmployee(e);
         }
-)
-public interface JobOrderMapper {
+        if (dto.comments() != null) {
+            jo.setComments(dto.comments());
+        }
+    }
 
-    /**
-     * Map JobOrder entity to JobOrderReadDto.
-     */
-    @Mapping(target = "workOrderId", source = "workOrder.id")
-    JobOrderReadDto toReadDto(JobOrder entity);
-
-    /**
-     * Map JobOrderCreateRequest to a new JobOrder entity.
-     * - id, version, status, workOrder, item and responsibleEmployee are managed elsewhere
-     */
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "version", ignore = true)
-    @Mapping(target = "status", ignore = true)
-    @Mapping(target = "workOrder", ignore = true)
-    @Mapping(target = "item", ignore = true)
-    @Mapping(target = "responsibleEmployee", ignore = true)
-    JobOrder toEntity(JobOrderCreateRequest dto);
-
-    /**
-     * Map JobOrderUpdateRequest onto an existing JobOrder entity.
-     * - only comments and version check are applied here;
-     * - workOrder, item, status and responsibleEmployee are handled in service
-     */
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "workOrder", ignore = true)
-    @Mapping(target = "item", ignore = true)
-    @Mapping(target = "status", ignore = true)
-    @Mapping(target = "responsibleEmployee", ignore = true)
-    @Mapping(target = "version", ignore = true)
-    void updateEntityFromDto(JobOrderUpdateRequest dto, @MappingTarget JobOrder entity);
-
-/**
- * Map JobOrderStatusChangeDto onto an existing JobOrder entity.
- * - only status is updated here; version check is handled in service
- */
+    /** Status-change DTO → existing Entity */
+    public void updateStatusFromDto(JobOrderStatusChangeDto dto, JobOrder jo) {
+        jo.setStatus(dto.status());
+        // version check and save handled in service
+    }
+}

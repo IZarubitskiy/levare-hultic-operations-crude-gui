@@ -1,8 +1,12 @@
 package com.example.levarehulticops.service.impl;
 
 import javax.persistence.OptimisticLockException;
+import javax.persistence.EntityNotFoundException;
+
+import com.example.levarehulticops.dto.JobOrderCreateRequest;
 import com.example.levarehulticops.dto.JobOrderReadDto;
 import com.example.levarehulticops.dto.JobOrderUpdateRequest;
+import com.example.levarehulticops.dto.JobOrderStatusChangeDto;
 import com.example.levarehulticops.entity.Employee;
 import com.example.levarehulticops.entity.Item;
 import com.example.levarehulticops.entity.JobOrder;
@@ -20,8 +24,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityNotFoundException;
-
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -33,55 +35,38 @@ public class JobOrderServiceImpl implements JobOrderService {
     private final JobOrderMapper mapper;
 
     @Override
-    public JobOrder create(JobOrder jobOrder) {
-        return jobOrderRepository.save(jobOrder);
+    public JobOrderReadDto create(JobOrderCreateRequest dto) {
+        JobOrder jo = mapper.toEntity(dto);
+        jo.setStatus(JobOrderStatus.CREATED);
+        JobOrder saved = jobOrderRepository.save(jo);
+        return mapper.toReadDto(saved);
     }
 
     @Override
-    public JobOrderReadDto updateJobOrder(Long id, JobOrderUpdateRequest dto) {
-        // 1. Load existing JobOrder entity
-        JobOrder jobOrder = jobOrderRepository.findById(id)
+    public JobOrderReadDto update(Long id, JobOrderUpdateRequest dto) {
+        JobOrder jo = jobOrderRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("JobOrder not found, id=" + id));
 
-        // 2. Check optimistic lock version
-        if (!jobOrder.getVersion().equals(dto.version())) {
+        if (!jo.getVersion().equals(dto.version())) {
             throw new OptimisticLockException("JobOrder was modified concurrently");
         }
 
-        // 3. Validate that workOrderId and itemId can only be changed when status is CREATED
-        if (jobOrder.getStatus() != JobOrderStatus.CREATED
-                && (dto.workOrderId() != null || dto.itemId() != null)) {
-            throw new IllegalStateException(
-                    "workOrderId and itemId may only be modified when status is CREATED"
-            );
+        mapper.updateEntityFromDto(dto, jo);
+        JobOrder updated = jobOrderRepository.save(jo);
+        return mapper.toReadDto(updated);
+    }
+
+    @Override
+    public JobOrderReadDto changeStatus(Long id, JobOrderStatusChangeDto dto) {
+        JobOrder jo = jobOrderRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("JobOrder not found, id=" + id));
+
+        if (!jo.getVersion().equals(dto.version())) {
+            throw new OptimisticLockException("JobOrder was modified concurrently");
         }
 
-        // 4. Apply optional changes to workOrder and item if provided
-        if (dto.workOrderId() != null) {
-            WorkOrder newWorkOrder = workOrderRepository.findById(dto.workOrderId())
-                    .orElseThrow(() -> new EntityNotFoundException(
-                            "WorkOrder not found, id=" + dto.workOrderId()));
-            jobOrder.setWorkOrder(newWorkOrder);
-        }
-
-        if (dto.itemId() != null) {
-            Item newItem = itemRepository.findById(dto.itemId())
-                    .orElseThrow(() -> new EntityNotFoundException(
-                            "Item not found, id=" + dto.itemId()));
-            jobOrder.setItem(newItem);
-        }
-
-        // 5. Always update responsible employee and comments
-        Employee responsible = employeeRepository.findById(dto.responsibleEmployeeId())
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "Employee not found, id=" + dto.responsibleEmployeeId()));
-        jobOrder.setResponsibleEmployee(responsible);
-        jobOrder.setComments(dto.comments());
-
-        // 6. Save changes—version will be incremented automatically
-        JobOrder updated = jobOrderRepository.save(jobOrder);
-
-        // 7. Map to DTO and return
+        jo.setStatus(dto.status());
+        JobOrder updated = jobOrderRepository.save(jo);
         return mapper.toReadDto(updated);
     }
 
@@ -95,19 +80,22 @@ public class JobOrderServiceImpl implements JobOrderService {
 
     @Override
     @Transactional(readOnly = true)
-    public JobOrder getById(Long id) {
-        return jobOrderRepository.findById(id)
+    public JobOrderReadDto getById(Long id) {
+        JobOrder jo = jobOrderRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("JobOrder not found: " + id));
+        return mapper.toReadDto(jo);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Page<JobOrder> getAll(Pageable pageable) {
-        return jobOrderRepository.findAll(pageable);
+    public Page<JobOrderReadDto> getAll(Pageable pageable) {
+        return jobOrderRepository.findAll(pageable)
+                .map(mapper::toReadDto);
     }
 
     @Override
-    public Page<JobOrder> getByStatus(JobOrderStatus status, Pageable pageable) {
-        return jobOrderRepository.findByStatus(status, pageable);
+    public Page<JobOrderReadDto> getByStatus(JobOrderStatus status, Pageable pageable) {
+        return jobOrderRepository.findByStatus(status, pageable)
+                .map(mapper::toReadDto);
     }
 }

@@ -1,41 +1,80 @@
 package com.example.levarehulticops.mapper;
 
-import org.mapstruct.*;
+import org.springframework.stereotype.Component;
 import com.example.levarehulticops.entity.Item;
 import com.example.levarehulticops.dto.ItemReadDto;
 import com.example.levarehulticops.dto.ItemCreateRequest;
 import com.example.levarehulticops.dto.ItemUpdateRequest;
+import com.example.levarehulticops.entity.ItemInfo;
+import com.example.levarehulticops.entity.Employee;
 
 /**
- * Mapper for converting between Item entity and its DTOs.
+ * Manual mapper for Item ↔ DTOs.
  */
-@Mapper(componentModel = "spring")
-public interface ItemMapper {
+@Component
+public class ItemMapper {
 
     /**
-     * Map Item entity to read-only DTO.
+     * Convert Item entity to read-only DTO.
      */
-    @Mapping(target = "itemInfoId", source = "itemInfo.partNumber")
-    ItemReadDto toReadDto(Item entity);
+    public ItemReadDto toReadDto(Item item) {
+        return new ItemReadDto(
+                item.getId(),
+                item.getItemInfo().getId(),
+                item.getClientPartNumber(),
+                item.getSerialNumber(),
+                item.getOwnership(),
+                item.getItemType(),
+                item.getItemCondition(),
+                item.getItemStatus(),
+                item.getJobOrder() != null ? item.getJobOrder().getId() : null,
+                item.getComments()
+        );
+    }
 
     /**
-     * Map create-request DTO to a new Item entity.
-     * - id, jobOrder and version are ignored (managed by JPA/service)
-     * - itemInfo will be set in service layer based on itemInfoId
+     * Convert create-request DTO to a new Item entity.
+     * Associations (itemInfo, jobOrder) must be set in service layer.
      */
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "version", ignore = true)
-    @Mapping(target = "jobOrder", ignore = true)
-    @Mapping(target = "itemInfo", ignore = true)
-    Item toEntity(ItemCreateRequest dto);
+    public Item toEntity(ItemCreateRequest dto) {
+        Item item = new Item();
+        item.setClientPartNumber(dto.clientPartNumber());
+        item.setSerialNumber(dto.serialNumber());
+        item.setOwnership(dto.ownership());
+        item.setItemType(dto.itemType());
+        item.setItemCondition(dto.itemCondition());
+        item.setItemStatus(dto.itemStatus());
+        item.setComments(dto.comments());
+        // itemInfo and jobOrder are injected in service
+        return item;
+    }
 
     /**
-     * Map update-request DTO onto an existing Item entity.
-     * - ignores null values
-     * - jobOrder and itemInfo are handled in service
+     * Apply update-request DTO onto existing Item entity.
+     * Only non-null fields are applied here; associations handled in service.
      */
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "jobOrder", ignore = true)
-    @Mapping(target = "itemInfo", ignore = true)
-    void updateEntityFromDto(ItemUpdateRequest dto, @MappingTarget Item entity);
+    public void updateEntityFromDto(ItemUpdateRequest dto, Item item) {
+        if (dto.clientPartNumber() != null) {
+            item.setClientPartNumber(dto.clientPartNumber());
+        }
+        if (dto.serialNumber() != null) {
+            item.setSerialNumber(dto.serialNumber());
+        }
+        if (dto.ownership() != null) {
+            item.setOwnership(dto.ownership());
+        }
+        if (dto.itemType() != null) {
+            item.setItemType(dto.itemType());
+        }
+        if (dto.itemCondition() != null) {
+            item.setItemCondition(dto.itemCondition());
+        }
+        if (dto.itemStatus() != null) {
+            item.setItemStatus(dto.itemStatus());
+        }
+        if (dto.comments() != null) {
+            item.setComments(dto.comments());
+        }
+        // version check and save in service layer
+    }
 }

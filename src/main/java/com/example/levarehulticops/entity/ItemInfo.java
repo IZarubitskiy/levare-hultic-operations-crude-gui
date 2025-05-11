@@ -2,10 +2,11 @@ package com.example.levarehulticops.entity;
 
 import lombok.*;
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
-import com.example.levarehulticops.entity.enums.ItemType;
+import java.util.*;
 
+/**
+ * Catalog entry for items, with per-client part-number mappings.
+ */
 @Entity
 @Table(
         name = "item_info",
@@ -17,38 +18,50 @@ import com.example.levarehulticops.entity.enums.ItemType;
 public class ItemInfo {
 
     /**
-     * Unique catalog entry part number — lookup key
+     * Surrogate primary key.
      */
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    /**
+     * Unique catalog key for the part.
+     */
     @Column(name = "part_number", nullable = false, unique = true)
     private String partNumber;
 
     /**
-     * Description of the item
+     * Description of the item.
      */
     @Column(name = "description", length = 1000, nullable = false)
     private String description;
 
     /**
-     * Type of the item (e.g., Pump, Valve, Seal)
+     * Map of client → client-specific part number.
      */
-    @Enumerated(EnumType.STRING)
-    @Column(name = "item_type", nullable = false)
-    private ItemType itemType;
+    @ElementCollection
+    @CollectionTable(
+            name = "item_info_client_parts",
+            joinColumns = @JoinColumn(name = "item_info_id")
+    )
+    @MapKeyColumn(name = "client")
+    @Column(name = "client_part_number")
+    @MapKeyEnumerated(EnumType.STRING)
+    private Map<com.example.levarehulticops.entity.enums.Client, String> clientPartNumbers = new HashMap<>();
 
     /**
-     * List of analogous catalog entries (does not include this entry)
+     * List of analogous catalog entries (not including this entry).
      */
     @ManyToMany
     @JoinTable(
             name = "item_info_analogs",
-            joinColumns = @JoinColumn(name = "part_number"),
-            inverseJoinColumns = @JoinColumn(name = "analog_part_number")
+            joinColumns = @JoinColumn(name = "item_info_id"),
+            inverseJoinColumns = @JoinColumn(name = "analog_item_info_id")
     )
     private List<ItemInfo> analogList = new ArrayList<>();
 
     /**
-     * Free-form comments for the catalog entry
+     * Free-form comments for the catalog entry.
      */
     @Lob
     @Column(name = "comments", nullable = true)
