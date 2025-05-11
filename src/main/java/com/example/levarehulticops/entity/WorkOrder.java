@@ -3,6 +3,7 @@ package com.example.levarehulticops.entity;
 import lombok.*;
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import com.example.levarehulticops.entity.enums.Client;
 import com.example.levarehulticops.entity.enums.WorkOrderStatus;
@@ -19,65 +20,95 @@ public class WorkOrder {
     private Long id;
 
     /**
-     * Уникальный номер заявки
+     * Unique work order number
      */
     @Column(name = "work_order_number", nullable = false, unique = true)
     private String workOrderNumber;
 
     /**
-     * Клиент (Petco, Metco, Ketco, Retco, Rets)
+     * Client (Petco, Metco, Ketco, Retco, Rets)
      */
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Client client;
 
     /**
-     * Название скважины или местоположения
+     * Name of the well or location
      */
     @Column(nullable = false)
     private String well;
 
     /**
-     * Позиции заказа (Item)
+     * 1) Items actually taken from stock (serial numbers)
+     *    link table: wo_stock_items(workorder_id, item_id)
      */
-    @OneToMany(mappedBy = "workOrder", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Item> items;
+    @ManyToMany
+    @JoinTable(
+            name = "wo_stock_items",
+            joinColumns = @JoinColumn(name = "workorder_id"),
+            inverseJoinColumns = @JoinColumn(name = "item_id")
+    )
+    private List<Item> stockItems = new ArrayList<>();
 
     /**
-     * Дата подачи заявки
+     * 2) Items sent for repair (serial numbers)
+     *    link table: wo_repair_items(workorder_id, item_id)
+     */
+    @ManyToMany
+    @JoinTable(
+            name = "wo_repair_items",
+            joinColumns = @JoinColumn(name = "workorder_id"),
+            inverseJoinColumns = @JoinColumn(name = "item_id")
+    )
+    private List<Item> repairItems = new ArrayList<>();
+
+    /**
+     * 3) Items ordered (new), without serial numbers, reference only by item info
+     *    link table: wo_new_requests(workorder_id, item_info_id)
+     */
+    @ManyToMany
+    @JoinTable(
+            name = "wo_new_requests",
+            joinColumns = @JoinColumn(name = "workorder_id"),
+            inverseJoinColumns = @JoinColumn(name = "item_info_id")
+    )
+    private List<ItemInfo> newRequests = new ArrayList<>();
+
+    /**
+     * Date when the work order was submitted
      */
     @Column(name = "request_date", nullable = false)
     private LocalDate requestDate;
 
     /**
-     * Планируемая дата доставки
+     * Planned delivery date
      */
     @Column(name = "delivery_date")
     private LocalDate deliveryDate;
 
     /**
-     * Статус заявки (Created, Approved, InProgress, Done, Cancelled)
+     * Work order status (Created, Approved, InProgress, Done, Cancelled)
      */
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private WorkOrderStatus status;
 
     /**
-     * Сотрудник, подавший заявку
+     * Employee who submitted the work order
      */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "requestor_id", nullable = false)
     private Employee requestor;
 
     /**
-     * Комментарий к записи
+     * Comments for the work order
      */
     @Lob
     @Column(name = "comments", nullable = true)
     private String comments;
 
     /**
-     * Поле для оптимистической блокировки
+     * Field for optimistic locking
      */
     @Version
     private Long version;

@@ -16,37 +16,43 @@ public class JobOrder {
     private Long id;
 
     /**
-     * Оборудование, к которому относится данный JobOrder
+     * WorkOrder to which this JobOrder belongs
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "work_order_id", nullable = false)
+    private WorkOrder workOrder;
+
+    /**
+     * Equipment item associated with this JobOrder
      */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id", nullable = false)
     private Item item;
 
     /**
-     * Статус JobOrder
+     * Current status of the JobOrder
      */
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private JobOrderStatus status;
 
     /**
-     * Сотрудник, ответственный за исполнение JobOrder
+     * Employee responsible for executing this JobOrder
      */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "responsible_employee_id", nullable = false)
     private Employee responsibleEmployee;
 
     /**
-     * Комментарий к записи
+     * Free-form comments about this JobOrder
      */
     @Lob
     @Column(name = "comments", nullable = true)
     private String comments;
 
     /**
-     * Поле для оптимистической блокировки
+     * Version for optimistic locking
      */
     @Version
     private Long version;
-
 }

@@ -4,6 +4,7 @@ import lombok.*;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import com.example.levarehulticops.entity.enums.ItemType;
 
 @Entity
 @Table(
@@ -16,20 +17,27 @@ import java.util.List;
 public class ItemInfo {
 
     /**
-     * Уникальный номер детали — ключ поиска
+     * Unique catalog entry part number — lookup key
      */
     @Id
     @Column(name = "part_number", nullable = false, unique = true)
     private String partNumber;
 
     /**
-     * Описание детали
+     * Description of the item
      */
     @Column(name = "description", length = 1000, nullable = false)
     private String description;
 
     /**
-     * Список аналоговых деталей (не включает саму запись)
+     * Type of the item (e.g., Pump, Valve, Seal)
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "item_type", nullable = false)
+    private ItemType itemType;
+
+    /**
+     * List of analogous catalog entries (does not include this entry)
      */
     @ManyToMany
     @JoinTable(
@@ -40,7 +48,7 @@ public class ItemInfo {
     private List<ItemInfo> analogList = new ArrayList<>();
 
     /**
-     * Комментарий к записи
+     * Free-form comments for the catalog entry
      */
     @Lob
     @Column(name = "comments", nullable = true)
