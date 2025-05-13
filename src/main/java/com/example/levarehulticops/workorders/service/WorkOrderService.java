@@ -1,12 +1,14 @@
 
 package com.example.levarehulticops.workorders.service;
 
+import com.example.levarehulticops.workorders.dto.WorkOrderCreateRequest;
+import com.example.levarehulticops.workorders.dto.WorkOrderReadDto;
 import com.example.levarehulticops.workorders.entity.WorkOrder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface WorkOrderService {
-    WorkOrder create(WorkOrder workOrder);
+    WorkOrderReadDto create(WorkOrderCreateRequest dto, Long requestorId);
     WorkOrder update(WorkOrder workOrder);
     void delete(Long id);
     WorkOrder getById(Long id);

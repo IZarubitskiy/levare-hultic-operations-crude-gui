@@ -1,5 +1,6 @@
 package com.example.levarehulticops.workorders.mapper;
 
+import com.example.levarehulticops.employees.entity.Employee;
 import com.example.levarehulticops.items.mapper.ItemMapper;
 import com.example.levarehulticops.employees.mapper.EmployeeMapper;
 import com.example.levarehulticops.iteminfos.mapper.ItemInfoMapper;
@@ -13,6 +14,7 @@ import com.example.levarehulticops.iteminfos.dto.ItemInfoDto;
 import com.example.levarehulticops.employees.dto.EmployeeDto;
 import com.example.levarehulticops.items.entity.Item;
 import com.example.levarehulticops.iteminfos.entity.ItemInfo;
+import com.example.levarehulticops.workorders.entity.Client;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -65,16 +67,61 @@ public class WorkOrderMapper {
         );
     }
 
-    /** Create DTO → new Entity */
-    public WorkOrder toEntity(WorkOrderCreateRequest dto) {
+    /**
+     * Manual mapping from WorkOrderCreateRequest + requestorId → WorkOrder entity.
+     * NOTE: related entities are created as stubs (only ID set) — they will be managed/merged by JPA.
+     */
+    public WorkOrder toEntity(WorkOrderCreateRequest dto, Long requestorId) {
+        // 1. Base fields
         WorkOrder wo = new WorkOrder();
         wo.setWorkOrderNumber(dto.workOrderNumber());
-        wo.setClient(dto.client());
+        wo.setClient(dto.client());                  // enum
         wo.setWell(dto.well());
-        wo.setRequestDate(dto.requestDate());
         wo.setDeliveryDate(dto.deliveryDate());
         wo.setComments(dto.comments());
-        // status is set to CREATED in service immediately after mapping
+
+        // 2. Related collections (create stubs by ID)
+        if (dto.stockItemIds() != null && !dto.stockItemIds().isEmpty()) {
+            wo.setStockItems(
+                    dto.stockItemIds().stream()
+                            .map(id -> {
+                                Item item = new Item();
+                                item.setId(id);
+                                return item;
+                            })
+                            .collect(Collectors.toList())
+            );
+        }
+
+        if (dto.repairItemIds() != null && !dto.repairItemIds().isEmpty()) {
+            wo.setRepairItems(
+                    dto.repairItemIds().stream()
+                            .map(id -> {
+                                Item item = new Item();
+                                item.setId(id);
+                                return item;
+                            })
+                            .collect(Collectors.toList())
+            );
+        }
+
+        if (dto.newRequestItemInfoIds() != null && !dto.newRequestItemInfoIds().isEmpty()) {
+            wo.setNewRequests(
+                    dto.newRequestItemInfoIds().stream()
+                            .map(id -> {
+                                ItemInfo info = new ItemInfo();
+                                info.setId(id);
+                                return info;
+                            })
+                            .collect(Collectors.toList())
+            );
+        }
+
+        // 3. Requestor stub
+        Employee requestor = new Employee();
+        requestor.setId(requestorId);
+        wo.setRequestor(requestor);
+
         return wo;
     }
 

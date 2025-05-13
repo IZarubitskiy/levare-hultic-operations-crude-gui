@@ -1,5 +1,6 @@
 package com.example.levarehulticops.workorders.controller;
 
+import com.example.levarehulticops.workorders.dto.WorkOrderCreateRequest;
 import com.example.levarehulticops.workorders.entity.WorkOrder;
 import com.example.levarehulticops.workorders.service.WorkOrderService;
 import lombok.RequiredArgsConstructor;
@@ -7,7 +8,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @Controller
 @RequestMapping("/workorders")
@@ -31,8 +35,11 @@ public class WorkOrderController {
     }
 
     @PostMapping
-    public String create(@ModelAttribute WorkOrder workOrder) {
-        workOrderService.create(workOrder);
+    public String create(
+            @ModelAttribute("workOrder") WorkOrderCreateRequest dto,
+            @RequestHeader("X-Sharer-User-Id") Long requestorId
+    ) {
+        workOrderService.create(dto, requestorId);
         return "redirect:/workorders";
     }
 

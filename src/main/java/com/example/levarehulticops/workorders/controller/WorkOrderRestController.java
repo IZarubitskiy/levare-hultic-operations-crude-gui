@@ -26,12 +26,13 @@ public class WorkOrderRestController {
         return workOrderService.getById(id);
     }
 
+    /*
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public WorkOrder create(@RequestBody WorkOrder workOrder) {
         return workOrderService.create(workOrder);
     }
-
+*/
     @PutMapping("/{id}")
     public WorkOrder update(@PathVariable Long id,
                             @RequestBody WorkOrder workOrder) {

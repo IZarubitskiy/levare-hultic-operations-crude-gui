@@ -1,5 +1,7 @@
 package com.example.levarehulticops.workorders.entity;
 
+import lombok.Builder;
+
 /**
  * Клиенты/владельцы оборудования
  */
