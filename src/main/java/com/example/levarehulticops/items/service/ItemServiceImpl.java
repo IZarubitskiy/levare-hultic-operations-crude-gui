@@ -156,6 +156,19 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    public Page<ItemReadDto> getStockItemsByClient(Client client, Pageable pageable) {
+        // Условие: только NEW и REPAIRED
+        ItemCondition[] conds = { ItemCondition.NEW, ItemCondition.REPAIRED };
+        Page<Item> page = itemRepository.findByItemConditionInAndItemStatusAndOwnership(
+                conds,
+                ItemStatus.ON_STOCK,
+                client,
+                pageable
+        );
+        return page.map(itemMapper::toReadDto);
+    }
+
+    @Override
     public Page<ItemReadDto> getRneCorporateItems(Pageable pageable) {
         Page<Item> page = itemRepository.findByItemConditionAndItemStatusAndOwnership(
                 ItemCondition.USED,

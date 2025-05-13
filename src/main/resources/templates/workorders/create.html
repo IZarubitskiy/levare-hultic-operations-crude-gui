@@ -1,46 +1,132 @@
-<!-- src/main/resources/templates/workorders/create.html -->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8" />
     <title>Create Work Order</title>
+    <style>
+        .form-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .form-row > div {
+            flex: 1;
+        }
+        table.items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+            table-layout: auto; /* allow auto column sizing */
+        }
+        table.items-table th,
+        table.items-table td {
+            border: 1px solid #ccc;
+            padding: 0.5rem;
+        }
+        /* center header text */
+        table.items-table th {
+            text-align: center;
+        }
+        /* all columns except last: no wrap */
+        table.items-table th:not(:last-child),
+        table.items-table td:not(:last-child) {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        /* last column (Comments): fixed width and wrap */
+        table.items-table th:last-child,
+        table.items-table td:last-child {
+            width: 200px; /* fixed width */
+            white-space: normal;
+            word-break: break-word;
+        }
+        /* inputs in table cells: no visible border, transparent background */
+        table.items-table td input {
+            border: none;
+            background: transparent;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 0;
+            margin: 0;
+        }
+        .button-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        /* Modal backdrop */
+        #stockModalBackdrop {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+        /* Modal window */
+        #stockModal {
+            display: none;
+            position: fixed;
+            top: 10%; left: 50%;
+            transform: translateX(-50%);
+            background: #fff;
+            border: 1px solid #ccc;
+            padding: 1rem;
+            max-height: 80%;
+            overflow: auto;
+            z-index: 1000;
+            width: 80%;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        #stockTable {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        #stockTable th, #stockTable td {
+            border: 1px solid #ccc;
+            padding: 0.5rem;
+            text-align: left;
+        }
+    </style>
 </head>
 <body>
 
-<!-- header fragment -->
+<!-- Header -->
 <div th:insert="~{fragments/header :: header}"></div>
 
 <h1>Create Work Order</h1>
 
+<!-- Form -->
 <form th:action="@{/workorders(currentUserId=${currentUserId})}"
       th:object="${workOrder}" method="post">
 
-    <!-- First row: number, client, well, delivery date -->
-    <div style="display:flex; gap:1rem; margin-bottom:1rem;">
-        <div style="flex:1;">
+    <!-- Top fields -->
+    <div class="form-row">
+        <div>
             <label for="workOrderNumber">Work Order Number</label><br/>
             <input type="text" id="workOrderNumber" th:field="*{workOrderNumber}" />
         </div>
-        <div style="flex:1;">
+        <div>
             <label for="client">Client</label><br/>
             <select id="client" th:field="*{client}">
                 <option th:each="c : ${T(com.example.levarehulticops.workorders.entity.Client).values()}"
                         th:value="${c}" th:text="${c}"></option>
             </select>
         </div>
-        <div style="flex:1;">
+        <div>
             <label for="well">Well</label><br/>
             <input type="text" id="well" th:field="*{well}" />
         </div>
-        <div style="flex:1;">
+        <div>
             <label for="deliveryDate">Delivery Date</label><br/>
             <input type="date" id="deliveryDate" th:field="*{deliveryDate}" />
         </div>
     </div>
 
-    <!-- Items Table -->
+    <!-- Items table -->
     <h2>Items</h2>
-    <table style="width:100%; border-collapse:collapse; margin-bottom:1rem;" border="1">
+    <table class="items-table">
         <thead>
         <tr>
             <th>#</th>
@@ -48,19 +134,25 @@
             <th>PartNumber</th>
             <th>Description</th>
             <th>Serial</th>
+            <th>Ownership</th>
             <th>Condition</th>
             <th>Status</th>
-            <th>JobOrder ID</th>
             <th>Comments</th>
         </tr>
         </thead>
         <tbody id="itemsTableBody">
-        <!-- динамические строки -->
+        <!-- dynamic rows -->
         </tbody>
     </table>
-    <button type="button" id="addItemBtn">Add New Item</button>
 
-    <!-- Comments below the table -->
+    <!-- Buttons to add rows / open modal -->
+    <div class="button-row">
+        <button type="button" id="addStockItemBtn">Add Item from Stock</button>
+        <button type="button" id="addRepairItemBtn">Add Item For Repair</button>
+        <button type="button" id="addItemBtn">Add New Item</button>
+    </div>
+
+    <!-- Comments -->
     <div style="margin-top:1rem;">
         <label for="comments">Comments</label><br/>
         <textarea id="comments" rows="3" th:field="*{comments}"></textarea>
@@ -73,30 +165,126 @@
     </div>
 </form>
 
-<!-- footer fragment -->
+<!-- Footer -->
 <div th:insert="~{fragments/footer :: footer}"></div>
 
+<!-- Modal backdrop and content -->
+<div id="stockModalBackdrop"></div>
+<div id="stockModal">
+    <h3>Select Stock Items</h3>
+    <table id="stockTable">
+        <thead>
+        <tr>
+            <th>Select</th>
+            <th>ID</th>
+            <th>Part#</th>
+            <th>Serial</th>
+            <th>Description</th>
+            <th>Ownership</th>
+            <th>Condition</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- filled by JS -->
+        </tbody>
+    </table>
+    <div style="margin-top:1rem; text-align:right;">
+        <button id="stockModalAddBtn">Add Selected</button>
+        <button id="stockModalCloseBtn">Close</button>
+    </div>
+</div>
+
+<!-- Script: row factories + modal logic -->
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const addBtn = document.getElementById('addItemBtn');
-      const tbody = document.getElementById('itemsTableBody');
-      let rowCount = 0;
-      addBtn.addEventListener('click', () => {
-        rowCount++;
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>${rowCount}</td>
-          <td><input type="text" name="items[${rowCount}].type"/></td>
-          <td><input type="text" name="items[${rowCount}].partNumber"/></td>
-          <td><input type="text" name="items[${rowCount}].description"/></td>
-          <td><input type="text" name="items[${rowCount}].serialNumber"/></td>
-          <td><input type="text" name="items[${rowCount}].condition"/></td>
-          <td><input type="text" name="items[${rowCount}].status"/></td>
-          <td><input type="text" name="items[${rowCount}].jobOrderId"/></td>
-          <td><input type="text" name="items[${rowCount}].comments"/></td>
-        `;
-        tbody.appendChild(row);
-      });
+    document.addEventListener('DOMContentLoaded', () => {
+        const tbody       = document.getElementById('itemsTableBody');
+        let rowCount      = 0;
+        const addItemBtn   = document.getElementById('addItemBtn');
+        const addRepairBtn = document.getElementById('addRepairItemBtn');
+        const stockBtn     = document.getElementById('addStockItemBtn');
+        const modal        = document.getElementById('stockModal');
+        const backdrop     = document.getElementById('stockModalBackdrop');
+        const stockTbody   = document.querySelector('#stockTable tbody');
+        const closeBtn     = document.getElementById('stockModalCloseBtn');
+        const addSelected  = document.getElementById('stockModalAddBtn');
+
+        function addRow(type, vals = {}) {
+            rowCount++;
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${rowCount}</td>
+                <td><input name="items[${rowCount}].type"       value="${type}" readonly/></td>
+                <td><input name="items[${rowCount}].partNumber" value="${vals.partNumber||''}" readonly/></td>
+                <td><input name="items[${rowCount}].description"value="${vals.description||''}" readonly/></td>
+                <td><input name="items[${rowCount}].serialNumber"value="${vals.serialNumber||''}" readonly/></td>
+                <td><input name="items[${rowCount}].ownership"   value="${vals.ownership||''}" readonly/></td>
+                <td><input name="items[${rowCount}].condition"   value="${vals.condition||''}" readonly/></td>
+                <td><input name="items[${rowCount}].status"                                      /></td>
+                <td><input name="items[${rowCount}].comments"                                    /></td>
+            `;
+            tbody.appendChild(row);
+        }
+
+        addItemBtn.addEventListener('click', () => addRow('New'));
+        addRepairBtn.addEventListener('click', () => addRow('Repair'));
+
+        function openModal() {
+            stockTbody.innerHTML = '';
+            const client = encodeURIComponent(document.getElementById('client').value);
+            fetch(`/api/items/stock?client=${client}`)
+                .then(res => res.json())
+                .then(data => {
+                    const items = Array.isArray(data) ? data : data.content;
+                    items.forEach(item => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td><input type="checkbox"
+                                       data-type="${item.itemInfo.itemType}"
+                                       data-id="${item.id}"
+                                       data-part="${item.itemInfo.partNumber}"
+                                       data-serial="${item.serialNumber}"
+                                       data-desc="${item.itemInfo.description}"
+                                       data-ownership="${item.ownership}"
+                                       data-condition="${item.itemCondition}" /></td>
+                            <td>${item.id}</td>
+                            <td>${item.itemInfo.partNumber}</td>
+                            <td>${item.serialNumber}</td>
+                            <td>${item.itemInfo.description}</td>
+                            <td>${item.ownership}</td>
+                            <td>${item.itemCondition}</td>
+                        `;
+                        stockTbody.appendChild(tr);
+                    });
+                    backdrop.style.display = 'block';
+                    modal.style.display    = 'block';
+                })
+                .catch(err => {
+                    console.error('Ошибка при загрузке складских позиций:', err);
+                });
+        }
+
+        function closeModal() {
+            backdrop.style.display = 'none';
+            modal.style.display    = 'none';
+        }
+
+        stockBtn.addEventListener('click', openModal);
+        closeBtn.addEventListener('click', closeModal);
+        backdrop.addEventListener('click', closeModal);
+
+        addSelected.addEventListener('click', () => {
+            document.querySelectorAll('#stockTable input[type=checkbox]:checked')
+                .forEach(chk => {
+                    addRow(chk.dataset.type, {
+                        partNumber: chk.dataset.part,
+                        serialNumber: chk.dataset.serial,
+                        description: chk.dataset.desc,
+                        ownership: chk.dataset.ownership,
+                        condition: chk.dataset.condition
+                    });
+                });
+            closeModal();
+        });
     });
 </script>
 </body>

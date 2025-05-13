@@ -6,6 +6,7 @@ public enum ItemStatus {
     ASSEMBLED,
     TESTED,
     ON_STOCK,
+    BOOKED,
     SCRAP,
     CANCELLED
 }
