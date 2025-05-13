@@ -29,11 +29,23 @@ public class WorkOrderController {
     }
 
     @GetMapping("/new")
-    public String showCreateForm(Model model) {
-        model.addAttribute("workOrder", new WorkOrder());
+    public String showCreateForm(
+            Model model,
+            @RequestParam(value = "currentUserId", required = false, defaultValue = "0") Long currentUserId
+    ) {
+        model.addAttribute("workOrder", new WorkOrderCreateRequest(
+                "",    // workOrderNumber
+                null,  // client
+                "",    // well
+                null,  // stockItemIds
+                null,  // repairItemIds
+                null,  // newRequestItemInfoIds
+                null,  // deliveryDate
+                ""     // comments
+        ));
+        model.addAttribute("currentUserId", currentUserId);
         return "workorders/create";
     }
-
     @PostMapping
     public String create(
             @ModelAttribute("workOrder") WorkOrderCreateRequest dto,

@@ -6,80 +6,98 @@
     <title>Create Work Order</title>
 </head>
 <body>
+
+<!-- header fragment -->
+<div th:insert="~{fragments/header :: header}"></div>
+
 <h1>Create Work Order</h1>
 
-<form th:action="@{/workorders}" th:object="${workOrder}" method="post">
-    <!-- Work Order Number -->
-    <div>
-        <label for="workOrderNumber">Work Order Number</label>
-        <input type="text" id="workOrderNumber" th:field="*{workOrderNumber}" />
-        <div th:if="${#fields.hasErrors('workOrderNumber')}" th:errors="*{workOrderNumber}"/>
+<form th:action="@{/workorders(currentUserId=${currentUserId})}"
+      th:object="${workOrder}" method="post">
+
+    <!-- First row: number, client, well, delivery date -->
+    <div style="display:flex; gap:1rem; margin-bottom:1rem;">
+        <div style="flex:1;">
+            <label for="workOrderNumber">Work Order Number</label><br/>
+            <input type="text" id="workOrderNumber" th:field="*{workOrderNumber}" />
+        </div>
+        <div style="flex:1;">
+            <label for="client">Client</label><br/>
+            <select id="client" th:field="*{client}">
+                <option th:each="c : ${T(com.example.levarehulticops.workorders.entity.Client).values()}"
+                        th:value="${c}" th:text="${c}"></option>
+            </select>
+        </div>
+        <div style="flex:1;">
+            <label for="well">Well</label><br/>
+            <input type="text" id="well" th:field="*{well}" />
+        </div>
+        <div style="flex:1;">
+            <label for="deliveryDate">Delivery Date</label><br/>
+            <input type="date" id="deliveryDate" th:field="*{deliveryDate}" />
+        </div>
     </div>
 
-    <!-- Client (enum) -->
-    <div>
-        <label for="client">Client</label>
-        <select id="client" th:field="*{client}">
-            <option th:each="c : ${T(com.example.levarehulticops.workorders.entity.Client).values()}"
-                    th:value="${c}" th:text="${c}"/>
-        </select>
-        <div th:if="${#fields.hasErrors('client')}" th:errors="*{client}"/>
-    </div>
+    <!-- Items Table -->
+    <h2>Items</h2>
+    <table style="width:100%; border-collapse:collapse; margin-bottom:1rem;" border="1">
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>Type</th>
+            <th>PartNumber</th>
+            <th>Description</th>
+            <th>Serial</th>
+            <th>Condition</th>
+            <th>Status</th>
+            <th>JobOrder ID</th>
+            <th>Comments</th>
+        </tr>
+        </thead>
+        <tbody id="itemsTableBody">
+        <!-- динамические строки -->
+        </tbody>
+    </table>
+    <button type="button" id="addItemBtn">Add New Item</button>
 
-    <!-- Well -->
-    <div>
-        <label for="well">Well</label>
-        <input type="text" id="well" th:field="*{well}" />
-        <div th:if="${#fields.hasErrors('well')}" th:errors="*{well}"/>
-    </div>
-
-    <!-- Delivery Date -->
-    <div>
-        <label for="deliveryDate">Delivery Date</label>
-        <input type="date" id="deliveryDate" th:field="*{deliveryDate}" />
-        <div th:if="${#fields.hasErrors('deliveryDate')}" th:errors="*{deliveryDate}"/>
-    </div>
-
-    <!-- Stock Items -->
-    <div>
-        <label for="stockItems">Stock Items</label>
-        <select id="stockItems" multiple th:field="*{stockItemIds}">
-            <option th:each="item : ${stockItems}"
-                    th:value="${item.id}" th:text="${item.serialNumber}"/>
-        </select>
-    </div>
-
-    <!-- Repair Items -->
-    <div>
-        <label for="repairItems">Repair Items</label>
-        <select id="repairItems" multiple th:field="*{repairItemIds}">
-            <option th:each="item : ${repairItems}"
-                    th:value="${item.id}" th:text="${item.serialNumber}"/>
-        </select>
-    </div>
-
-    <!-- New Item Requests -->
-    <div>
-        <label for="newRequests">New Item Requests</label>
-        <select id="newRequests" multiple th:field="*{newRequestItemInfoIds}">
-            <option th:each="info : ${itemInfos}"
-                    th:value="${info.id}" th:text="${info.description}"/>
-        </select>
-    </div>
-
-    <!-- Comments -->
-    <div>
-        <label for="comments">Comments</label>
+    <!-- Comments below the table -->
+    <div style="margin-top:1rem;">
+        <label for="comments">Comments</label><br/>
         <textarea id="comments" rows="3" th:field="*{comments}"></textarea>
     </div>
 
-    <!-- Requestor Header -->
-    <input type="hidden" name="X-Sharer-User-Id"
-           th:value="${currentUserId}" />
+    <input type="hidden" name="currentUserId" th:value="${currentUserId}" />
 
-    <div>
+    <div style="margin-top:1rem;">
         <button type="submit">Create</button>
     </div>
 </form>
+
+<!-- footer fragment -->
+<div th:insert="~{fragments/footer :: footer}"></div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const addBtn = document.getElementById('addItemBtn');
+      const tbody = document.getElementById('itemsTableBody');
+      let rowCount = 0;
+      addBtn.addEventListener('click', () => {
+        rowCount++;
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${rowCount}</td>
+          <td><input type="text" name="items[${rowCount}].type"/></td>
+          <td><input type="text" name="items[${rowCount}].partNumber"/></td>
+          <td><input type="text" name="items[${rowCount}].description"/></td>
+          <td><input type="text" name="items[${rowCount}].serialNumber"/></td>
+          <td><input type="text" name="items[${rowCount}].condition"/></td>
+          <td><input type="text" name="items[${rowCount}].status"/></td>
+          <td><input type="text" name="items[${rowCount}].jobOrderId"/></td>
+          <td><input type="text" name="items[${rowCount}].comments"/></td>
+        `;
+        tbody.appendChild(row);
+      });
+    });
+</script>
 </body>
 </html>
