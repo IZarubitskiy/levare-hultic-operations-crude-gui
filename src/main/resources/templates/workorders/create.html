@@ -5,103 +5,93 @@
     <title>Create Work Order</title>
     <style>
         .form-row {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1rem;
+          display: flex;
+          gap: 1rem;
+          margin-bottom: 1rem;
         }
-        .form-row > div {
-            flex: 1;
-        }
+        .form-row > div { flex: 1; }
+
         table.items-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 1rem;
-            table-layout: auto; /* allow auto column sizing */
+          width: 100%;
+          border-collapse: collapse;
+          margin-bottom: 1rem;
+          table-layout: auto;
         }
         table.items-table th,
         table.items-table td {
-            border: 1px solid #ccc;
-            padding: 0.5rem;
+          border: 1px solid #ccc;
+          padding: 0.5rem;
+          overflow: hidden;
         }
-        /* center header text */
         table.items-table th {
-            text-align: center;
+          text-align: center;
         }
-        /* all columns except last: no wrap */
         table.items-table th:not(:last-child),
         table.items-table td:not(:last-child) {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+          white-space: nowrap;
+          text-overflow: ellipsis;
         }
-        /* last column (Comments): fixed width and wrap */
         table.items-table th:last-child,
         table.items-table td:last-child {
-            width: 200px; /* fixed width */
-            white-space: normal;
-            word-break: break-word;
+          width: 200px;
+          white-space: normal;
+          word-break: break-word;
         }
-        /* inputs in table cells: no visible border, transparent background */
         table.items-table td input {
-            border: none;
-            background: transparent;
-            width: 100%;
-            box-sizing: border-box;
-            padding: 0;
-            margin: 0;
+          border: none;
+          background: transparent;
+          width: 100%;
+          box-sizing: border-box;
+          padding: 0;
+          margin: 0;
         }
+
         .button-row {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1rem;
+          display: flex;
+          gap: 1rem;
+          margin-bottom: 1rem;
         }
-        /* Modal backdrop */
-        #stockModalBackdrop {
-            display: none;
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 999;
+        /* Stock modal styles */
+        #stockModalBackdrop,
+        #repairModalBackdrop {
+          display: none;
+          position: fixed; top: 0; left: 0;
+          width: 100%; height: 100%;
+          background: rgba(0,0,0,0.5);
+          z-index: 999;
         }
-        /* Modal window */
-        #stockModal {
-            display: none;
-            position: fixed;
-            top: 10%; left: 50%;
-            transform: translateX(-50%);
-            background: #fff;
-            border: 1px solid #ccc;
-            padding: 1rem;
-            max-height: 80%;
-            overflow: auto;
-            z-index: 1000;
-            width: 80%;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        #stockModal,
+        #repairModal {
+          display: none;
+          position: fixed; top: 10%; left: 50%;
+          transform: translateX(-50%);
+          background: #fff;
+          border: 1px solid #ccc;
+          padding: 1rem;
+          max-height: 80%; overflow: auto;
+          width: 80%; box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+          z-index: 1000;
         }
-        #stockTable {
-            width: 100%;
-            border-collapse: collapse;
+        #stockTable, #repairTable {
+          width: 100%; border-collapse: collapse;
         }
-        #stockTable th, #stockTable td {
-            border: 1px solid #ccc;
-            padding: 0.5rem;
-            text-align: left;
+        #stockTable th, #stockTable td,
+        #repairTable th, #repairTable td {
+          border: 1px solid #ccc;
+          padding: 0.5rem;
+          text-align: left;
         }
     </style>
 </head>
 <body>
 
-<!-- Header -->
 <div th:insert="~{fragments/header :: header}"></div>
 
 <h1>Create Work Order</h1>
 
-<!-- Form -->
 <form th:action="@{/workorders(currentUserId=${currentUserId})}"
       th:object="${workOrder}" method="post">
 
-    <!-- Top fields -->
     <div class="form-row">
         <div>
             <label for="workOrderNumber">Work Order Number</label><br/>
@@ -124,20 +114,13 @@
         </div>
     </div>
 
-    <!-- Items table -->
     <h2>Items</h2>
     <table class="items-table">
         <thead>
         <tr>
-            <th>#</th>
-            <th>Type</th>
-            <th>PartNumber</th>
-            <th>Description</th>
-            <th>Serial</th>
-            <th>Ownership</th>
-            <th>Condition</th>
-            <th>Status</th>
-            <th>Comments</th>
+            <th>#</th><th>Type</th><th>PartNumber</th><th>Description</th>
+            <th>Serial</th><th>Ownership</th><th>Condition</th>
+            <th>Status</th><th>Comments</th>
         </tr>
         </thead>
         <tbody id="itemsTableBody">
@@ -145,14 +128,12 @@
         </tbody>
     </table>
 
-    <!-- Buttons to add rows / open modal -->
     <div class="button-row">
         <button type="button" id="addStockItemBtn">Add Item from Stock</button>
         <button type="button" id="addRepairItemBtn">Add Item For Repair</button>
         <button type="button" id="addItemBtn">Add New Item</button>
     </div>
 
-    <!-- Comments -->
     <div style="margin-top:1rem;">
         <label for="comments">Comments</label><br/>
         <textarea id="comments" rows="3" th:field="*{comments}"></textarea>
@@ -165,126 +146,178 @@
     </div>
 </form>
 
-<!-- Footer -->
 <div th:insert="~{fragments/footer :: footer}"></div>
 
-<!-- Modal backdrop and content -->
+<!-- Stock modal -->
 <div id="stockModalBackdrop"></div>
 <div id="stockModal">
     <h3>Select Stock Items</h3>
     <table id="stockTable">
         <thead>
         <tr>
-            <th>Select</th>
-            <th>ID</th>
-            <th>Part#</th>
-            <th>Serial</th>
-            <th>Description</th>
-            <th>Ownership</th>
-            <th>Condition</th>
+            <th>Select</th><th>ID</th><th>Part#</th><th>Serial</th>
+            <th>Description</th><th>Ownership</th><th>Condition</th>
         </tr>
         </thead>
-        <tbody>
-        <!-- filled by JS -->
-        </tbody>
+        <tbody></tbody>
     </table>
-    <div style="margin-top:1rem; text-align:right;">
+    <div style="text-align:right; margin-top:1rem;">
         <button id="stockModalAddBtn">Add Selected</button>
         <button id="stockModalCloseBtn">Close</button>
     </div>
 </div>
 
-<!-- Script: row factories + modal logic -->
+<!-- Repair modal -->
+<div id="repairModalBackdrop"></div>
+<div id="repairModal">
+    <h3>Select Repair Items</h3>
+    <table id="repairTable">
+        <thead>
+        <tr>
+            <th>Select</th><th>ID</th><th>Part#</th><th>Serial</th>
+            <th>Description</th><th>Ownership</th><th>Condition</th>
+        </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <div style="text-align:right; margin-top:1rem;">
+        <button id="repairModalAddBtn">Add Selected</button>
+        <button id="repairModalCloseBtn">Close</button>
+    </div>
+</div>
+
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        const tbody       = document.getElementById('itemsTableBody');
-        let rowCount      = 0;
-        const addItemBtn   = document.getElementById('addItemBtn');
-        const addRepairBtn = document.getElementById('addRepairItemBtn');
-        const stockBtn     = document.getElementById('addStockItemBtn');
-        const modal        = document.getElementById('stockModal');
-        const backdrop     = document.getElementById('stockModalBackdrop');
-        const stockTbody   = document.querySelector('#stockTable tbody');
-        const closeBtn     = document.getElementById('stockModalCloseBtn');
-        const addSelected  = document.getElementById('stockModalAddBtn');
+      const tbody         = document.getElementById('itemsTableBody');
+      let rowCount        = 0;
+      const addItemBtn    = document.getElementById('addItemBtn');
+      const addStockBtn   = document.getElementById('addStockItemBtn');
+      const addRepairBtn  = document.getElementById('addRepairItemBtn');
 
-        function addRow(type, vals = {}) {
-            rowCount++;
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${rowCount}</td>
-                <td><input name="items[${rowCount}].type"       value="${type}" readonly/></td>
-                <td><input name="items[${rowCount}].partNumber" value="${vals.partNumber||''}" readonly/></td>
-                <td><input name="items[${rowCount}].description"value="${vals.description||''}" readonly/></td>
-                <td><input name="items[${rowCount}].serialNumber"value="${vals.serialNumber||''}" readonly/></td>
-                <td><input name="items[${rowCount}].ownership"   value="${vals.ownership||''}" readonly/></td>
-                <td><input name="items[${rowCount}].condition"   value="${vals.condition||''}" readonly/></td>
-                <td><input name="items[${rowCount}].status"                                      /></td>
-                <td><input name="items[${rowCount}].comments"                                    /></td>
-            `;
-            tbody.appendChild(row);
-        }
+      // Stock modal elements
+      const stockModal       = document.getElementById('stockModal');
+      const stockBackdrop    = document.getElementById('stockModalBackdrop');
+      const stockTbody       = document.querySelector('#stockTable tbody');
+      const stockCloseBtn    = document.getElementById('stockModalCloseBtn');
+      const stockAddBtn      = document.getElementById('stockModalAddBtn');
 
-        addItemBtn.addEventListener('click', () => addRow('New'));
-        addRepairBtn.addEventListener('click', () => addRow('Repair'));
+      // Repair modal elements
+      const repairModal      = document.getElementById('repairModal');
+      const repairBackdrop   = document.getElementById('repairModalBackdrop');
+      const repairTbody      = document.querySelector('#repairTable tbody');
+      const repairCloseBtn   = document.getElementById('repairModalCloseBtn');
+      const repairAddBtn     = document.getElementById('repairModalAddBtn');
 
-        function openModal() {
-            stockTbody.innerHTML = '';
-            const client = encodeURIComponent(document.getElementById('client').value);
-            fetch(`/api/items/stock?client=${client}`)
-                .then(res => res.json())
-                .then(data => {
-                    const items = Array.isArray(data) ? data : data.content;
-                    items.forEach(item => {
-                        const tr = document.createElement('tr');
-                        tr.innerHTML = `
-                            <td><input type="checkbox"
-                                       data-type="${item.itemInfo.itemType}"
-                                       data-id="${item.id}"
-                                       data-part="${item.itemInfo.partNumber}"
-                                       data-serial="${item.serialNumber}"
-                                       data-desc="${item.itemInfo.description}"
-                                       data-ownership="${item.ownership}"
-                                       data-condition="${item.itemCondition}" /></td>
-                            <td>${item.id}</td>
-                            <td>${item.itemInfo.partNumber}</td>
-                            <td>${item.serialNumber}</td>
-                            <td>${item.itemInfo.description}</td>
-                            <td>${item.ownership}</td>
-                            <td>${item.itemCondition}</td>
-                        `;
-                        stockTbody.appendChild(tr);
-                    });
-                    backdrop.style.display = 'block';
-                    modal.style.display    = 'block';
-                })
-                .catch(err => {
-                    console.error('Ошибка при загрузке складских позиций:', err);
-                });
-        }
+      function addRow(type, vals = {}) {
+        rowCount++;
+        const tr = document.createElement('tr');
+        tr.setAttribute('data-id', vals.id||'');
+        tr.innerHTML = `
+          <td>${rowCount}</td>
+          <td><input name="items[${rowCount}].type"       value="${type}" readonly/></td>
+          <td><input name="items[${rowCount}].partNumber" value="${vals.partNumber||''}" readonly/></td>
+          <td><input name="items[${rowCount}].description"value="${vals.description||''}" readonly/></td>
+          <td><input name="items[${rowCount}].serialNumber"value="${vals.serialNumber||''}" readonly/></td>
+          <td><input name="items[${rowCount}].ownership"   value="${vals.ownership||''}" readonly/></td>
+          <td><input name="items[${rowCount}].condition"   value="${vals.condition||''}" readonly/></td>
+          <td><input name="items[${rowCount}].status"                                      /></td>
+          <td><input name="items[${rowCount}].comments"                                    /></td>
+        `;
+        tbody.appendChild(tr);
+      }
 
-        function closeModal() {
-            backdrop.style.display = 'none';
-            modal.style.display    = 'none';
-        }
+      addItemBtn.addEventListener('click', () => addRow('New'));
 
-        stockBtn.addEventListener('click', openModal);
-        closeBtn.addEventListener('click', closeModal);
-        backdrop.addEventListener('click', closeModal);
+      // Generic open/close modal, fetch & filter
+      function openModal(fetchUrl, modalElem, backdropElem, tableBody) {
+        const existingIds = new Set(
+          Array.from(tbody.querySelectorAll('tr[data-id]'))
+               .map(r => r.getAttribute('data-id'))
+               .filter(id => id)
+        );
+        tableBody.innerHTML = '';
+        const client = encodeURIComponent(document.getElementById('client').value);
+        fetch(`${fetchUrl}?client=${client}`)
+          .then(r => r.json())
+          .then(data => {
+            const items = Array.isArray(data) ? data : data.content;
+            items
+              .filter(item => !existingIds.has(String(item.id)))
+              .forEach(item => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                  <td><input type="checkbox"
+                             data-type="${item.itemInfo.itemType}"
+                             data-id="${item.id}"
+                             data-part="${item.itemInfo.partNumber}"
+                             data-serial="${item.serialNumber}"
+                             data-desc="${item.itemInfo.description}"
+                             data-ownership="${item.ownership}"
+                             data-condition="${item.itemCondition}" /></td>
+                  <td>${item.id}</td>
+                  <td>${item.itemInfo.partNumber}</td>
+                  <td>${item.serialNumber}</td>
+                  <td>${item.itemInfo.description}</td>
+                  <td>${item.ownership}</td>
+                  <td>${item.itemCondition}</td>
+                `;
+                tableBody.appendChild(tr);
+              });
+            backdropElem.style.display = 'block';
+            modalElem.style.display    = 'block';
+          })
+          .catch(err => console.error('Ошибка загрузки:', err));
+      }
+      function closeModal(modalElem, backdropElem) {
+        modalElem.style.display   = 'none';
+        backdropElem.style.display= 'none';
+      }
 
-        addSelected.addEventListener('click', () => {
-            document.querySelectorAll('#stockTable input[type=checkbox]:checked')
-                .forEach(chk => {
-                    addRow(chk.dataset.type, {
-                        partNumber: chk.dataset.part,
-                        serialNumber: chk.dataset.serial,
-                        description: chk.dataset.desc,
-                        ownership: chk.dataset.ownership,
-                        condition: chk.dataset.condition
-                    });
-                });
-            closeModal();
-        });
+      // Stock handlers
+      addStockBtn.addEventListener('click', () =>
+        openModal('/api/items/stock', stockModal, stockBackdrop, stockTbody)
+      );
+      stockCloseBtn.addEventListener('click', () =>
+        closeModal(stockModal, stockBackdrop)
+      );
+      stockBackdrop.addEventListener('click', () =>
+        closeModal(stockModal, stockBackdrop)
+      );
+      stockAddBtn.addEventListener('click', () => {
+        document.querySelectorAll('#stockTable input[type=checkbox]:checked')
+          .forEach(chk => addRow(chk.dataset.type, {
+            id:           chk.dataset.id,
+            partNumber:   chk.dataset.part,
+            serialNumber: chk.dataset.serial,
+            description:  chk.dataset.desc,
+            ownership:    chk.dataset.ownership,
+            condition:    chk.dataset.condition
+          }));
+        closeModal(stockModal, stockBackdrop);
+      });
+
+      // Repair handlers
+      addRepairBtn.addEventListener('click', () =>
+        openModal('/api/items/repair', repairModal, repairBackdrop, repairTbody)
+      );
+      repairCloseBtn.addEventListener('click', () =>
+        closeModal(repairModal, repairBackdrop)
+      );
+      repairBackdrop.addEventListener('click', () =>
+        closeModal(repairModal, repairBackdrop)
+      );
+      repairAddBtn.addEventListener('click', () => {
+        document.querySelectorAll('#repairTable input[type=checkbox]:checked')
+          .forEach(chk => addRow(chk.dataset.type, {
+            id:           chk.dataset.id,
+            partNumber:   chk.dataset.part,
+            serialNumber: chk.dataset.serial,
+            description:  chk.dataset.desc,
+            ownership:    chk.dataset.ownership,
+            condition:    chk.dataset.condition
+          }));
+        closeModal(repairModal, repairBackdrop);
+      });
     });
 </script>
 </body>

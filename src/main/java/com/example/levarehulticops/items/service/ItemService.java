@@ -18,6 +18,7 @@ public interface ItemService {
     Page<ItemReadDto> getAll(Pageable pageable);
     Page<ItemReadDto> getItemsByConditionAndNotClients(ItemCondition condition, Client[] excludedClients, Pageable pageable);
     Page<ItemReadDto> getStockItemsByClient(Client client, Pageable pageable);
+    Page<ItemReadDto> getRepairItemsByClient(Pageable pageable, Client client);
         /**
      * Returns items for Stock Egypt:
      * condition NEW or REPAIRED, status ON_STOCK,

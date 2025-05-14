@@ -157,7 +157,6 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Page<ItemReadDto> getStockItemsByClient(Client client, Pageable pageable) {
-        // Условие: только NEW и REPAIRED
         ItemCondition[] conds = { ItemCondition.NEW, ItemCondition.REPAIRED };
         Page<Item> page = itemRepository.findByItemConditionInAndItemStatusAndOwnership(
                 conds,
@@ -166,6 +165,14 @@ public class ItemServiceImpl implements ItemService {
                 pageable
         );
         return page.map(itemMapper::toReadDto);
+    }
+
+    @Override
+    public Page<ItemReadDto> getRepairItemsByClient(Pageable pageable, Client client) {
+        ItemCondition[] conds = { ItemCondition.USED };
+        return itemRepository
+                .findByItemConditionInAndItemStatusAndOwnership(conds, ItemStatus.ON_STOCK, client, pageable)
+                .map(itemMapper::toReadDto);
     }
 
     @Override

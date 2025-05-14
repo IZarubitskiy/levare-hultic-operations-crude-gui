@@ -58,4 +58,12 @@ public class ItemRestController {
     ) {
         return itemService.getStockItemsByClient(client, pageable);
     }
+
+    @GetMapping("/repair")
+    public Page<ItemReadDto> repair(
+            @RequestParam Client client,
+            Pageable pageable
+    ) {
+        return itemService.getRepairItemsByClient(pageable, client);
+    }
 }
