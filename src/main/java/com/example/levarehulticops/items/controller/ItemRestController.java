@@ -4,6 +4,8 @@ package com.example.levarehulticops.items.controller;
 import com.example.levarehulticops.items.dto.ItemCreateRequest;
 import com.example.levarehulticops.items.dto.ItemReadDto;
 import com.example.levarehulticops.items.dto.ItemUpdateRequest;
+import com.example.levarehulticops.items.entity.ItemCondition;
+import com.example.levarehulticops.items.entity.ItemStatus;
 import com.example.levarehulticops.items.service.ItemService;
 import com.example.levarehulticops.workorders.entity.Client;
 import lombok.RequiredArgsConstructor;
@@ -51,19 +53,41 @@ public class ItemRestController {
         itemService.delete(id);
     }
 
-    @GetMapping("/stock")
-    public Page<ItemReadDto> getStockByClient(
-            @RequestParam("client") Client client,
+    @GetMapping("/search")
+    public Page<ItemReadDto> search(
+            @RequestParam List<ItemCondition> conditions,
+            @RequestParam List<ItemStatus> statuses,
+            @RequestParam List<Client> ownerships,
             Pageable pageable
     ) {
-        return itemService.getStockItemsByClient(client, pageable);
+        return itemService.filterItems(conditions, statuses, ownerships, pageable);
     }
 
+    // алиас для stock
+    @GetMapping("/stock")
+    public Page<ItemReadDto> stock(
+            @RequestParam Client client,
+            Pageable pageable
+    ) {
+        return search(
+                List.of(ItemCondition.NEW, ItemCondition.REPAIRED),
+                List.of(ItemStatus.ON_STOCK),
+                List.of(client),
+                pageable
+        );
+    }
+
+    // алиас для repair
     @GetMapping("/repair")
     public Page<ItemReadDto> repair(
             @RequestParam Client client,
             Pageable pageable
     ) {
-        return itemService.getRepairItemsByClient(pageable, client);
+        return search(
+                List.of(ItemCondition.USED),
+                List.of(ItemStatus.ON_STOCK),
+                List.of(client),
+                pageable
+        );
     }
 }

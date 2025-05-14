@@ -1,85 +1,63 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8" />
+    <meta charset="UTF-8"/>
     <title>Create Work Order</title>
     <style>
-        .form-row {
-          display: flex;
-          gap: 1rem;
-          margin-bottom: 1rem;
-        }
+        .form-row { display: flex; gap: 1rem; margin-bottom: 1rem; }
         .form-row > div { flex: 1; }
 
         table.items-table {
-          width: 100%;
-          border-collapse: collapse;
-          margin-bottom: 1rem;
-          table-layout: auto;
+          width: 100%; border-collapse: collapse;
+          margin-bottom: 1rem; table-layout: auto;
         }
-        table.items-table th,
-        table.items-table td {
-          border: 1px solid #ccc;
-          padding: 0.5rem;
-          overflow: hidden;
+        table.items-table th, table.items-table td {
+          border: 1px solid #ccc; padding: 0.5rem; overflow: hidden;
         }
-        table.items-table th {
-          text-align: center;
-        }
+        table.items-table th { text-align: center; }
         table.items-table th:not(:last-child),
         table.items-table td:not(:last-child) {
-          white-space: nowrap;
-          text-overflow: ellipsis;
+          white-space: nowrap; text-overflow: ellipsis;
         }
         table.items-table th:last-child,
         table.items-table td:last-child {
-          width: 200px;
-          white-space: normal;
-          word-break: break-word;
+          width: 200px; white-space: normal; word-break: break-word;
         }
         table.items-table td input {
-          border: none;
-          background: transparent;
-          width: 100%;
-          box-sizing: border-box;
-          padding: 0;
-          margin: 0;
+          border: none; background: transparent;
+          width: 100%; box-sizing: border-box; padding: 0; margin: 0;
         }
 
-        .button-row {
-          display: flex;
-          gap: 1rem;
-          margin-bottom: 1rem;
-        }
-        /* Stock modal styles */
-        #stockModalBackdrop,
-        #repairModalBackdrop {
-          display: none;
-          position: fixed; top: 0; left: 0;
-          width: 100%; height: 100%;
-          background: rgba(0,0,0,0.5);
+        .button-row { display: flex; gap: 1rem; margin-bottom: 1rem; }
+
+        /* Modals backdrop */
+        #stockModalBackdrop, #repairModalBackdrop, #catalogModalBackdrop {
+          display: none; position: fixed; top: 0; left: 0;
+          width: 100%; height: 100%; background: rgba(0,0,0,0.5);
           z-index: 999;
         }
-        #stockModal,
-        #repairModal {
-          display: none;
-          position: fixed; top: 10%; left: 50%;
+        /* Modals window */
+        #stockModal, #repairModal, #catalogModal {
+          display: none; position: fixed; top: 10%; left: 50%;
           transform: translateX(-50%);
-          background: #fff;
-          border: 1px solid #ccc;
-          padding: 1rem;
-          max-height: 80%; overflow: auto;
+          background: #fff; border: 1px solid #ccc;
+          padding: 1rem; max-height: 80%; overflow: auto;
           width: 80%; box-shadow: 0 2px 10px rgba(0,0,0,0.3);
           z-index: 1000;
         }
-        #stockTable, #repairTable {
-          width: 100%; border-collapse: collapse;
+        #stockTable, #repairTable, #catalogTable {
+          width: 100%; border-collapse: collapse; margin-top: .5rem;
         }
         #stockTable th, #stockTable td,
-        #repairTable th, #repairTable td {
-          border: 1px solid #ccc;
-          padding: 0.5rem;
-          text-align: left;
+        #repairTable th, #repairTable td,
+        #catalogTable th, #catalogTable td {
+          border: 1px solid #ccc; padding: 0.5rem; text-align: left;
+        }
+        .catalog-filter {
+          display: flex; gap: 1rem; margin-bottom: .5rem;
+        }
+        .catalog-filter input, .catalog-filter select {
+          flex: 1; padding: .25rem;
         }
     </style>
 </head>
@@ -95,22 +73,22 @@
     <div class="form-row">
         <div>
             <label for="workOrderNumber">Work Order Number</label><br/>
-            <input type="text" id="workOrderNumber" th:field="*{workOrderNumber}" />
+            <input type="text" id="workOrderNumber" th:field="*{workOrderNumber}"/>
         </div>
         <div>
             <label for="client">Client</label><br/>
             <select id="client" th:field="*{client}">
                 <option th:each="c : ${T(com.example.levarehulticops.workorders.entity.Client).values()}"
-                        th:value="${c}" th:text="${c}"></option>
+                        th:value="${c}" th:text="${c}"/>
             </select>
         </div>
         <div>
             <label for="well">Well</label><br/>
-            <input type="text" id="well" th:field="*{well}" />
+            <input type="text" id="well" th:field="*{well}"/>
         </div>
         <div>
             <label for="deliveryDate">Delivery Date</label><br/>
-            <input type="date" id="deliveryDate" th:field="*{deliveryDate}" />
+            <input type="date" id="deliveryDate" th:field="*{deliveryDate}"/>
         </div>
     </div>
 
@@ -123,15 +101,13 @@
             <th>Status</th><th>Comments</th>
         </tr>
         </thead>
-        <tbody id="itemsTableBody">
-        <!-- dynamic rows -->
-        </tbody>
+        <tbody id="itemsTableBody"></tbody>
     </table>
 
     <div class="button-row">
         <button type="button" id="addStockItemBtn">Add Item from Stock</button>
         <button type="button" id="addRepairItemBtn">Add Item For Repair</button>
-        <button type="button" id="addItemBtn">Add New Item</button>
+        <button type="button" id="addCatalogItemBtn">Add Item from Catalog</button>
     </div>
 
     <div style="margin-top:1rem;">
@@ -139,8 +115,7 @@
         <textarea id="comments" rows="3" th:field="*{comments}"></textarea>
     </div>
 
-    <input type="hidden" name="currentUserId" th:value="${currentUserId}" />
-
+    <input type="hidden" name="currentUserId" th:value="${currentUserId}"/>
     <div style="margin-top:1rem;">
         <button type="submit">Create</button>
     </div>
@@ -154,10 +129,8 @@
     <h3>Select Stock Items</h3>
     <table id="stockTable">
         <thead>
-        <tr>
-            <th>Select</th><th>ID</th><th>Part#</th><th>Serial</th>
-            <th>Description</th><th>Ownership</th><th>Condition</th>
-        </tr>
+        <tr><th>Select</th><th>ID</th><th>Part#</th><th>Serial</th>
+            <th>Description</th><th>Ownership</th><th>Condition</th></tr>
         </thead>
         <tbody></tbody>
     </table>
@@ -173,10 +146,8 @@
     <h3>Select Repair Items</h3>
     <table id="repairTable">
         <thead>
-        <tr>
-            <th>Select</th><th>ID</th><th>Part#</th><th>Serial</th>
-            <th>Description</th><th>Ownership</th><th>Condition</th>
-        </tr>
+        <tr><th>Select</th><th>ID</th><th>Part#</th><th>Serial</th>
+            <th>Description</th><th>Ownership</th><th>Condition</th></tr>
         </thead>
         <tbody></tbody>
     </table>
@@ -186,139 +157,237 @@
     </div>
 </div>
 
+<!-- Catalog modal -->
+<div id="catalogModalBackdrop"></div>
+<div id="catalogModal">
+    <h3>Select Catalog Items</h3>
+    <div class="catalog-filter">
+        <input type="text" id="filterPart" placeholder="Part Number"/>
+        <input type="text" id="filterDesc" placeholder="Description"/>
+        <select id="filterType">
+            <option value="">— Any Type —</option>
+            <option th:each="t : ${T(com.example.levarehulticops.iteminfos.entity.ItemType).values()}"
+                    th:value="${t}" th:text="${t}"/>
+        </select>
+        <button id="catalogFilterBtn">Filter</button>
+    </div>
+    <table id="catalogTable">
+        <thead>
+        <tr><th>Select</th><th>Part#</th><th>Description</th><th>Type</th></tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <div style="text-align:right; margin-top:1rem;">
+        <button id="catalogModalAddBtn">Add Selected</button>
+        <button id="catalogModalCloseBtn">Close</button>
+    </div>
+</div>
+
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const tbody         = document.getElementById('itemsTableBody');
-      let rowCount        = 0;
-      const addItemBtn    = document.getElementById('addItemBtn');
-      const addStockBtn   = document.getElementById('addStockItemBtn');
-      const addRepairBtn  = document.getElementById('addRepairItemBtn');
+      const tbody       = document.getElementById('itemsTableBody');
+      let rowCount      = 0;
+      const clientSel   = document.getElementById('client');
 
-      // Stock modal elements
-      const stockModal       = document.getElementById('stockModal');
-      const stockBackdrop    = document.getElementById('stockModalBackdrop');
-      const stockTbody       = document.querySelector('#stockTable tbody');
-      const stockCloseBtn    = document.getElementById('stockModalCloseBtn');
-      const stockAddBtn      = document.getElementById('stockModalAddBtn');
-
-      // Repair modal elements
-      const repairModal      = document.getElementById('repairModal');
-      const repairBackdrop   = document.getElementById('repairModalBackdrop');
-      const repairTbody      = document.querySelector('#repairTable tbody');
-      const repairCloseBtn   = document.getElementById('repairModalCloseBtn');
-      const repairAddBtn     = document.getElementById('repairModalAddBtn');
-
-      function addRow(type, vals = {}) {
+      // вспомогательная функция добавления строки
+      function addRow(fields) {
         rowCount++;
-        const tr = document.createElement('tr');
-        tr.setAttribute('data-id', vals.id||'');
-        tr.innerHTML = `
-          <td>${rowCount}</td>
-          <td><input name="items[${rowCount}].type"       value="${type}" readonly/></td>
-          <td><input name="items[${rowCount}].partNumber" value="${vals.partNumber||''}" readonly/></td>
-          <td><input name="items[${rowCount}].description"value="${vals.description||''}" readonly/></td>
-          <td><input name="items[${rowCount}].serialNumber"value="${vals.serialNumber||''}" readonly/></td>
-          <td><input name="items[${rowCount}].ownership"   value="${vals.ownership||''}" readonly/></td>
-          <td><input name="items[${rowCount}].condition"   value="${vals.condition||''}" readonly/></td>
-          <td><input name="items[${rowCount}].status"                                      /></td>
-          <td><input name="items[${rowCount}].comments"                                    /></td>
-        `;
-        tbody.appendChild(tr);
+        tbody.insertAdjacentHTML('beforeend', `
+          <tr data-id="${fields.id||''}">
+            <td>${rowCount}</td>
+            <td><input name="items[${rowCount}].type"        value="${fields.type}"        readonly/></td>
+            <td><input name="items[${rowCount}].partNumber"  value="${fields.partNumber}"  readonly/></td>
+            <td><input name="items[${rowCount}].description" value="${fields.description}" readonly/></td>
+            <td><input name="items[${rowCount}].serialNumber"value="${fields.serialNumber}" readonly/></td>
+            <td><input name="items[${rowCount}].ownership"   value="${fields.ownership}"   readonly/></td>
+            <td><input name="items[${rowCount}].condition"   value="${fields.condition}"   readonly/></td>
+            <td><input name="items[${rowCount}].status"      value="TBA"/></td>
+            <td><input name="items[${rowCount}].comments"    value="TBA"/></td>
+          </tr>
+        `);
       }
 
-      addItemBtn.addEventListener('click', () => addRow('New'));
-
-      // Generic open/close modal, fetch & filter
-      function openModal(fetchUrl, modalElem, backdropElem, tableBody) {
-        const existingIds = new Set(
+      // обёртки для открытия/закрытия модалок
+      function openModal(url, modal, backdrop, tbodyContainer, renderRow) {
+        // собрать уже добавленные ID
+        const existing = new Set(
           Array.from(tbody.querySelectorAll('tr[data-id]'))
-               .map(r => r.getAttribute('data-id'))
-               .filter(id => id)
+               .map(r=>r.getAttribute('data-id'))
+               .filter(id=>id)
         );
-        tableBody.innerHTML = '';
-        const client = encodeURIComponent(document.getElementById('client').value);
-        fetch(`${fetchUrl}?client=${client}`)
-          .then(r => r.json())
-          .then(data => {
-            const items = Array.isArray(data) ? data : data.content;
-            items
-              .filter(item => !existingIds.has(String(item.id)))
-              .forEach(item => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                  <td><input type="checkbox"
-                             data-type="${item.itemInfo.itemType}"
-                             data-id="${item.id}"
-                             data-part="${item.itemInfo.partNumber}"
-                             data-serial="${item.serialNumber}"
-                             data-desc="${item.itemInfo.description}"
-                             data-ownership="${item.ownership}"
-                             data-condition="${item.itemCondition}" /></td>
-                  <td>${item.id}</td>
-                  <td>${item.itemInfo.partNumber}</td>
-                  <td>${item.serialNumber}</td>
-                  <td>${item.itemInfo.description}</td>
-                  <td>${item.ownership}</td>
-                  <td>${item.itemCondition}</td>
-                `;
-                tableBody.appendChild(tr);
-              });
-            backdropElem.style.display = 'block';
-            modalElem.style.display    = 'block';
-          })
-          .catch(err => console.error('Ошибка загрузки:', err));
+        tbodyContainer.innerHTML = '';
+        fetch(url).then(r=>r.json()).then(data=>{
+          const items = Array.isArray(data)? data : data.content;
+          items.filter(it=>!existing.has(String(it.id))).forEach(it=> renderRow(it, tbodyContainer));
+          backdrop.style.display = 'block';
+          modal.style.display    = 'block';
+        });
       }
-      function closeModal(modalElem, backdropElem) {
-        modalElem.style.display   = 'none';
-        backdropElem.style.display= 'none';
+      function closeModal(modal, backdrop) {
+        modal.style.display    = 'none';
+        backdrop.style.display = 'none';
       }
 
-      // Stock handlers
-      addStockBtn.addEventListener('click', () =>
-        openModal('/api/items/stock', stockModal, stockBackdrop, stockTbody)
+      // Stock
+      document.getElementById('addStockItemBtn').onclick = ()=> openModal(
+        `/api/items/stock?client=${encodeURIComponent(clientSel.value)}`,
+        document.getElementById('stockModal'),
+        document.getElementById('stockModalBackdrop'),
+        document.querySelector('#stockTable tbody'),
+        (item, c) => c.insertAdjacentHTML('beforeend', `
+          <tr>
+            <td><input type="checkbox"
+                       data-id="${item.id}"
+                       data-type="Stock"
+                       data-part="${item.itemInfo.partNumber}"
+                       data-serial="${item.serialNumber}"
+                       data-desc="${item.itemInfo.description}"
+                       data-ownership="${item.ownership}"
+                       data-condition="${item.itemCondition}"/></td>
+            <td>${item.id}</td>
+            <td>${item.itemInfo.partNumber}</td>
+            <td>${item.serialNumber}</td>
+            <td>${item.itemInfo.description}</td>
+            <td>${item.ownership}</td>
+            <td>${item.itemCondition}</td>
+          </tr>`)
       );
-      stockCloseBtn.addEventListener('click', () =>
-        closeModal(stockModal, stockBackdrop)
+      document.getElementById('stockModalCloseBtn').onclick = ()=> closeModal(
+        document.getElementById('stockModal'),
+        document.getElementById('stockModalBackdrop')
       );
-      stockBackdrop.addEventListener('click', () =>
-        closeModal(stockModal, stockBackdrop)
+      document.getElementById('stockModalBackdrop').onclick = ()=> closeModal(
+        document.getElementById('stockModal'),
+        document.getElementById('stockModalBackdrop')
       );
-      stockAddBtn.addEventListener('click', () => {
+      document.getElementById('stockModalAddBtn').onclick = ()=>{
         document.querySelectorAll('#stockTable input[type=checkbox]:checked')
-          .forEach(chk => addRow(chk.dataset.type, {
-            id:           chk.dataset.id,
-            partNumber:   chk.dataset.part,
-            serialNumber: chk.dataset.serial,
-            description:  chk.dataset.desc,
-            ownership:    chk.dataset.ownership,
-            condition:    chk.dataset.condition
-          }));
-        closeModal(stockModal, stockBackdrop);
-      });
+          .forEach(chk=>{
+            addRow({
+              id:           chk.dataset.id,
+              type:         chk.dataset.type,
+              partNumber:   chk.dataset.part,
+              description:  chk.dataset.desc,
+              serialNumber: chk.dataset.serial,
+              ownership:    chk.dataset.ownership,
+              condition:    chk.dataset.condition
+            });
+          });
+        closeModal(document.getElementById('stockModal'), document.getElementById('stockModalBackdrop'));
+      };
 
-      // Repair handlers
-      addRepairBtn.addEventListener('click', () =>
-        openModal('/api/items/repair', repairModal, repairBackdrop, repairTbody)
+      // Repair
+      document.getElementById('addRepairItemBtn').onclick = ()=> openModal(
+        `/api/items/repair?client=${encodeURIComponent(clientSel.value)}`,
+        document.getElementById('repairModal'),
+        document.getElementById('repairModalBackdrop'),
+        document.querySelector('#repairTable tbody'),
+        (item, c) => c.insertAdjacentHTML('beforeend', `
+          <tr>
+            <td><input type="checkbox"
+                       data-id="${item.id}"
+                       data-type="Repair"
+                       data-part="${item.itemInfo.partNumber}"
+                       data-serial="${item.serialNumber}"
+                       data-desc="${item.itemInfo.description}"
+                       data-ownership="${item.ownership}"
+                       data-condition="${item.itemCondition}"/></td>
+            <td>${item.id}</td>
+            <td>${item.itemInfo.partNumber}</td>
+            <td>${item.serialNumber}</td>
+            <td>${item.itemInfo.description}</td>
+            <td>${item.ownership}</td>
+            <td>${item.itemCondition}</td>
+          </tr>`)
       );
-      repairCloseBtn.addEventListener('click', () =>
-        closeModal(repairModal, repairBackdrop)
+      document.getElementById('repairModalCloseBtn').onclick = ()=> closeModal(
+        document.getElementById('repairModal'),
+        document.getElementById('repairModalBackdrop')
       );
-      repairBackdrop.addEventListener('click', () =>
-        closeModal(repairModal, repairBackdrop)
+      document.getElementById('repairModalBackdrop').onclick = ()=> closeModal(
+        document.getElementById('repairModal'),
+        document.getElementById('repairModalBackdrop')
       );
-      repairAddBtn.addEventListener('click', () => {
+      document.getElementById('repairModalAddBtn').onclick = ()=>{
         document.querySelectorAll('#repairTable input[type=checkbox]:checked')
-          .forEach(chk => addRow(chk.dataset.type, {
-            id:           chk.dataset.id,
-            partNumber:   chk.dataset.part,
-            serialNumber: chk.dataset.serial,
-            description:  chk.dataset.desc,
-            ownership:    chk.dataset.ownership,
-            condition:    chk.dataset.condition
-          }));
-        closeModal(repairModal, repairBackdrop);
-      });
+          .forEach(chk=>{
+            addRow({
+              id:           chk.dataset.id,
+              type:         chk.dataset.type,
+              partNumber:   chk.dataset.part,
+              description:  chk.dataset.desc,
+              serialNumber: chk.dataset.serial,
+              ownership:    chk.dataset.ownership,
+              condition:    chk.dataset.condition
+            });
+          });
+        closeModal(document.getElementById('repairModal'), document.getElementById('repairModalBackdrop'));
+      };
+
+      // Catalog (без фильтрации добавленных)
+      document.getElementById('addCatalogItemBtn').onclick = ()=> openModal(
+        '/api/iteminfos/all',
+        document.getElementById('catalogModal'),
+        document.getElementById('catalogModalBackdrop'),
+        document.querySelector('#catalogTable tbody'),
+        (item, c) => c.insertAdjacentHTML('beforeend', `
+          <tr>
+            <td><input type="checkbox"
+                       data-type="${item.itemType}"
+                       data-part="${item.partNumber}"
+                       data-desc="${item.description}"/></td>
+            <td>${item.partNumber}</td>
+            <td>${item.description}</td>
+            <td>${item.itemType}</td>
+          </tr>`)
+      );
+      document.getElementById('catalogFilterBtn').onclick = ()=>{
+        const pn = encodeURIComponent(document.getElementById('filterPart').value),
+              dc = encodeURIComponent(document.getElementById('filterDesc').value),
+              tp = encodeURIComponent(document.getElementById('filterType').value);
+        openModal(
+          `/api/iteminfos/search?partNumber=${pn}&description=${dc}&itemType=${tp}`,
+          document.getElementById('catalogModal'),
+          document.getElementById('catalogModalBackdrop'),
+          document.querySelector('#catalogTable tbody'),
+          (item,c)=> c.insertAdjacentHTML('beforeend', `
+            <tr>
+              <td><input type="checkbox"
+                         data-type="${item.itemType}"
+                         data-part="${item.partNumber}"
+                         data-desc="${item.description}"/></td>
+              <td>${item.partNumber}</td>
+              <td>${item.description}</td>
+              <td>${item.itemType}</td>
+            </tr>`)
+        );
+      };
+      document.getElementById('catalogModalAddBtn').onclick = ()=>{
+        const currentClient = clientSel.value;
+        document.querySelectorAll('#catalogTable input[type=checkbox]:checked')
+          .forEach(chk=>{
+            addRow({
+              id:           '',
+              type:         chk.dataset.type,
+              partNumber:   chk.dataset.part,
+              description:  chk.dataset.desc,
+              serialNumber: 'TBA',
+              ownership:    currentClient,
+              condition:    'NEW_ASSEMBLY'
+            });
+          });
+        closeModal(document.getElementById('catalogModal'), document.getElementById('catalogModalBackdrop'));
+      };
+      document.getElementById('catalogModalCloseBtn').onclick = ()=> closeModal(
+        document.getElementById('catalogModal'),
+        document.getElementById('catalogModalBackdrop')
+      );
+      document.getElementById('catalogModalBackdrop').onclick = ()=> closeModal(
+        document.getElementById('catalogModal'),
+        document.getElementById('catalogModalBackdrop')
+      );
     });
 </script>
+
 </body>
 </html>

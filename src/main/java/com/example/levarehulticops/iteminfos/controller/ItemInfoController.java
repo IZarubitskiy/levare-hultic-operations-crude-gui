@@ -15,16 +15,7 @@ import org.springframework.web.bind.annotation.*;
 public class ItemInfoController {
     private final ItemInfoService service;
 
-    @GetMapping
-    public String list(@RequestParam(defaultValue = "0") int page,
-                       @RequestParam(defaultValue = "20") int size,
-                       Model model) {
-        Page<ItemInfo> pg = service.getAll(PageRequest.of(page, size));
-        model.addAttribute("page", pg);
-        return "iteminfos/list";
-    }
-
-    @GetMapping("/{partNumber}")
+       @GetMapping("/{partNumber}")
     public String view(@PathVariable String partNumber, Model model) {
         model.addAttribute("info", service.getById(partNumber));
         return "iteminfos/view";

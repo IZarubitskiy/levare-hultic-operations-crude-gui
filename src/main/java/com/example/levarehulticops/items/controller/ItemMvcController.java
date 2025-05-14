@@ -11,9 +11,12 @@ import com.example.levarehulticops.items.service.ItemService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Controller
 @RequestMapping("/items")
@@ -23,22 +26,40 @@ public class ItemMvcController {
     private final ItemService itemService;
 
     /**
-     * Stock Egypt page — shows items NEW or REPAIRED, ON_STOCK,
-     * ownership not RETS or CORP.
+     * Stock Egypt page — shows items:
+     * Condition NEW or REPAIRED,
+     * Status ON_STOCK or BOOKED,
+     * Ownership not RETS or CORP.
      */
+
     @GetMapping("/stock_egypt")
     public String stockEgypt(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             Model model
     ) {
-        Page<ItemReadDto> pg = itemService.getStockEgyptItems(PageRequest.of(page, size));
+        // Собираем параметры фильтрации
+        List<ItemCondition> conditions  = List.of(ItemCondition.NEW, ItemCondition.REPAIRED);
+        List<ItemStatus>    statuses    = List.of(ItemStatus.ON_STOCK, ItemStatus.BOOKED);
+        List<Client>        ownerships  = List.of(Client.RETS, Client.CORP);
+
+        // Вызываем метод
+        Page<ItemReadDto> pg = itemService.filterItemsExcludeClients(
+                conditions,
+                statuses,
+                ownerships,
+                PageRequest.of(page, size)
+        );
+
         model.addAttribute("page", pg);
         return "items/stock_egypt";
     }
 
     /**
-     * RNE page — показывает все Item со статусом USED и клиентом RETS.
+     * RNE page — shows items:
+     * Condition USED,
+     * Status ON_STOCK or REQUESTED_REPAIR,
+     * Ownership RETS.
      */
     @GetMapping("/rne")
     public String rneItems(
@@ -46,13 +67,28 @@ public class ItemMvcController {
             @RequestParam(defaultValue = "20") int size,
             Model model
     ) {
-        Page<ItemReadDto> pg = itemService.getRneItems(PageRequest.of(page, size));
+        // Собираем параметры фильтрации
+        List<ItemCondition> conditions  = List.of(ItemCondition.USED);
+        List<ItemStatus>    statuses    = List.of(ItemStatus.ON_STOCK, ItemStatus.REQUESTED_REPAIR);
+        List<Client>        ownerships  = List.of(Client.RETS);
+
+        // Вызываем метод
+        Page<ItemReadDto> pg = itemService.filterItems(
+                conditions,
+                statuses,
+                ownerships,
+                PageRequest.of(page, size)
+        );
+
         model.addAttribute("page", pg);
         return "items/rne";
     }
 
     /**
-     * Corporate page — показывает все Item со статусом USED и клиентом CORP.
+     * Corporate page — shows items:
+     * Condition USED,
+     * Status ON_STOCK or REQUESTED_REPAIR,
+     * ownership CORP.
      */
     @GetMapping("/rne_corporate")
     public String rneCorporateItems(
@@ -60,13 +96,28 @@ public class ItemMvcController {
             @RequestParam(defaultValue = "20") int size,
             Model model
     ) {
-        Page<ItemReadDto> pg = itemService.getRneCorporateItems(PageRequest.of(page, size));
+        // Собираем параметры фильтрации
+        List<ItemCondition> conditions  = List.of(ItemCondition.USED);
+        List<ItemStatus>    statuses    = List.of(ItemStatus.ON_STOCK, ItemStatus.REQUESTED_REPAIR);
+        List<Client>        ownerships  = List.of(Client.CORP);
+
+        // Вызываем метод
+        Page<ItemReadDto> pg = itemService.filterItems(
+                conditions,
+                statuses,
+                ownerships,
+                PageRequest.of(page, size)
+        );
+
         model.addAttribute("page", pg);
         return "items/rne_corporate";
     }
 
     /**
-     * Outstanding page — показывает все Item со статусом USED, но не с клиентами CORP или RETS.
+     * Outstanding page — shows items:
+     * Condition USED,
+     * Status ON_STOCK or REQUESTED_REPAIR,
+     * Ownership not RETS or CORP.
      */
     @GetMapping("/outstanding")
     public String outstandingItems(
@@ -74,18 +125,47 @@ public class ItemMvcController {
             @RequestParam(defaultValue = "20") int size,
             Model model
     ) {
-        Page<ItemReadDto> pg = itemService.getOutstandingItems(PageRequest.of(page, size));
+        // Собираем параметры фильтрации
+        List<ItemCondition> conditions  = List.of(ItemCondition.USED);
+        List<ItemStatus>    statuses    = List.of(ItemStatus.ON_STOCK, ItemStatus.REQUESTED_REPAIR);
+        List<Client>        ownerships  = List.of(Client.RETS, Client.CORP);
+
+        // Вызываем метод
+        Page<ItemReadDto> pg = itemService.filterItemsExcludeClients(
+                conditions,
+                statuses,
+                ownerships,
+                PageRequest.of(page, size)
+        );
+
         model.addAttribute("page", pg);
         return "items/outstanding";
     }
 
+    /**
+     * Stock Corporate page — shows items:
+     * Condition NEW or REPAIRED,
+     * Status ON_STOCK or BOOKED,
+     * Ownership  CORP.
+     */
     @GetMapping("/stock_corporate")
     public String stockCorporate(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             Model model
     ) {
-        Page<ItemReadDto> pg = itemService.getStockCorporateItems(PageRequest.of(page, size));
+        // Собираем параметры фильтрации
+        List<ItemCondition> conditions  = List.of(ItemCondition.NEW, ItemCondition.REPAIRED);
+        List<ItemStatus>    statuses    = List.of(ItemStatus.ON_STOCK, ItemStatus.BOOKED);
+        List<Client>        ownerships  = List.of(Client.CORP);
+
+        // Вызываем метод
+        Page<ItemReadDto> pg = itemService.filterItems(
+                conditions,
+                statuses,
+                ownerships,
+                PageRequest.of(page, size)
+        );
         model.addAttribute("page", pg);
         return "items/stock_corporate";
     }

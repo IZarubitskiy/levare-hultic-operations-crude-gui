@@ -8,6 +8,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
+
 public interface ItemRepository extends JpaRepository<Item, Long> {
     Page<Item> findByItemConditionAndOwnership(ItemCondition itemCondition, Client ownership, Pageable pageable);
     Page<Item> findByItemConditionIn(ItemCondition[] conditions, Pageable pageable);
@@ -60,6 +62,20 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
             ItemCondition[] conditions,
             ItemStatus status,
             Client ownership,
+            Pageable pageable
+    );
+
+    Page<Item> findByItemConditionInAndItemStatusInAndOwnershipIn(
+            List<ItemCondition> conditions,
+            List<ItemStatus> statuses,
+            List<Client> ownerships,
+            Pageable pageable
+    );
+
+    Page<Item> findByItemConditionInAndItemStatusInAndOwnershipNotIn(
+            List<ItemCondition> conditions,
+            List<ItemStatus> statuses,
+            List<Client> ownerships,
             Pageable pageable
     );
 

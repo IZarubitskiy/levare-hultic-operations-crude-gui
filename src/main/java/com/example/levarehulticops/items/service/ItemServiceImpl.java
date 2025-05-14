@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -55,7 +56,6 @@ public class ItemServiceImpl implements ItemService {
         Item item = itemRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Item not found: " + id));
 
-        // Apply non-null updates to the entity
         itemMapper.updateEntityFromDto(dto, item);
 
         Item updated = itemRepository.save(item);
@@ -86,103 +86,30 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Page<ItemReadDto> getItemsByConditionAndClient(ItemCondition condition, Client client, Pageable pageable) {
-        Page<Item> page =
-                itemRepository.findByItemConditionAndOwnership(condition, client, pageable);
-        return page.map(itemMapper::toReadDto);
-    }
-
-    @Override
-    public Page<ItemReadDto> getItemsByConditionIn(ItemCondition[] conditions, Pageable pageable) {
-        Page<Item> page =
-                itemRepository.findByItemConditionIn(conditions, pageable);
-        return page.map(itemMapper::toReadDto);
-    }
-
-    @Override
-    public Page<ItemReadDto> getItemsByConditionAndNotClients(ItemCondition condition, Client[] excludedClients, Pageable pageable) {
-        Page<Item> page =
-                itemRepository.findByItemConditionAndOwnershipNotIn(condition, excludedClients, pageable);
-        return page.map(itemMapper::toReadDto);
-    }
-
-    @Override
-    public Page<ItemReadDto> getStockEgyptItems(Pageable pageable) {
-        ItemCondition[] conds = { ItemCondition.NEW, ItemCondition.REPAIRED };
-        Client[] excluded = { Client.CORP, Client.RETS };
-        Page<Item> page =
-                itemRepository.findByItemConditionInAndItemStatusAndOwnershipNotIn(
-                        conds, ItemStatus.ON_STOCK, excluded, pageable
-                );
-        return page.map(itemMapper::toReadDto);
-    }
-
-    @Override
-    public Page<ItemReadDto> getOutstandingItems(Pageable pageable) {
-        Client[] excluded = { Client.CORP, Client.RETS };
-        Page<Item> page =
-                itemRepository.findByItemConditionAndItemStatusAndOwnershipNotIn(
-                        ItemCondition.USED,
-                        ItemStatus.ON_STOCK,
-                        excluded,
-                        pageable
-                );
-        return page.map(itemMapper::toReadDto);
-    }
-
-    @Override
-    public Page<ItemReadDto> getRneItems(Pageable pageable) {
-        Page<Item> page =
-                itemRepository.findByItemConditionAndItemStatusAndOwnership(
-                        ItemCondition.USED,
-                        ItemStatus.ON_STOCK,
-                        Client.RETS,
-                        pageable
-                );
-        return page.map(itemMapper::toReadDto);
-    }
-
-    @Override
-    public Page<ItemReadDto> getStockCorporateItems(Pageable pageable) {
-        // Теперь NEW и REPAIRED
-        ItemCondition[] conds = { ItemCondition.NEW, ItemCondition.REPAIRED };
-        Page<Item> page = itemRepository.findByItemConditionInAndItemStatusAndOwnership(
-                conds,
-                ItemStatus.ON_STOCK,
-                Client.CORP,
-                pageable
-        );
-        return page.map(itemMapper::toReadDto);
-    }
-
-    @Override
-    public Page<ItemReadDto> getStockItemsByClient(Client client, Pageable pageable) {
-        ItemCondition[] conds = { ItemCondition.NEW, ItemCondition.REPAIRED };
-        Page<Item> page = itemRepository.findByItemConditionInAndItemStatusAndOwnership(
-                conds,
-                ItemStatus.ON_STOCK,
-                client,
-                pageable
-        );
-        return page.map(itemMapper::toReadDto);
-    }
-
-    @Override
-    public Page<ItemReadDto> getRepairItemsByClient(Pageable pageable, Client client) {
-        ItemCondition[] conds = { ItemCondition.USED };
+    public Page<ItemReadDto> filterItems(
+            List<ItemCondition> conditions,
+            List<ItemStatus> statuses,
+            List<Client> ownerships,
+            Pageable pageable
+    ) {
         return itemRepository
-                .findByItemConditionInAndItemStatusAndOwnership(conds, ItemStatus.ON_STOCK, client, pageable)
+                .findByItemConditionInAndItemStatusInAndOwnershipIn(
+                        conditions, statuses, ownerships, pageable
+                )
                 .map(itemMapper::toReadDto);
     }
 
     @Override
-    public Page<ItemReadDto> getRneCorporateItems(Pageable pageable) {
-        Page<Item> page = itemRepository.findByItemConditionAndItemStatusAndOwnership(
-                ItemCondition.USED,
-                ItemStatus.ON_STOCK,
-                Client.CORP,
-                pageable
-        );
-        return page.map(itemMapper::toReadDto);
+    public Page<ItemReadDto> filterItemsExcludeClients(
+            List<ItemCondition> conditions,
+            List<ItemStatus> statuses,
+            List<Client> ownerships,
+            Pageable pageable
+    ) {
+        return itemRepository
+                .findByItemConditionInAndItemStatusInAndOwnershipNotIn(
+                        conditions, statuses, ownerships, pageable
+                )
+                .map(itemMapper::toReadDto);
     }
 }

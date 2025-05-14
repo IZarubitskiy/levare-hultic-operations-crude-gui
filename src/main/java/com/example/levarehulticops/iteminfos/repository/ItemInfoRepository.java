@@ -1,6 +1,12 @@
 package com.example.levarehulticops.iteminfos.repository;
 
+import com.example.levarehulticops.iteminfos.dto.ItemInfoDto;
+import com.example.levarehulticops.iteminfos.entity.ItemType;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Repository;
 import com.example.levarehulticops.iteminfos.entity.ItemInfo;
 import java.util.Optional;
@@ -37,4 +43,13 @@ public interface ItemInfoRepository extends JpaRepository<ItemInfo, String> {
      * Check existence of ItemInfo by partnumber.
      */
     boolean existsByPartNumber (String partNumber);
+
+    Page<ItemInfoDto> findByPartNumberContainingIgnoreCaseAndDescriptionContainingIgnoreCaseAndItemType(
+            String partNumber,
+            String description,
+            ItemType itemType,
+            Pageable pageable
+    );
+
+    Page<ItemInfo> findAll(@Nullable Specification<ItemInfo> spec, Pageable pageable);
 }
