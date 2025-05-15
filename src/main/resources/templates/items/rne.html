@@ -1,43 +1,105 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head><title>RNE Items</title></head>
+<head>
+    <meta charset="UTF-8"/>
+    <title>RNE Items</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            color: #333;
+        }
+        h1 {
+            color: #4a4a4a;
+            margin-bottom: 10px;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        thead th {
+            background-color: #2a9d8f;
+            color: #fff;
+            padding: 10px;
+            text-transform: uppercase;
+            font-size: 0.9em;
+            letter-spacing: 0.05em;
+        }
+        /* Центрируем все заголовки, кроме третьего (Description) */
+        thead th:not(:nth-child(3)) {
+            text-align: center;
+        }
+        tbody tr:nth-child(even) {
+            background-color: #f7f7f7;
+        }
+        tbody tr:hover {
+            background-color: #e0f2f1;
+        }
+        td {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+            font-size: 0.95em;
+        }
+        /* Центрируем все ячейки, кроме Description (3-й столбец) */
+        tbody td:not(:nth-child(3)) {
+            text-align: center;
+        }
+        .pagination {
+            margin-top: 15px;
+        }
+        .pagination a {
+            margin-right: 10px;
+            text-decoration: none;
+            color: #2a9d8f;
+        }
+        .pagination span {
+            margin-right: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
 <body>
 <div th:insert="fragments/header :: header"></div>
-<h1>RNE Items (USED, ON_STOCK, RETS)</h1>
+
+<h1>Repair and Exchange Stock</h1>
 <table>
     <thead>
     <tr>
         <th>#</th>
-        <th>Item ID</th>
-        <th>Catalog Part#</th>
+        <th>Catalog Partnumber</th>
         <th>Description</th>
         <th>Type</th>
-        <th>Client Part#</th>
         <th>Serial</th>
         <th>Ownership</th>
         <th>Condition</th>
         <th>Status</th>
-        <th>JobOrder ID</th>
         <th>Comments</th>
     </tr>
     </thead>
     <tbody>
-    <tr th:each="item,iter : ${page.content}">
+    <tr th:each="item, iter : ${page.content}">
         <td th:text="${iter.index + 1}">1</td>
-        <td th:text="${item.id}">ID</td>
         <td th:text="${item.itemInfo.partNumber}">PN</td>
         <td th:text="${item.itemInfo.description}">Desc</td>
         <td th:text="${item.itemInfo.itemType}">Type</td>
-        <td th:text="${item.clientPartNumber}">CPN</td>
         <td th:text="${item.serialNumber}">SN</td>
         <td th:text="${item.ownership}">OWN</td>
         <td th:text="${item.itemCondition}">COND</td>
         <td th:text="${item.itemStatus}">STAT</td>
-        <td th:text="${item.jobOrderId}">JO</td>
         <td th:text="${item.comments}">CM</td>
     </tr>
     </tbody>
 </table>
+
+<div class="pagination">
+    <span th:text="'Page ' + (${page.number} + 1) + ' of ' + ${page.totalPages}">Page info</span>
+    <a th:href="@{/items/rne(page=${page.number - 1},size=${page.size})}"
+       th:if="${page.hasPrevious()}">‹ Prev</a>
+    <a th:href="@{/items/rne(page=${page.number + 1},size=${page.size})}"
+       th:if="${page.hasNext()}">Next ›</a>
+</div>
+
 <div th:insert="fragments/footer :: footer"></div>
 </body>
 </html>

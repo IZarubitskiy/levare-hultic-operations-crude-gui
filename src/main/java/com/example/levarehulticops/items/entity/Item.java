@@ -27,7 +27,7 @@ public class Item {
     /**
      * Client-specific part number
      */
-    @Column(name = "client_part_number", nullable = false)
+    @Column(name = "client_part_number", nullable = true)
     private String clientPartNumber;
 
     /**

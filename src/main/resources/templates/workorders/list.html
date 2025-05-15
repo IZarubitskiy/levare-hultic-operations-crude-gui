@@ -1,15 +1,79 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8"/>
     <title>Work Orders</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            color: #333;
+        }
+        h1 {
+            color: #4a4a4a;
+            margin-bottom: 10px;
+        }
+        a {
+            color: #2a9d8f;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        thead th {
+            background-color: #2a9d8f;
+            color: #fff;
+            padding: 10px;
+            text-transform: uppercase;
+            font-size: 0.9em;
+            letter-spacing: 0.05em;
+        }
+        /* Центрируем все колонки, кроме комментариев */
+        thead th:not(:nth-child(9)) {
+            text-align: center;
+        }
+        tbody tr:nth-child(even) {
+            background-color: #f7f7f7;
+        }
+        tbody tr:hover {
+            background-color: #e0f2f1;
+        }
+        td {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+            font-size: 0.95em;
+        }
+        /* Центрируем все данные, кроме комментариев */
+        tbody td:not(:nth-child(9)) {
+            text-align: center;
+        }
+        .pagination ul {
+            list-style: none;
+            padding: 0;
+            margin: 15px 0;
+        }
+        .pagination li {
+            display: inline;
+            margin-right: 10px;
+        }
+        .pagination a {
+            color: #2a9d8f;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
 <div th:insert="fragments/header :: header"></div>
 
 <h1>Work Orders</h1>
-<a th:href="@{/workorders/new}">Create New WorkOrder</a>
+<p><a th:href="@{/workorders/new}">Create New Work Order</a></p>
 
-<table border="1" cellpadding="5">
+<table>
     <thead>
     <tr>
         <th>#</th>
@@ -43,13 +107,13 @@
     </tbody>
 </table>
 
-<div>
+<div class="pagination">
     <ul>
         <li th:if="${page.hasPrevious()}">
-            <a th:href="@{/workorders(page=${page.number-1},size=${page.size})}">Previous</a>
+            <a th:href="@{/workorders(page=${page.number-1},size=${page.size})}">‹ Prev</a>
         </li>
         <li th:if="${page.hasNext()}">
-            <a th:href="@{/workorders(page=${page.number+1},size=${page.size})}">Next</a>
+            <a th:href="@{/workorders(page=${page.number+1},size=${page.size})}">Next ›</a>
         </li>
     </ul>
 </div>
