@@ -8,9 +8,13 @@ import org.springframework.data.domain.Pageable;
 
 public interface ItemInfoService {
     Page<ItemInfoDto> getAll(Pageable pageable);
+
     ItemInfo getById(String partNumber);
+
     ItemInfo create(ItemInfo info);
+
     ItemInfo update(ItemInfo info);
+
     // нет удаления: справочник правим, но не удаляем вовсе
     Page<ItemInfoDto> filter(
             String partNumber,
@@ -18,5 +22,6 @@ public interface ItemInfoService {
             ItemType itemType,
             Pageable pg
     );
+
     Page<ItemInfoDto> search(String partNumber, String description, String itemType, Pageable pageable);
 }

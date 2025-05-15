@@ -6,8 +6,12 @@ import org.springframework.data.domain.Pageable;
 
 public interface TransactionService {
     Transaction create(Transaction tx);
+
     Transaction update(Transaction tx);
+
     void delete(Long id);
+
     Transaction getById(Long id);
+
     Page<Transaction> getAll(Pageable pageable);
 }

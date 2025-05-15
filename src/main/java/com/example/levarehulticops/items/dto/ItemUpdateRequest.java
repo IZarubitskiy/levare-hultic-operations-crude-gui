@@ -1,8 +1,8 @@
 package com.example.levarehulticops.items.dto;
 
-import com.example.levarehulticops.workorders.entity.Client;
 import com.example.levarehulticops.items.entity.ItemCondition;
 import com.example.levarehulticops.items.entity.ItemStatus;
+import com.example.levarehulticops.workorders.entity.Client;
 
 /**
  * DTO for updating an existing Item.
@@ -30,4 +30,5 @@ public record ItemUpdateRequest(
         /** Free-form comments */
         String comments
 
-) {}
+) {
+}

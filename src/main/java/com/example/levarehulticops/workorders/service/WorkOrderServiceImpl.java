@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
-import java.security.PrivateKey;
 import java.time.LocalDate;
 import java.time.ZoneId;
 
@@ -59,6 +58,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
                 .orElseThrow(() -> new EntityNotFoundException("WorkOrder not found: " + id));
     }
 
+
     @Override
     @Transactional(readOnly = true)
     public Page<WorkOrder> getAll(Pageable pageable) {
@@ -71,5 +71,11 @@ public class WorkOrderServiceImpl implements WorkOrderService {
             throw new EntityNotFoundException("WorkOrder not found: " + id);
         }
         workOrderRepository.deleteById(id);
+    }
+
+    @Override
+    public Page<WorkOrderReadDto> getByStatus(WorkOrderStatus status, Pageable pageable) {
+        return workOrderRepository.findAllByStatus(status, pageable)
+                .map(workOrderMapper::toReadDto);
     }
 }

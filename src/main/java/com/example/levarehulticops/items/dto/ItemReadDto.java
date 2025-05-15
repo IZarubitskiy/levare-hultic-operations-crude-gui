@@ -1,9 +1,9 @@
 package com.example.levarehulticops.items.dto;
 
 import com.example.levarehulticops.iteminfos.dto.ItemInfoDto;
-import com.example.levarehulticops.workorders.entity.Client;
 import com.example.levarehulticops.items.entity.ItemCondition;
 import com.example.levarehulticops.items.entity.ItemStatus;
+import com.example.levarehulticops.workorders.entity.Client;
 
 /**
  * DTO for reading Item details.
@@ -36,4 +36,5 @@ public record ItemReadDto(
         /** Free-form comments */
         String comments
 
-) {}
+) {
+}

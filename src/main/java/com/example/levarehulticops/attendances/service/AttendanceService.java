@@ -7,8 +7,12 @@ import org.springframework.data.domain.Pageable;
 
 public interface AttendanceService {
     Attendance create(Attendance attendance);
+
     Attendance update(Attendance attendance);
+
     void delete(Long id);
+
     Attendance getById(Long id);
+
     Page<Attendance> getAll(Pageable pageable);
 }

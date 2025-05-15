@@ -3,7 +3,10 @@ package com.example.levarehulticops.joborders.entity;
 import com.example.levarehulticops.employees.entity.Employee;
 import com.example.levarehulticops.items.entity.Item;
 import com.example.levarehulticops.workorders.entity.WorkOrder;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
 
 @Entity

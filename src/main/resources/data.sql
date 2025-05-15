@@ -1732,3 +1732,45 @@ INSERT INTO items (
   ('10017173', NULL, 'SN-1097','CORP','USED','ON_STOCK',NULL,'rne_corporate #18'),
   ('10082246', NULL, 'SN-1098','CORP','USED','ON_STOCK',NULL,'rne_corporate #19'),
   ('10082270', NULL, 'SN-1099','CORP','USED','ON_STOCK',NULL,'rne_corporate #20');
+
+INSERT INTO employees (name, position, username, password_hash, role) VALUES
+  ('John Doe',        'Technician',   'jdoe',        '$2a$10$7qJ...dummyhash1', 'USER'),
+  ('Jane Smith',      'Engineer',     'jsmith',      '$2a$10$7qJ...dummyhash2', 'USER'),
+  ('Bob Johnson',     'Supervisor',   'bjohnson',    '$2a$10$7qJ...dummyhash3', 'USER'),
+  ('Alice Brown',     'Manager',      'abrown',      '$2a$10$7qJ...dummyhash4', 'ADMIN'),
+  ('Mike Davis',      'Technician',   'mdavis',      '$2a$10$7qJ...dummyhash5', 'USER'),
+  ('Emma Wilson',     'Engineer',     'ewilson',     '$2a$10$7qJ...dummyhash6', 'USER'),
+  ('Chris Taylor',    'Supervisor',   'ctaylor',     '$2a$10$7qJ...dummyhash7', 'USER'),
+  ('Olivia Thomas',   'Manager',      'othomas',     '$2a$10$7qJ...dummyhash8', 'ADMIN'),
+  ('David Lee',       'Engineer',     'dlee',        '$2a$10$7qJ...dummyhash9', 'USER'),
+  ('Sophia Harris',   'Technician',   'sharris',     '$2a$10$7qJ...dummyhash10','USER');
+
+
+INSERT INTO work_orders (work_order_number, client, well, request_date, delivery_date, status, requestor_id, comments, version) VALUES
+  ('WO-001','PETCO','Well Alpha','2025-01-01','2025-01-10','CREATED',1,'Test order 1',0),
+  ('WO-002','METCO','Well Beta','2025-01-02','2025-01-12','APPROVED',2,'Test order 2',0),
+  ('WO-003','KETCO','Well Gamma','2025-01-03','2025-01-14','IN_PROGRESS',3,'Test order 3',0),
+  ('WO-004','RETCO','Well Delta','2025-01-04','2025-01-16','DONE',4,'Test order 4',0),
+  ('WO-005','RETS','Well Epsilon','2025-01-05','2025-01-18','CANCELLED',5,'Test order 5',0),
+  ('WO-006','PETCO','Well Zeta','2025-01-06','2025-01-20','CREATED',1,'Test order 6',0),
+  ('WO-007','METCO','Well Eta','2025-01-07','2025-01-22','APPROVED',2,'Test order 7',0),
+  ('WO-008','KETCO','Well Theta','2025-01-08','2025-01-24','IN_PROGRESS',3,'Test order 8',0),
+  ('WO-009','RETCO','Well Iota','2025-01-09','2025-01-26','DONE',4,'Test order 9',0),
+  ('WO-010','RETS','Well Kappa','2025-01-10','2025-01-28','CANCELLED',5,'Test order 10',0),
+  ('WO-011','PETCO','Well Lambda','2025-01-11','2025-01-30','CREATED',1,'Test order 11',0),
+  ('WO-012','METCO','Well Mu','2025-01-12','2025-02-01','APPROVED',2,'Test order 12',0),
+  ('WO-013','KETCO','Well Nu','2025-01-13','2025-02-03','IN_PROGRESS',3,'Test order 13',0),
+  ('WO-014','RETCO','Well Xi','2025-01-14','2025-02-05','DONE',4,'Test order 14',0),
+  ('WO-015','RETS','Well Omicron','2025-01-15','2025-02-07','CANCELLED',5,'Test order 15',0),
+  ('WO-016','PETCO','Well Pi','2025-01-16','2025-02-09','CREATED',1,'Test order 16',0),
+  ('WO-017','METCO','Well Rho','2025-01-17','2025-02-11','APPROVED',2,'Test order 17',0),
+  ('WO-018','KETCO','Well Sigma','2025-01-18','2025-02-13','IN_PROGRESS',3,'Test order 18',0),
+  ('WO-019','RETCO','Well Tau','2025-01-19','2025-02-15','DONE',4,'Test order 19',0),
+  ('WO-020','RETS','Well Upsilon','2025-01-20','2025-02-17','CANCELLED',5,'Test order 20',0),
+  ('WO-021','PETCO','Well Phi','2025-01-21','2025-02-19','CREATED',1,'Test order 21',0),
+  ('WO-022','METCO','Well Chi','2025-01-22','2025-02-21','APPROVED',2,'Test order 22',0),
+  ('WO-023','KETCO','Well Psi','2025-01-23','2025-02-23','IN_PROGRESS',3,'Test order 23',0),
+  ('WO-024','RETCO','Well Omega','2025-01-24','2025-02-25','DONE',4,'Test order 24',0),
+  ('WO-025','RETS','Well Alpha2','2025-01-25','2025-02-27','CANCELLED',5,'Test order 25',0);
+
+

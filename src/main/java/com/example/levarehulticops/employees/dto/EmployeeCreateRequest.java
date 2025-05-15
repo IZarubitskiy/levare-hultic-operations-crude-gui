@@ -1,6 +1,7 @@
 package com.example.levarehulticops.employees.dto;
 
 import com.example.levarehulticops.employees.entity.AccessLevel;
+
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -28,4 +29,5 @@ public record EmployeeCreateRequest(
         /** System access level */
         @NotNull(message = "Role must not be null")
         AccessLevel role
-) {}
+) {
+}

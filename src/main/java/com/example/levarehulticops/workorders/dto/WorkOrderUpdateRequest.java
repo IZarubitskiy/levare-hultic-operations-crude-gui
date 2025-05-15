@@ -28,4 +28,5 @@ public record WorkOrderUpdateRequest(
         /** Current version for optimistic locking */
         @NotNull(message = "Version must not be null")
         Long version
-) {}
+) {
+}

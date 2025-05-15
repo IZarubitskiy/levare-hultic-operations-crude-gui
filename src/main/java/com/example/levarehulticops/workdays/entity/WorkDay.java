@@ -2,7 +2,10 @@ package com.example.levarehulticops.workdays.entity;
 
 import com.example.levarehulticops.employees.entity.Employee;
 import com.example.levarehulticops.joborders.entity.JobOrder;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.ArrayList;

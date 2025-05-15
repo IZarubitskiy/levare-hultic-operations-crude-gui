@@ -1,11 +1,14 @@
 package com.example.levarehulticops.executionlogs.entity;
 
-import com.example.levarehulticops.workdays.entity.WorkDay;
 import com.example.levarehulticops.joborders.entity.JobOrder;
-import lombok.*;
+import com.example.levarehulticops.joborders.entity.JobOrderStatus;
+import com.example.levarehulticops.workdays.entity.WorkDay;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import com.example.levarehulticops.joborders.entity.JobOrderStatus;
 
 @Entity
 @Table(name = "execution_logs")

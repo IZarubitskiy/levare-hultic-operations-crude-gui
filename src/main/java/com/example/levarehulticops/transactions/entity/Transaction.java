@@ -1,9 +1,12 @@
 package com.example.levarehulticops.transactions.entity;
 
 import com.example.levarehulticops.employees.entity.Employee;
-import com.example.levarehulticops.joborders.entity.JobOrderStatus;
 import com.example.levarehulticops.joborders.entity.JobOrder;
-import lombok.*;
+import com.example.levarehulticops.joborders.entity.JobOrderStatus;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
 

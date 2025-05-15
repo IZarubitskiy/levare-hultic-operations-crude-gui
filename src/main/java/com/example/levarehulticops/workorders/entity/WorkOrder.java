@@ -3,7 +3,11 @@ package com.example.levarehulticops.workorders.entity;
 import com.example.levarehulticops.employees.entity.Employee;
 import com.example.levarehulticops.iteminfos.entity.ItemInfo;
 import com.example.levarehulticops.items.entity.Item;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -42,7 +46,7 @@ public class WorkOrder {
 
     /**
      * 1) Items actually taken from stock (serial numbers)
-     *    link table: wo_stock_items(workorder_id, item_id)
+     * link table: wo_stock_items(workorder_id, item_id)
      */
     @ManyToMany
     @JoinTable(
@@ -54,7 +58,7 @@ public class WorkOrder {
 
     /**
      * 2) Items sent for repair (serial numbers)
-     *    link table: wo_repair_items(workorder_id, item_id)
+     * link table: wo_repair_items(workorder_id, item_id)
      */
     @ManyToMany
     @JoinTable(
@@ -66,7 +70,7 @@ public class WorkOrder {
 
     /**
      * 3) Items ordered (new), without serial numbers, reference only by item info
-     *    link table: wo_new_requests(workorder_id, item_info_id)
+     * link table: wo_new_requests(workorder_id, item_info_id)
      */
     @ManyToMany
     @JoinTable(

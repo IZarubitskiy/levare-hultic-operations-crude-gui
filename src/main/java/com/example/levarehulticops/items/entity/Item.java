@@ -1,10 +1,13 @@
 package com.example.levarehulticops.items.entity;
 
-import com.example.levarehulticops.joborders.entity.JobOrder;
-import lombok.*;
-import javax.persistence.*;
 import com.example.levarehulticops.iteminfos.entity.ItemInfo;
+import com.example.levarehulticops.joborders.entity.JobOrder;
 import com.example.levarehulticops.workorders.entity.Client;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import javax.persistence.*;
 
 @Entity
 @Table(name = "items")

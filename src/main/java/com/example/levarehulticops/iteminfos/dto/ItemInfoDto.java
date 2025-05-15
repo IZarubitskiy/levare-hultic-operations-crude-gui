@@ -15,4 +15,5 @@ public record ItemInfoDto(
 
         /** Type of the item (e.g., Pump, Valve, Seal) */
         ItemType itemType
-) {}
+) {
+}

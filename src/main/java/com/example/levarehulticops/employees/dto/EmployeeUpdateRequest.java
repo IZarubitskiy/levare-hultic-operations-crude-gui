@@ -1,6 +1,7 @@
 package com.example.levarehulticops.employees.dto;
 
 import com.example.levarehulticops.employees.entity.AccessLevel;
+
 import javax.validation.constraints.NotNull;
 
 /**
@@ -26,4 +27,5 @@ public record EmployeeUpdateRequest(
 
         /** New system access level (optional) */
         AccessLevel role
-) {}
+) {
+}

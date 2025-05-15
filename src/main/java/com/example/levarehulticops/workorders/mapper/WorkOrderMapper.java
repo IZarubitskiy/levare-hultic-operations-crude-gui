@@ -1,20 +1,19 @@
 package com.example.levarehulticops.workorders.mapper;
 
-import com.example.levarehulticops.employees.entity.Employee;
-import com.example.levarehulticops.items.mapper.ItemMapper;
-import com.example.levarehulticops.employees.mapper.EmployeeMapper;
-import com.example.levarehulticops.iteminfos.mapper.ItemInfoMapper;
-import org.springframework.stereotype.Component;
-import com.example.levarehulticops.workorders.entity.WorkOrder;
-import com.example.levarehulticops.workorders.dto.WorkOrderCreateRequest;
-import com.example.levarehulticops.workorders.dto.WorkOrderUpdateRequest;
-import com.example.levarehulticops.workorders.dto.WorkOrderReadDto;
-import com.example.levarehulticops.items.dto.ItemReadDto;
-import com.example.levarehulticops.iteminfos.dto.ItemInfoDto;
 import com.example.levarehulticops.employees.dto.EmployeeDto;
-import com.example.levarehulticops.items.entity.Item;
+import com.example.levarehulticops.employees.entity.Employee;
+import com.example.levarehulticops.employees.mapper.EmployeeMapper;
+import com.example.levarehulticops.iteminfos.dto.ItemInfoDto;
 import com.example.levarehulticops.iteminfos.entity.ItemInfo;
-import com.example.levarehulticops.workorders.entity.Client;
+import com.example.levarehulticops.iteminfos.mapper.ItemInfoMapper;
+import com.example.levarehulticops.items.dto.ItemReadDto;
+import com.example.levarehulticops.items.entity.Item;
+import com.example.levarehulticops.items.mapper.ItemMapper;
+import com.example.levarehulticops.workorders.dto.WorkOrderCreateRequest;
+import com.example.levarehulticops.workorders.dto.WorkOrderReadDto;
+import com.example.levarehulticops.workorders.dto.WorkOrderUpdateRequest;
+import com.example.levarehulticops.workorders.entity.WorkOrder;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -37,7 +36,9 @@ public class WorkOrderMapper {
         this.employeeMapper = employeeMapper;
     }
 
-    /** Entity → Read DTO */
+    /**
+     * Entity → Read DTO
+     */
     public WorkOrderReadDto toReadDto(WorkOrder wo) {
         List<ItemReadDto> stock = wo.getStockItems().stream()
                 .map(itemMapper::toReadDto)
@@ -125,21 +126,35 @@ public class WorkOrderMapper {
         return wo;
     }
 
-    /** Update DTO → existing Entity */
+    /**
+     * Update DTO → existing Entity
+     */
     public void updateEntityFromDto(WorkOrderUpdateRequest dto, WorkOrder wo) {
         if (dto.stockItemIds() != null) {
             wo.setStockItems(dto.stockItemIds().stream()
-                    .map(id -> { Item i = new Item(); i.setId(id); return i; })
+                    .map(id -> {
+                        Item i = new Item();
+                        i.setId(id);
+                        return i;
+                    })
                     .collect(Collectors.toList()));
         }
         if (dto.repairItemIds() != null) {
             wo.setRepairItems(dto.repairItemIds().stream()
-                    .map(id -> { Item i = new Item(); i.setId(id); return i; })
+                    .map(id -> {
+                        Item i = new Item();
+                        i.setId(id);
+                        return i;
+                    })
                     .collect(Collectors.toList()));
         }
         if (dto.newRequestIds() != null) {
             wo.setNewRequests(dto.newRequestIds().stream()
-                    .map(code -> { ItemInfo info = new ItemInfo(); info.setId(code); return info; })
+                    .map(code -> {
+                        ItemInfo info = new ItemInfo();
+                        info.setId(code);
+                        return info;
+                    })
                     .collect(Collectors.toList()));
         }
         if (dto.deliveryDate() != null) {

@@ -21,4 +21,5 @@ public record JobOrderCreateRequest(
 
         /** Optional comments */
         String comments
-) {}
+) {
+}

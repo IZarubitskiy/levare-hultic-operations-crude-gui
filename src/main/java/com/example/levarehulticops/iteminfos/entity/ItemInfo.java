@@ -1,10 +1,16 @@
 package com.example.levarehulticops.iteminfos.entity;
 
 import com.example.levarehulticops.workorders.entity.Client;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Catalog entry for items, with per-client part-number mappings.

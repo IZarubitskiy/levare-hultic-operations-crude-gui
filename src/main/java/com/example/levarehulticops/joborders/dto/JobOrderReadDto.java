@@ -1,8 +1,8 @@
 package com.example.levarehulticops.joborders.dto;
 
 import com.example.levarehulticops.employees.dto.EmployeeDto;
-import com.example.levarehulticops.joborders.entity.JobOrderStatus;
 import com.example.levarehulticops.items.dto.ItemReadDto;
+import com.example.levarehulticops.joborders.entity.JobOrderStatus;
 
 /**
  * DTO for reading a JobOrder for edit/view.
@@ -29,4 +29,5 @@ public record JobOrderReadDto(
 
         /** Version for optimistic locking */
         Long version
-) {}
+) {
+}

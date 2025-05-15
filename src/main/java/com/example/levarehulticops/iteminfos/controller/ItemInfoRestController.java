@@ -2,11 +2,9 @@ package com.example.levarehulticops.iteminfos.controller;
 
 import com.example.levarehulticops.iteminfos.dto.ItemInfoDto;
 import com.example.levarehulticops.iteminfos.entity.ItemInfo;
-import com.example.levarehulticops.iteminfos.entity.ItemType;
 import com.example.levarehulticops.iteminfos.service.ItemInfoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
@@ -43,6 +41,7 @@ public class ItemInfoRestController {
     ) {
         return service.search(partNumber, description, itemType, pageable);
     }
+
     @GetMapping("/all")
     public Page<ItemInfoDto> getAll(
             @PageableDefault(size = 20) Pageable pageable

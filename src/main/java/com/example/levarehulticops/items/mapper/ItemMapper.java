@@ -2,11 +2,11 @@ package com.example.levarehulticops.items.mapper;
 
 import com.example.levarehulticops.iteminfos.dto.ItemInfoDto;
 import com.example.levarehulticops.iteminfos.mapper.ItemInfoMapper;
-import org.springframework.stereotype.Component;
-import com.example.levarehulticops.items.entity.Item;
-import com.example.levarehulticops.items.dto.ItemReadDto;
 import com.example.levarehulticops.items.dto.ItemCreateRequest;
+import com.example.levarehulticops.items.dto.ItemReadDto;
 import com.example.levarehulticops.items.dto.ItemUpdateRequest;
+import com.example.levarehulticops.items.entity.Item;
+import org.springframework.stereotype.Component;
 
 /**
  * Manual mapper for Item ↔ DTOs.
@@ -19,6 +19,7 @@ public class ItemMapper {
     public ItemMapper(ItemInfoMapper itemInfoMapper) {
         this.itemInfoMapper = itemInfoMapper;
     }
+
     /**
      * Convert Item entity to read-only DTO.
      */

@@ -1,17 +1,16 @@
 package com.example.levarehulticops.items.controller;
 
+import com.example.levarehulticops.iteminfos.entity.ItemType;
 import com.example.levarehulticops.items.dto.ItemCreateRequest;
 import com.example.levarehulticops.items.dto.ItemReadDto;
 import com.example.levarehulticops.items.dto.ItemUpdateRequest;
-import com.example.levarehulticops.workorders.entity.Client;
 import com.example.levarehulticops.items.entity.ItemCondition;
 import com.example.levarehulticops.items.entity.ItemStatus;
-import com.example.levarehulticops.iteminfos.entity.ItemType;
 import com.example.levarehulticops.items.service.ItemService;
+import com.example.levarehulticops.workorders.entity.Client;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -39,9 +38,9 @@ public class ItemMvcController {
             Model model
     ) {
         // Собираем параметры фильтрации
-        List<ItemCondition> conditions  = List.of(ItemCondition.NEW, ItemCondition.REPAIRED);
-        List<ItemStatus>    statuses    = List.of(ItemStatus.ON_STOCK, ItemStatus.BOOKED);
-        List<Client>        ownerships  = List.of(Client.RETS, Client.CORP);
+        List<ItemCondition> conditions = List.of(ItemCondition.NEW, ItemCondition.REPAIRED);
+        List<ItemStatus> statuses = List.of(ItemStatus.ON_STOCK, ItemStatus.BOOKED);
+        List<Client> ownerships = List.of(Client.RETS, Client.CORP);
 
         // Вызываем метод
         Page<ItemReadDto> pg = itemService.filterItemsExcludeClients(
@@ -68,9 +67,9 @@ public class ItemMvcController {
             Model model
     ) {
         // Собираем параметры фильтрации
-        List<ItemCondition> conditions  = List.of(ItemCondition.USED);
-        List<ItemStatus>    statuses    = List.of(ItemStatus.ON_STOCK, ItemStatus.REQUESTED_REPAIR);
-        List<Client>        ownerships  = List.of(Client.RETS);
+        List<ItemCondition> conditions = List.of(ItemCondition.USED);
+        List<ItemStatus> statuses = List.of(ItemStatus.ON_STOCK, ItemStatus.REQUESTED_REPAIR);
+        List<Client> ownerships = List.of(Client.RETS);
 
         // Вызываем метод
         Page<ItemReadDto> pg = itemService.filterItems(
@@ -97,9 +96,9 @@ public class ItemMvcController {
             Model model
     ) {
         // Собираем параметры фильтрации
-        List<ItemCondition> conditions  = List.of(ItemCondition.USED);
-        List<ItemStatus>    statuses    = List.of(ItemStatus.ON_STOCK, ItemStatus.REQUESTED_REPAIR);
-        List<Client>        ownerships  = List.of(Client.CORP);
+        List<ItemCondition> conditions = List.of(ItemCondition.USED);
+        List<ItemStatus> statuses = List.of(ItemStatus.ON_STOCK, ItemStatus.REQUESTED_REPAIR);
+        List<Client> ownerships = List.of(Client.CORP);
 
         // Вызываем метод
         Page<ItemReadDto> pg = itemService.filterItems(
@@ -126,9 +125,9 @@ public class ItemMvcController {
             Model model
     ) {
         // Собираем параметры фильтрации
-        List<ItemCondition> conditions  = List.of(ItemCondition.USED);
-        List<ItemStatus>    statuses    = List.of(ItemStatus.ON_STOCK, ItemStatus.REQUESTED_REPAIR);
-        List<Client>        ownerships  = List.of(Client.RETS, Client.CORP);
+        List<ItemCondition> conditions = List.of(ItemCondition.USED);
+        List<ItemStatus> statuses = List.of(ItemStatus.ON_STOCK, ItemStatus.REQUESTED_REPAIR);
+        List<Client> ownerships = List.of(Client.RETS, Client.CORP);
 
         // Вызываем метод
         Page<ItemReadDto> pg = itemService.filterItemsExcludeClients(
@@ -155,9 +154,9 @@ public class ItemMvcController {
             Model model
     ) {
         // Собираем параметры фильтрации
-        List<ItemCondition> conditions  = List.of(ItemCondition.NEW, ItemCondition.REPAIRED);
-        List<ItemStatus>    statuses    = List.of(ItemStatus.ON_STOCK, ItemStatus.BOOKED);
-        List<Client>        ownerships  = List.of(Client.CORP);
+        List<ItemCondition> conditions = List.of(ItemCondition.NEW, ItemCondition.REPAIRED);
+        List<ItemStatus> statuses = List.of(ItemStatus.ON_STOCK, ItemStatus.BOOKED);
+        List<Client> ownerships = List.of(Client.CORP);
 
         // Вызываем метод
         Page<ItemReadDto> pg = itemService.filterItems(

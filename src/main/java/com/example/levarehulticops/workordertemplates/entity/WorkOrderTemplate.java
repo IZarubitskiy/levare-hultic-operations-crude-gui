@@ -2,7 +2,10 @@ package com.example.levarehulticops.workordertemplates.entity;
 
 import com.example.levarehulticops.employees.entity.Employee;
 import com.example.levarehulticops.iteminfos.entity.ItemInfo;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;

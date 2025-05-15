@@ -1,17 +1,20 @@
 package com.example.levarehulticops.employees.mapper;
 
-import org.mapstruct.*;
-import com.example.levarehulticops.employees.entity.Employee;
 import com.example.levarehulticops.employees.dto.EmployeeDto;
+import com.example.levarehulticops.employees.entity.Employee;
+import org.springframework.stereotype.Component;
 
-/**
- * Mapper for converting between Employee entity and its DTO.
- */
-@Mapper(componentModel = "spring")
-public interface EmployeeMapper {
+@Component
+public class EmployeeMapper {
 
     /**
-     * Map Employee entity to DTO.
+     * Преобразует одну сущность в DTO
      */
-    EmployeeDto toDto(Employee entity);
+    public EmployeeDto toDto(Employee e) {
+        return new EmployeeDto(
+                e.getId(),
+                e.getName(),
+                e.getPosition()
+        );
+    }
 }

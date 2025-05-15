@@ -3,8 +3,6 @@ package com.example.levarehulticops.iteminfos.controller;
 import com.example.levarehulticops.iteminfos.entity.ItemInfo;
 import com.example.levarehulticops.iteminfos.service.ItemInfoService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 public class ItemInfoController {
     private final ItemInfoService service;
 
-       @GetMapping("/{partNumber}")
+    @GetMapping("/{partNumber}")
     public String view(@PathVariable String partNumber, Model model) {
         model.addAttribute("info", service.getById(partNumber));
         return "iteminfos/view";

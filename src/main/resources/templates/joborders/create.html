@@ -1,38 +1,347 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Create JobOrder</title>
+    <meta charset="UTF-8"/>
+    <title>Create Job Order</title>
+    <style>
+        /* Global */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            color: #333;
+        }
+        h1 {
+            color: #4a4a4a;
+            margin-bottom: 1rem;
+        }
+        label {
+            font-weight: bold;
+            color: #4a4a4a;
+            display: block;
+            margin-top: 1rem;
+        }
+        input, textarea, button {
+            font-family: inherit;
+            font-size: 1em;
+        }
+        /* Form layout */
+        .form-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .form-row > div {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .form-row input,
+        .form-row textarea {
+            padding: 0.5rem;
+            margin-top: 0.25rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        /* Buttons */
+        button {
+            background-color: #2a9d8f;
+            color: #fff;
+            border: none;
+            padding: 0.6rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 1rem;
+        }
+        button:hover {
+            background-color: #21867a;
+        }
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 1rem;
+        }
+        thead th {
+            background-color: #2a9d8f;
+            color: #fff;
+            padding: 10px;
+            text-transform: uppercase;
+            font-size: 0.9em;
+            letter-spacing: 0.05em;
+            text-align: center;
+        }
+        tbody tr:nth-child(even) {
+            background-color: #f7f7f7;
+        }
+        tbody tr:hover {
+            background-color: #e0f2f1;
+        }
+        td {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+            font-size: 0.95em;
+            text-align: center;
+        }
+        /* Modals */
+        .modal-backdrop {
+            display: none;
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+        .modal-window {
+            display: none;
+            position: fixed; top: 10%; left: 50%;
+            transform: translateX(-50%);
+            background: #fff;
+            border-radius: 8px;
+            padding: 1.5rem;
+            max-height: 80%; overflow: auto;
+            width: 80%;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+        .modal-pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+        .modal-pagination button {
+            padding: 0.3rem 0.6rem;
+        }
+        .modal-pagination span {
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
-<div th:insert="fragments/header :: header"></div>
+
+<div th:insert="~{fragments/header :: header}"></div>
 
 <h1>Create Job Order</h1>
-<form th:action="@{/joborders}" th:object="${jobOrder}" method="post">
-    <label>Number: <input th:field="*{jobOrderNumber}" /></label><br/>
-    <label>Client:
-        <select th:field="*{client}">
-            <option th:each="c : ${T(com.example.levarehulticops.entity.enums.Client).values()}"
-                    th:value="${c}" th:text="${c}"/>
-        </select>
-    </label><br/>
-    <label>Ownership:
-        <select th:field="*{ownership}">
-            <option th:each="o : ${T(com.example.levarehulticops.entity.enums.Ownership).values()}"
-                    th:value="${o}" th:text="${o}"/>
-        </select>
-    </label><br/>
-    <label>Status:
-        <select th:field="*{status}">
-            <option th:each="s : ${T(com.example.levarehulticops.entity.enums.JobOrderStatus).values()}"
-                    th:value="${s}" th:text="${s}"/>
-        </select>
-    </label><br/>
-    <label>Comments:<br/>
-        <textarea th:field="*{comments}" rows="4"></textarea>
-    </label><br/>
-    <button type="submit">Save</button>
+
+<form th:action="@{/joborders}" th:object="${createDto}" method="post">
+
+    <!-- Work Order -->
+    <label>Work Order</label>
+    <table id="workOrderTable">
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>Number</th>
+            <th>Client</th>
+            <th>Well</th>
+            <th>Delivery Date</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody><!-- JS --></tbody>
+    </table>
+    <button type="button" id="selectWoBtn">Select Work Order</button>
+    <input type="hidden" th:field="*{workOrderId}" id="workOrderId"/>
+
+    <div style="height:1rem;"></div>
+
+    <!-- Equipment Item -->
+    <label>Equipment Item</label>
+    <table id="itemTable">
+        <thead>
+        <tr>
+            <th>Catalog Part#</th>
+            <th>Description</th>
+            <th>Serial Number</th>
+            <th>Ownership</th>
+            <th>Status</th>
+        </tr>
+        </thead>
+        <tbody><!-- JS --></tbody>
+    </table>
+    <div class="form-row">
+        <button type="button" id="usedEqBtn">Used Equipment</button>
+        <button type="button" id="newAsmBtn">New Assembly</button>
+    </div>
+
+    <!-- Responsible Employee -->
+    <label>Responsible Employee</label>
+    <input type="text"
+           id="selectedEmpText"
+           placeholder="Employee name"
+           readonly
+           style="background:#f0f0f0; color:#666; margin-bottom:0.5rem;"/>
+    <div class="form-row">
+        <button type="button" id="selectEmpBtn">Select Employee</button>
+    </div>
+    <input type="hidden" th:field="*{responsibleEmployeeId}" id="responsibleEmployeeId"/>
+
+    <!-- Comments -->
+    <div class="form-row">
+        <div>
+            <label for="comments">Comments</label>
+            <textarea id="comments" rows="3" th:field="*{comments}"></textarea>
+        </div>
+    </div>
+
+    <div style="margin-top: 1rem;">
+        <button type="submit">Create</button>
+    </div>
+    <div style="height:1rem;"></div>
 </form>
 
-<div th:insert="fragments/footer :: footer"></div>
+<div th:insert="~{fragments/footer :: footer}"></div>
+
+<!-- Work Order Modal -->
+<div id="woModalBackdrop" class="modal-backdrop"></div>
+<div id="woModal" class="modal-window">
+    <h3>Select Work Order</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>#</th><th>Number</th><th>Client</th><th>Well</th><th>Delivery Date</th><th></th>
+        </tr>
+        </thead>
+        <tbody><!-- JS --></tbody>
+    </table>
+    <div class="modal-pagination">
+        <button id="woPrevBtn" disabled>‹ Prev</button>
+        <span id="woPageInfo">Page 1 of 1</span>
+        <button id="woNextBtn">Next ›</button>
+    </div>
+    <button id="woModalCloseBtn">Close</button>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const PAGE_SIZE = 20;
+      let woPage = 0, woTotal = 1;
+
+      function loadWorkOrders() {
+        fetch(`/api/workorders/create-job-order?page=${woPage}&size=${PAGE_SIZE}`)
+          .then(r => r.json())
+          .then(data => {
+            const tb = document.querySelector('#woModal tbody');
+            tb.innerHTML = '';
+            data.content.forEach((wo, idx) => {
+              const tr = document.createElement('tr');
+              tr.innerHTML = `
+                <td>${woPage*PAGE_SIZE + idx + 1}</td>
+                <td>${wo.workOrderNumber}</td>
+                <td>${wo.client}</td>
+                <td>${wo.well}</td>
+                <td>${wo.deliveryDate}</td>
+                <td><button class="selBtn">Select</button></td>`;
+              tr.querySelector('.selBtn').addEventListener('click', () => {
+                document.getElementById('workOrderId').value = wo.id;
+                document.querySelector('#workOrderTable tbody').innerHTML = `
+                  <tr>
+                    <td>${idx+1}</td>
+                    <td>${wo.workOrderNumber}</td>
+                    <td>${wo.client}</td>
+                    <td>${wo.well}</td>
+                    <td>${wo.deliveryDate}</td>
+                    <td></td>
+                  </tr>`;
+                closeWoModal();
+              });
+              tb.appendChild(tr);
+            });
+            woTotal = data.totalPages;
+            document.getElementById('woPageInfo').textContent = `Page ${woPage+1} of ${woTotal}`;
+            document.getElementById('woPrevBtn').disabled = woPage===0;
+            document.getElementById('woNextBtn').disabled = woPage>=woTotal-1;
+          });
+      }
+
+      function openWoModal() {
+        document.getElementById('woModalBackdrop').style.display = 'block';
+        document.getElementById('woModal').style.display = 'block';
+        loadWorkOrders();
+      }
+      function closeWoModal() {
+        document.getElementById('woModalBackdrop').style.display = 'none';
+        document.getElementById('woModal').style.display = 'none';
+      }
+
+      document.getElementById('selectWoBtn').addEventListener('click', openWoModal);
+      document.getElementById('woModalCloseBtn').addEventListener('click', closeWoModal);
+      document.getElementById('woModalBackdrop').addEventListener('click', closeWoModal);
+      document.getElementById('woPrevBtn').addEventListener('click', () => { woPage--; loadWorkOrders(); });
+      document.getElementById('woNextBtn').addEventListener('click', () => { woPage++; loadWorkOrders(); });
+    });
+</script>
+
+<!-- Employee Modal -->
+<div id="empModalBackdrop" class="modal-backdrop"></div>
+<div id="empModal" class="modal-window">
+    <h3>Select Employee</h3>
+    <table id="empTable">
+        <thead>
+        <tr>
+            <th>#</th><th>Name</th><th>Position</th><th></th>
+        </tr>
+        </thead>
+        <tbody><!-- JS --></tbody>
+    </table>
+    <div class="modal-pagination">
+        <button id="empPrevBtn" disabled>‹ Prev</button>
+        <span id="empPageInfo">Page 1 of 1</span>
+        <button id="empNextBtn">Next ›</button>
+    </div>
+    <button id="empModalCloseBtn">Close</button>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const PAGE_SIZE = 20;
+      let empPage = 0, empTotal = 1;
+
+      function loadEmployees() {
+        fetch(`/api/employees?page=${empPage}&size=${PAGE_SIZE}`)
+          .then(r=>r.json())
+          .then(data=>{
+            const tb = document.querySelector('#empTable tbody');
+            tb.innerHTML = '';
+            data.content.forEach((emp, idx)=>{
+              const tr = document.createElement('tr');
+              tr.innerHTML = `
+                <td>${empPage*PAGE_SIZE+idx+1}</td>
+                <td>${emp.name}</td>
+                <td>${emp.position}</td>
+                <td><button class="selEmpBtn">Select</button></td>`;
+              tr.querySelector('.selEmpBtn').addEventListener('click', ()=>{
+                document.getElementById('responsibleEmployeeId').value = emp.id;
+                document.getElementById('selectedEmpText').value    = emp.name;
+                closeEmpModal();
+              });
+              tb.appendChild(tr);
+            });
+            empTotal = data.totalPages;
+            document.getElementById('empPageInfo').textContent = `Page ${empPage+1} of ${empTotal}`;
+            document.getElementById('empPrevBtn').disabled = empPage === 0;
+            document.getElementById('empNextBtn').disabled = empPage >= empTotal - 1;
+          });
+      }
+
+      function openEmpModal() {
+        document.getElementById('empModalBackdrop').style.display = 'block';
+        document.getElementById('empModal').style.display         = 'block';
+        loadEmployees();
+      }
+      function closeEmpModal() {
+        document.getElementById('empModalBackdrop').style.display = 'none';
+        document.getElementById('empModal').style.display         = 'none';
+      }
+
+      document.getElementById('selectEmpBtn').addEventListener('click', openEmpModal);
+      document.getElementById('empModalCloseBtn').addEventListener('click', closeEmpModal);
+      document.getElementById('empModalBackdrop').addEventListener('click', closeEmpModal);
+      document.getElementById('empPrevBtn').addEventListener('click', ()=>{ empPage--; loadEmployees(); });
+      document.getElementById('empNextBtn').addEventListener('click', ()=>{ empPage++; loadEmployees(); });
+    });
+</script>
+
 </body>
 </html>

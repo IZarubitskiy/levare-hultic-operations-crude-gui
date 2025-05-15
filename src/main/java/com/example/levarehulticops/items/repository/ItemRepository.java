@@ -1,9 +1,9 @@
 package com.example.levarehulticops.items.repository;
 
 import com.example.levarehulticops.items.entity.Item;
-import com.example.levarehulticops.workorders.entity.Client;
 import com.example.levarehulticops.items.entity.ItemCondition;
 import com.example.levarehulticops.items.entity.ItemStatus;
+import com.example.levarehulticops.workorders.entity.Client;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,13 +12,17 @@ import java.util.List;
 
 public interface ItemRepository extends JpaRepository<Item, Long> {
     Page<Item> findByItemConditionAndOwnership(ItemCondition itemCondition, Client ownership, Pageable pageable);
+
     Page<Item> findByItemConditionIn(ItemCondition[] conditions, Pageable pageable);
+
     Page<Item> findByItemConditionAndOwnershipNotIn(ItemCondition itemCondition, Client[] excludedClients, Pageable pageable);
+
     Page<Item> findByItemConditionInAndItemStatus(
             ItemCondition[] conditions,
             ItemStatus status,
             Pageable pageable
     );
+
     /**
      * Finds items whose condition is in the given list,
      * whose status equals the given status,

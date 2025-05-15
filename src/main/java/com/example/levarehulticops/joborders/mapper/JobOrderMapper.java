@@ -1,16 +1,16 @@
 package com.example.levarehulticops.joborders.mapper;
 
-import com.example.levarehulticops.items.mapper.ItemMapper;
-import com.example.levarehulticops.employees.mapper.EmployeeMapper;
-import org.springframework.stereotype.Component;
-import com.example.levarehulticops.joborders.entity.JobOrder;
-import com.example.levarehulticops.joborders.dto.JobOrderCreateRequest;
-import com.example.levarehulticops.joborders.dto.JobOrderUpdateRequest;
-import com.example.levarehulticops.joborders.dto.JobOrderStatusChangeDto;
-import com.example.levarehulticops.joborders.dto.JobOrderReadDto;
-import com.example.levarehulticops.items.dto.ItemReadDto;
 import com.example.levarehulticops.employees.dto.EmployeeDto;
 import com.example.levarehulticops.employees.entity.Employee;
+import com.example.levarehulticops.employees.mapper.EmployeeMapper;
+import com.example.levarehulticops.items.dto.ItemReadDto;
+import com.example.levarehulticops.items.mapper.ItemMapper;
+import com.example.levarehulticops.joborders.dto.JobOrderCreateRequest;
+import com.example.levarehulticops.joborders.dto.JobOrderReadDto;
+import com.example.levarehulticops.joborders.dto.JobOrderStatusChangeDto;
+import com.example.levarehulticops.joborders.dto.JobOrderUpdateRequest;
+import com.example.levarehulticops.joborders.entity.JobOrder;
+import org.springframework.stereotype.Component;
 
 /**
  * Manual mapper for JobOrder ↔ DTOs.
@@ -27,7 +27,9 @@ public class JobOrderMapper {
         this.employeeMapper = employeeMapper;
     }
 
-    /** Entity → Read DTO */
+    /**
+     * Entity → Read DTO
+     */
     public JobOrderReadDto toReadDto(JobOrder jo) {
         ItemReadDto itemDto = itemMapper.toReadDto(jo.getItem());
         EmployeeDto respDto = employeeMapper.toDto(jo.getResponsibleEmployee());
@@ -43,7 +45,9 @@ public class JobOrderMapper {
         );
     }
 
-    /** Create DTO → new Entity */
+    /**
+     * Create DTO → new Entity
+     */
     public JobOrder toEntity(JobOrderCreateRequest dto) {
         JobOrder jo = new JobOrder();
         // relationships (workOrder, item, responsibleEmployee) set in service
@@ -52,7 +56,9 @@ public class JobOrderMapper {
         return jo;
     }
 
-    /** Update DTO → existing Entity */
+    /**
+     * Update DTO → existing Entity
+     */
     public void updateEntityFromDto(JobOrderUpdateRequest dto, JobOrder jo) {
         // allowed: responsibleEmployee and comments (others in service)
         if (dto.responsibleEmployeeId() != null) {
@@ -65,7 +71,9 @@ public class JobOrderMapper {
         }
     }
 
-    /** Status-change DTO → existing Entity */
+    /**
+     * Status-change DTO → existing Entity
+     */
     public void updateStatusFromDto(JobOrderStatusChangeDto dto, JobOrder jo) {
         jo.setStatus(dto.status());
         // version check and save handled in service

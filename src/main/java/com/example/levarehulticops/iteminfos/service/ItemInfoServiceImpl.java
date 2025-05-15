@@ -76,7 +76,8 @@ public class ItemInfoServiceImpl implements ItemInfoService {
                 pageable
         );
     }
-@Override
+
+    @Override
     public Page<ItemInfoDto> search(String partNumber, String description, String itemType, Pageable pageable) {
         // пример на Specification:
         Specification<ItemInfo> spec = Specification.where(null);

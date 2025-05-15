@@ -3,7 +3,10 @@ package com.example.levarehulticops.attendances.entity;
 
 import com.example.levarehulticops.employees.entity.Employee;
 import com.example.levarehulticops.workdays.entity.WorkDay;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
 
 @Entity

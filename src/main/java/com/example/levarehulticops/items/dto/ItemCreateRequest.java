@@ -1,8 +1,8 @@
 package com.example.levarehulticops.items.dto;
 
-import com.example.levarehulticops.workorders.entity.Client;
 import com.example.levarehulticops.items.entity.ItemCondition;
 import com.example.levarehulticops.items.entity.ItemStatus;
+import com.example.levarehulticops.workorders.entity.Client;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -40,4 +40,5 @@ public record ItemCreateRequest(
 
         /** Free-form comments (optional) */
         String comments
-) {}
+) {
+}

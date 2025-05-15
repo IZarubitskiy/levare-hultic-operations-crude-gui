@@ -1,7 +1,8 @@
 package com.example.levarehulticops.joborders.dto;
 
-import javax.validation.constraints.NotNull;
 import com.example.levarehulticops.joborders.entity.JobOrderStatus;
+
+import javax.validation.constraints.NotNull;
 
 /**
  * DTO for changing the status of a JobOrder.
@@ -14,4 +15,5 @@ public record JobOrderStatusChangeDto(
         /** Current version for optimistic locking */
         @NotNull(message = "Version must not be null")
         Long version
-) {}
+) {
+}

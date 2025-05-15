@@ -1,7 +1,9 @@
 // src/main/java/com/example/levarehulticops/service/impl/EmployeeServiceImpl.java
 package com.example.levarehulticops.employees.service;
 
+import com.example.levarehulticops.employees.dto.EmployeeDto;
 import com.example.levarehulticops.employees.entity.Employee;
+import com.example.levarehulticops.employees.mapper.EmployeeMapper;
 import com.example.levarehulticops.employees.repository.EmployeeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -16,6 +18,7 @@ import javax.persistence.EntityNotFoundException;
 @Transactional
 public class EmployeeServiceImpl implements EmployeeService {
     private final EmployeeRepository repo;
+    private final EmployeeMapper employeeMapper;
 
     @Override
     public Employee create(Employee employee) {
@@ -47,7 +50,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<Employee> getAll(Pageable pageable) {
-        return repo.findAll(pageable);
+    public Page<EmployeeDto> getAll(Pageable pageable) {
+        return repo.findAll(pageable).map(employeeMapper::toDto);
     }
 }

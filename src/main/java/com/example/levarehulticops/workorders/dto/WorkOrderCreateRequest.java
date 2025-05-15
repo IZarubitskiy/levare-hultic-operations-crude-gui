@@ -2,7 +2,9 @@ package com.example.levarehulticops.workorders.dto;
 
 import com.example.levarehulticops.workorders.entity.Client;
 
-import javax.validation.constraints.*;
+import javax.validation.constraints.AssertTrue;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
@@ -40,15 +42,15 @@ public record WorkOrderCreateRequest(
 
 ) {
 
-        /**
-         * Ensure that deliveryDate is today or in the future.
-         */
-        @AssertTrue(message = "Delivery date must be today or in the future")
-        public boolean isDeliveryDateValid() {
-                if (deliveryDate == null) {
-                        return true;  // @NotNull will catch missing date
-                }
-                LocalDate today = LocalDate.now(ZoneId.of("Africa/Cairo"));
-                return !deliveryDate.isBefore(today);
+    /**
+     * Ensure that deliveryDate is today or in the future.
+     */
+    @AssertTrue(message = "Delivery date must be today or in the future")
+    public boolean isDeliveryDateValid() {
+        if (deliveryDate == null) {
+            return true;  // @NotNull will catch missing date
         }
+        LocalDate today = LocalDate.now(ZoneId.of("Africa/Cairo"));
+        return !deliveryDate.isBefore(today);
+    }
 }

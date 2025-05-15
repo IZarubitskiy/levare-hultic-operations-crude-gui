@@ -2,9 +2,9 @@ package com.example.levarehulticops.workorders.dto;
 
 import com.example.levarehulticops.employees.dto.EmployeeDto;
 import com.example.levarehulticops.iteminfos.dto.ItemInfoDto;
+import com.example.levarehulticops.items.dto.ItemReadDto;
 import com.example.levarehulticops.workorders.entity.Client;
 import com.example.levarehulticops.workorders.entity.WorkOrderStatus;
-import com.example.levarehulticops.items.dto.ItemReadDto;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -34,4 +34,5 @@ public record WorkOrderReadDto(
         EmployeeDto requestor,
         String comments,
         Long version
-) {}
+) {
+}
