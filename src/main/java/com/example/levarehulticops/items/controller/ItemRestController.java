@@ -90,4 +90,19 @@ public class ItemRestController {
                 pageable
         );
     }
+
+    @GetMapping("/used")
+    public Page<ItemReadDto> listUsedEquipment(
+            @RequestParam List<ItemCondition> conditions,
+            @RequestParam List<ItemStatus> statuses,
+            Pageable pageable
+    ) {
+        // ownerships = null означает “игнорировать владельцев”
+        return itemService.filterItemsExcludeClients(
+                conditions,
+                statuses,
+                null,
+                pageable
+        );
+    }
 }
