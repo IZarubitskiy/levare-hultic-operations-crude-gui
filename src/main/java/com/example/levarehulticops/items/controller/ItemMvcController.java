@@ -39,7 +39,7 @@ public class ItemMvcController {
     ) {
         // Собираем параметры фильтрации
         List<ItemCondition> conditions = List.of(ItemCondition.NEW, ItemCondition.REPAIRED);
-        List<ItemStatus> statuses = List.of(ItemStatus.ON_STOCK, ItemStatus.BOOKED);
+        List<ItemStatus> statuses = List.of(ItemStatus.ON_STOCK, ItemStatus.STOCK_BOOKED, ItemStatus.STOCK_REQUEST);
         List<Client> ownerships = List.of(Client.RETS, Client.CORP);
 
         // Вызываем метод
@@ -68,7 +68,7 @@ public class ItemMvcController {
     ) {
         // Собираем параметры фильтрации
         List<ItemCondition> conditions = List.of(ItemCondition.USED);
-        List<ItemStatus> statuses = List.of(ItemStatus.ON_STOCK, ItemStatus.REQUESTED_REPAIR);
+        List<ItemStatus> statuses = List.of(ItemStatus.ON_STOCK, ItemStatus.REPAIR_REQUEST, ItemStatus.REPAIR_BOOKED);
         List<Client> ownerships = List.of(Client.RETS);
 
         // Вызываем метод
@@ -97,7 +97,7 @@ public class ItemMvcController {
     ) {
         // Собираем параметры фильтрации
         List<ItemCondition> conditions = List.of(ItemCondition.USED);
-        List<ItemStatus> statuses = List.of(ItemStatus.ON_STOCK, ItemStatus.REQUESTED_REPAIR);
+        List<ItemStatus> statuses = List.of(ItemStatus.ON_STOCK, ItemStatus.REPAIR_REQUEST, ItemStatus.REPAIR_BOOKED);
         List<Client> ownerships = List.of(Client.CORP);
 
         // Вызываем метод
@@ -126,7 +126,7 @@ public class ItemMvcController {
     ) {
         // Собираем параметры фильтрации
         List<ItemCondition> conditions = List.of(ItemCondition.USED);
-        List<ItemStatus> statuses = List.of(ItemStatus.ON_STOCK, ItemStatus.REQUESTED_REPAIR);
+        List<ItemStatus> statuses = List.of(ItemStatus.ON_STOCK, ItemStatus.REPAIR_REQUEST, ItemStatus.REPAIR_BOOKED);
         List<Client> ownerships = List.of(Client.RETS, Client.CORP);
 
         // Вызываем метод
@@ -155,7 +155,7 @@ public class ItemMvcController {
     ) {
         // Собираем параметры фильтрации
         List<ItemCondition> conditions = List.of(ItemCondition.NEW, ItemCondition.REPAIRED);
-        List<ItemStatus> statuses = List.of(ItemStatus.ON_STOCK, ItemStatus.BOOKED);
+        List<ItemStatus> statuses = List.of(ItemStatus.ON_STOCK, ItemStatus.STOCK_BOOKED, ItemStatus.STOCK_REQUEST);
         List<Client> ownerships = List.of(Client.CORP);
 
         // Вызываем метод

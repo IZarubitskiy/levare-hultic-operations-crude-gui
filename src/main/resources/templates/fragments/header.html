@@ -1,12 +1,12 @@
 <!-- src/main/resources/templates/fragments/header.html -->
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8" />
     <title th:replace="~{::title}">App</title>
 </head>
 <body>
-<!-- src/main/resources/templates/fragments/header.html -->
 <div th:fragment="header" style="
     background-color: #9370DB;
     padding: 1rem 2rem;
@@ -17,18 +17,18 @@
         justify-content: space-between;
         width: 100%;
     ">
-        <!-- Название приложения, без отступа слева -->
+        <!-- Название приложения -->
         <div style="
           color: white;
           font-size: 2.5rem;
           font-weight: bold;
-          margin: 0;  /* обнуляем любые внешние отступы */
+          margin: 0;
       ">
             Levare Hultic Operations Control
         </div>
 
         <!-- Навигация -->
-        <nav style="display: flex; gap: 1.5rem;">
+        <nav style="display: flex; gap: 1.5rem; align-items: center;">
             <a th:href="@{/workorders}"        style="color: white; text-decoration: none;">Work Orders</a>
             <a th:href="@{/joborders}"         style="color: white; text-decoration: none;">Job Orders</a>
             <a th:href="@{/items/stock_egypt}" style="color: white; text-decoration: none;">Stock</a>
@@ -36,6 +36,15 @@
             <a th:href="@{/items/outstanding}" style="color: white; text-decoration: none;">Outstanding</a>
             <a th:href="@{/items/stock_corporate}" style="color: white; text-decoration: none;">Stock Corporate</a>
             <a th:href="@{/items/rne_corporate}"    style="color: white; text-decoration: none;">RNE Corporate</a>
+
+            <!-- Если пользователь аутентифицирован — показываем Logout -->
+            <span sec:authorize="isAuthenticated()">
+                <a th:href="@{/logout}" style="color: white; text-decoration: none;">Logout</a>
+            </span>
+            <!-- Если не аутентифицирован — показываем Login -->
+            <span sec:authorize="isAnonymous()">
+                <a th:href="@{/login}" style="color: white; text-decoration: none;">Login</a>
+            </span>
         </nav>
     </div>
     <hr style="border-color: rgba(255,255,255,0.4); margin:0;" />

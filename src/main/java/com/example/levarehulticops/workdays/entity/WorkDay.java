@@ -1,6 +1,6 @@
 package com.example.levarehulticops.workdays.entity;
 
-import com.example.levarehulticops.employees.entity.Employee;
+import com.example.levarehulticops.users.entity.User;
 import com.example.levarehulticops.joborders.entity.JobOrder;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -40,7 +40,7 @@ public class WorkDay {
             joinColumns = @JoinColumn(name = "work_day_id"),
             inverseJoinColumns = @JoinColumn(name = "employee_id")
     )
-    private List<Employee> employees = new ArrayList<>();
+    private List<User> users = new ArrayList<>();
 
     /**
      * JobOrder, которые должны быть выполнены в этот день

@@ -1,8 +1,8 @@
 package com.example.levarehulticops.joborders.mapper;
 
-import com.example.levarehulticops.employees.dto.EmployeeDto;
-import com.example.levarehulticops.employees.entity.Employee;
-import com.example.levarehulticops.employees.mapper.EmployeeMapper;
+import com.example.levarehulticops.users.dto.UserDto;
+import com.example.levarehulticops.users.entity.User;
+import com.example.levarehulticops.users.mapper.UserMapper;
 import com.example.levarehulticops.items.dto.ItemReadDto;
 import com.example.levarehulticops.items.mapper.ItemMapper;
 import com.example.levarehulticops.joborders.dto.JobOrderCreateRequest;
@@ -19,12 +19,12 @@ import org.springframework.stereotype.Component;
 public class JobOrderMapper {
 
     private final ItemMapper itemMapper;
-    private final EmployeeMapper employeeMapper;
+    private final UserMapper userMapper;
 
     public JobOrderMapper(ItemMapper itemMapper,
-                          EmployeeMapper employeeMapper) {
+                          UserMapper userMapper) {
         this.itemMapper = itemMapper;
-        this.employeeMapper = employeeMapper;
+        this.userMapper = userMapper;
     }
 
     /**
@@ -32,7 +32,7 @@ public class JobOrderMapper {
      */
     public JobOrderReadDto toReadDto(JobOrder jo) {
         ItemReadDto itemDto = itemMapper.toReadDto(jo.getItem());
-        EmployeeDto respDto = employeeMapper.toDto(jo.getResponsibleEmployee());
+        UserDto respDto = userMapper.toDto(jo.getResponsibleUser());
 
         return new JobOrderReadDto(
                 jo.getId(),
@@ -62,9 +62,9 @@ public class JobOrderMapper {
     public void updateEntityFromDto(JobOrderUpdateRequest dto, JobOrder jo) {
         // allowed: responsibleEmployee and comments (others in service)
         if (dto.responsibleEmployeeId() != null) {
-            Employee e = new Employee();
+            User e = new User();
             e.setId(dto.responsibleEmployeeId());
-            jo.setResponsibleEmployee(e);
+            jo.setResponsibleUser(e);
         }
         if (dto.comments() != null) {
             jo.setComments(dto.comments());

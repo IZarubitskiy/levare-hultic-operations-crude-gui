@@ -1,7 +1,7 @@
 // src/main/java/com/example/levarehulticops/entity/Attendance.java
 package com.example.levarehulticops.attendances.entity;
 
-import com.example.levarehulticops.employees.entity.Employee;
+import com.example.levarehulticops.users.entity.User;
 import com.example.levarehulticops.workdays.entity.WorkDay;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -35,7 +35,7 @@ public class Attendance {
      */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "employee_id", nullable = false)
-    private Employee employee;
+    private User user;
 
     /**
      * Флаг присутствия на рабочем дне

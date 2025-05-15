@@ -15,11 +15,11 @@
         </select>
     </label><br/>
     <label>Employee:
-        <select th:field="*{employee.id}">
+        <select th:field="*{user.id}">
             <option th:each="e : ${employees}"
                     th:value="${e.id}"
                     th:text="${e.name}"
-                    th:selected="${attendance.employee.id == e.id}"/>
+                    th:selected="${attendance.user.id == e.id}"/>
         </select>
     </label><br/>
     <label>Status:

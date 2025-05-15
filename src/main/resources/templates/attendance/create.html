@@ -13,7 +13,7 @@
         </select>
     </label><br/>
     <label>Employee:
-        <select th:field="*{employee.id}">
+        <select th:field="*{user.id}">
             <option th:each="e : ${employees}"
                     th:value="${e.id}"
                     th:text="${e.name}"/>

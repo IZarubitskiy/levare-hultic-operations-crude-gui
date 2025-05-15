@@ -1,0 +1,34 @@
+INSERT INTO work_orders (work_order_number, client, well, request_date, delivery_date, status, requestor_id, comments, version) VALUES
+  ('WO-001','PETCO','Well Alpha','2025-01-01','2025-01-10','CREATED',1,'Test order 1',0),
+  ('WO-002','METCO','Well Beta','2025-01-02','2025-01-12','APPROVED',2,'Test order 2',0),
+  ('WO-003','KETCO','Well Gamma','2025-01-03','2025-01-14','IN_PROGRESS',3,'Test order 3',0),
+  ('WO-004','RETCO','Well Delta','2025-01-04','2025-01-16','DONE',4,'Test order 4',0),
+  ('WO-005','RETS','Well Epsilon','2025-01-05','2025-01-18','CANCELLED',5,'Test order 5',0),
+  ('WO-006','PETCO','Well Zeta','2025-01-06','2025-01-20','CREATED',1,'Test order 6',0),
+  ('WO-007','METCO','Well Eta','2025-01-07','2025-01-22','APPROVED',2,'Test order 7',0),
+  ('WO-008','KETCO','Well Theta','2025-01-08','2025-01-24','IN_PROGRESS',3,'Test order 8',0),
+  ('WO-009','RETCO','Well Iota','2025-01-09','2025-01-26','DONE',4,'Test order 9',0),
+  ('WO-010','RETS','Well Kappa','2025-01-10','2025-01-28','CANCELLED',5,'Test order 10',0),
+  ('WO-011','PETCO','Well Lambda','2025-01-11','2025-01-30','CREATED',1,'Test order 11',0);
+
+-- 2) Складские позиции (stock items)
+INSERT INTO wo_stock_items (workorder_id, item_id) VALUES
+    ( (SELECT id FROM work_orders WHERE work_order_number='WO-001'), 1 ),
+    ( (SELECT id FROM work_orders WHERE work_order_number='WO-001'), 2 );
+
+-- 3) Позиции на ремонт (repair items)
+INSERT INTO wo_repair_items (workorder_id, item_id) VALUES
+    ( (SELECT id FROM work_orders WHERE work_order_number='WO-001'), 3 ),
+    ( (SELECT id FROM work_orders WHERE work_order_number='WO-001'), 4 );
+
+-- 4) Новые сборки (new requests) – используем item_info_id
+INSERT INTO wo_new_requests (workorder_id, item_info_id) VALUES
+    ( (SELECT id FROM work_orders WHERE work_order_number='WO-001'), 10 ),
+    ( (SELECT id FROM work_orders WHERE work_order_number='WO-001'), 11 );
+
+INSERT INTO employees (name, position, username, password_hash, role) VALUES
+  ('Igor Zarubitskiy',     'Manager',      'admin',      '$2a$10$778lYaX1T41GJw/vRuCZ0.AjaLknUoMq65hSQ294cIw.8l1MIGgbu', 'ADMIN'),
+  ('John Doe',        'Technician',   'user',        '$2a$10$778lYaX1T41GJw/vRuCZ0.AjaLknUoMq65hSQ294cIw.8l1MIGgbu', 'USER'),
+  ('Jane Smith',      'Engineer',     'manager',      '$2a$10$778lYaX1T41GJw/vRuCZ0.AjaLknUoMq65hSQ294cIw.8l1MIGgbu', 'MANAGER'),
+  ('Bob Johnson',     'Supervisor',   'supervisor',    '$2a$10$778lYaX1T41GJw/vRuCZ0.AjaLknUoMq65hSQ294cIw.8l1MIGgbu', 'SUPERVISOR'),
+  ('Mike Davis',      'Technician',   'engineer',      '$2a$10$778lYaX1T41GJw/vRuCZ0.AjaLknUoMq65hSQ294cIw.8l1MIGgbu', 'ENGINEER');

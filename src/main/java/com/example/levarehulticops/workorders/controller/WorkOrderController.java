@@ -34,8 +34,7 @@ public class WorkOrderController {
                 "",    // workOrderNumber
                 null,  // client
                 "",    // well
-                null,  // stockItemIds
-                null,  // repairItemIds
+                null,  // ItemIds
                 null,  // newRequestItemInfoIds
                 null,  // deliveryDate
                 ""     // comments

@@ -1,6 +1,6 @@
 package com.example.levarehulticops.workordertemplates.entity;
 
-import com.example.levarehulticops.employees.entity.Employee;
+import com.example.levarehulticops.users.entity.User;
 import com.example.levarehulticops.iteminfos.entity.ItemInfo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -32,7 +32,7 @@ public class WorkOrderTemplate {
      */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id", nullable = false)
-    private Employee owner;
+    private User owner;
 
     /**
      * Справочные записи деталей, входящие в шаблон

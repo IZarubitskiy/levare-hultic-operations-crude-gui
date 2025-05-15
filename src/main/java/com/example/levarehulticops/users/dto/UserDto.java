@@ -1,9 +1,9 @@
-package com.example.levarehulticops.employees.dto;
+package com.example.levarehulticops.users.dto;
 
 /**
  * DTO for representing an employee in WorkOrder and JobOrder contexts.
  */
-public record EmployeeDto(
+public record UserDto(
         /** Unique identifier of the employee */
         Long id,
         /** Full name of the employee */

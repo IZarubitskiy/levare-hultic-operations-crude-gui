@@ -101,7 +101,7 @@ public class ItemRestController {
         return itemService.filterItemsExcludeClients(
                 conditions,
                 statuses,
-                null,
+                List.of(Client.EMPTY),
                 pageable
         );
     }

@@ -131,12 +131,7 @@
     <table id="workOrderTable">
         <thead>
         <tr>
-            <th>#</th>
-            <th>Number</th>
-            <th>Client</th>
-            <th>Well</th>
-            <th>Delivery Date</th>
-            <th></th>
+            <th>#</th><th>Number</th><th>Client</th><th>Well</th><th>Delivery Date</th><th></th>
         </tr>
         </thead>
         <tbody><!-- JS --></tbody>
@@ -145,6 +140,27 @@
     <input type="hidden" th:field="*{workOrderId}" id="workOrderId"/>
 
     <div style="height:1rem;"></div>
+
+    <!-- Repair Items -->
+    <label>Repair Items</label>
+    <table id="repairTable">
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>Type</th>
+            <th>Part Number</th>
+            <th>Description</th>
+            <th>Serial</th>
+            <th>Ownership</th>
+            <th>Condition</th>
+            <th>Status</th>
+            <th>Comments</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- сюда позже заполняем JS по выбранному workOrderId -->
+        </tbody>
+    </table>
 
     <!-- Equipment Item -->
     <label>Equipment Item</label>
@@ -165,7 +181,7 @@
         <button type="button" id="newAsmBtn">New Assembly</button>
     </div>
 
-    <!-- Responsible Employee -->
+    <!-- Responsible User -->
     <label>Responsible Employee</label>
     <input type="text"
            id="selectedEmpText"
@@ -264,7 +280,6 @@
         document.getElementById('woModalBackdrop').style.display = 'none';
         document.getElementById('woModal').style.display = 'none';
       }
-
       document.getElementById('selectWoBtn').addEventListener('click', openWoModal);
       document.getElementById('woModalCloseBtn').addEventListener('click', closeWoModal);
       document.getElementById('woModalBackdrop').addEventListener('click', closeWoModal);
@@ -273,7 +288,85 @@
     });
 </script>
 
-<!-- Employee Modal -->
+<!-- Used Equipment Modal -->
+<div id="usedEqBackdrop" class="modal-backdrop"></div>
+<div id="usedEqModal" class="modal-window">
+    <h3>Select Used Equipment</h3>
+    <table id="usedEqTable">
+        <thead>
+        <tr>
+            <th>#</th><th>Part#</th><th>Description</th><th>Serial</th><th>Ownership</th><th>Status</th><th></th>
+        </tr>
+        </thead>
+        <tbody><!-- JS --></tbody>
+    </table>
+    <div class="modal-pagination">
+        <button id="usedEqPrevBtn" disabled>‹ Prev</button>
+        <span id="usedEqPageInfo">Page 1 of 1</span>
+        <button id="usedEqNextBtn">Next ›</button>
+    </div>
+    <button id="usedEqCloseBtn">Close</button>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const PAGE_SIZE = 20;
+      let usedPage = 0, usedTotal = 1;
+
+      function loadUsed() {
+        fetch(`/api/items/used?conditions=USED&statuses=ON_STOCK&page=${usedPage}&size=${PAGE_SIZE}`)
+          .then(r => r.json())
+          .then(data => {
+            const tb = document.querySelector('#usedEqTable tbody');
+            tb.innerHTML = '';
+            data.content.forEach((it, idx) => {
+              const tr = document.createElement('tr');
+              tr.innerHTML = `
+                <td>${usedPage*PAGE_SIZE + idx + 1}</td>
+                <td>${it.itemInfo.partNumber}</td>
+                <td>${it.itemInfo.description}</td>
+                <td>${it.serialNumber}</td>
+                <td>${it.ownership}</td>
+                <td>${it.itemStatus}</td>
+                <td><button class="selUsedBtn">Select</button></td>`;
+              tr.querySelector('.selUsedBtn').addEventListener('click', () => {
+                document.querySelector('#itemTable tbody').innerHTML = `
+                  <tr>
+                    <td>${it.itemInfo.partNumber}</td>
+                    <td>${it.itemInfo.description}</td>
+                    <td>${it.serialNumber}</td>
+                    <td>${it.ownership}</td>
+                    <td>${it.itemStatus}</td>
+                  </tr>`;
+                closeUsedModal();
+              });
+              tb.appendChild(tr);
+            });
+            usedTotal = data.totalPages;
+            document.getElementById('usedEqPageInfo').textContent = `Page ${usedPage+1} of ${usedTotal}`;
+            document.getElementById('usedEqPrevBtn').disabled = usedPage === 0;
+            document.getElementById('usedEqNextBtn').disabled = usedPage >= usedTotal - 1;
+          });
+      }
+
+      function openUsedModal() {
+        document.getElementById('usedEqBackdrop').style.display = 'block';
+        document.getElementById('usedEqModal').style.display = 'block';
+        loadUsed();
+      }
+      function closeUsedModal() {
+        document.getElementById('usedEqBackdrop').style.display = 'none';
+        document.getElementById('usedEqModal').style.display = 'none';
+      }
+      document.getElementById('usedEqBtn').addEventListener('click', openUsedModal);
+      document.getElementById('usedEqCloseBtn').addEventListener('click', closeUsedModal);
+      document.getElementById('usedEqBackdrop').addEventListener('click', closeUsedModal);
+      document.getElementById('usedEqPrevBtn').addEventListener('click', () => { usedPage--; loadUsed(); });
+      document.getElementById('usedEqNextBtn').addEventListener('click', () => { usedPage++; loadUsed(); });
+    });
+</script>
+
+<!-- User Modal -->
 <div id="empModalBackdrop" class="modal-backdrop"></div>
 <div id="empModal" class="modal-window">
     <h3>Select Employee</h3>

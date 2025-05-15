@@ -1,4 +1,4 @@
-package com.example.levarehulticops.employees.entity;
+package com.example.levarehulticops.users.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,7 +11,7 @@ import javax.persistence.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Employee {
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

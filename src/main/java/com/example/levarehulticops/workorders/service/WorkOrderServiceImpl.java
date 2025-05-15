@@ -1,7 +1,7 @@
 // src/main/java/com/example/levarehulticops/service/impl/WorkOrderServiceImpl.java
 package com.example.levarehulticops.workorders.service;
 
-import com.example.levarehulticops.employees.service.EmployeeService;
+import com.example.levarehulticops.users.service.UserService;
 import com.example.levarehulticops.workorders.dto.WorkOrderCreateRequest;
 import com.example.levarehulticops.workorders.dto.WorkOrderReadDto;
 import com.example.levarehulticops.workorders.entity.WorkOrder;
@@ -24,7 +24,7 @@ import java.time.ZoneId;
 public class WorkOrderServiceImpl implements WorkOrderService {
     private final WorkOrderRepository workOrderRepository;
     private final WorkOrderMapper workOrderMapper;
-    private final EmployeeService employeeService;
+    private final UserService userService;
 
     @Override
     @Transactional

@@ -1,16 +1,16 @@
-package com.example.levarehulticops.employees.dto;
+package com.example.levarehulticops.users.dto;
 
-import com.example.levarehulticops.employees.entity.AccessLevel;
+import com.example.levarehulticops.users.entity.AccessLevel;
 
 import javax.validation.constraints.NotNull;
 
 /**
- * DTO for updating an existing Employee.
+ * DTO for updating an existing User.
  * Only provided fields will be modified; ID is required.
  */
-public record EmployeeUpdateRequest(
-        /** Employee ID */
-        @NotNull(message = "Employee ID must not be null")
+public record UserUpdateRequest(
+        /** User ID */
+        @NotNull(message = "User ID must not be null")
         Long id,
 
         /** New full name (optional) */

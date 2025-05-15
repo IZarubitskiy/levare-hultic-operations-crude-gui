@@ -25,11 +25,8 @@ public record WorkOrderCreateRequest(
         @NotBlank(message = "Well must not be blank")
         String well,
 
-        /** Optional list of existing stock item IDs */
+        /** Optional list of item IDs */
         List<Long> stockItemIds,
-
-        /** Optional list of existing repair item IDs */
-        List<Long> repairItemIds,
 
         /** Optional list of new item info request IDs */
         List<Long> newRequestItemInfoIds,

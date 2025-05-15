@@ -1,8 +1,8 @@
 package com.example.levarehulticops.workorders.mapper;
 
-import com.example.levarehulticops.employees.dto.EmployeeDto;
-import com.example.levarehulticops.employees.entity.Employee;
-import com.example.levarehulticops.employees.mapper.EmployeeMapper;
+import com.example.levarehulticops.users.dto.UserDto;
+import com.example.levarehulticops.users.entity.User;
+import com.example.levarehulticops.users.mapper.UserMapper;
 import com.example.levarehulticops.iteminfos.dto.ItemInfoDto;
 import com.example.levarehulticops.iteminfos.entity.ItemInfo;
 import com.example.levarehulticops.iteminfos.mapper.ItemInfoMapper;
@@ -26,39 +26,32 @@ public class WorkOrderMapper {
 
     private final ItemMapper itemMapper;
     private final ItemInfoMapper itemInfoMapper;
-    private final EmployeeMapper employeeMapper;
+    private final UserMapper userMapper;
 
     public WorkOrderMapper(ItemMapper itemMapper,
                            ItemInfoMapper itemInfoMapper,
-                           EmployeeMapper employeeMapper) {
+                           UserMapper userMapper) {
         this.itemMapper = itemMapper;
         this.itemInfoMapper = itemInfoMapper;
-        this.employeeMapper = employeeMapper;
+        this.userMapper = userMapper;
     }
 
     /**
      * Entity → Read DTO
      */
     public WorkOrderReadDto toReadDto(WorkOrder wo) {
-        List<ItemReadDto> stock = wo.getStockItems().stream()
+        List<ItemReadDto> items = wo.getItems().stream()
                 .map(itemMapper::toReadDto)
                 .collect(Collectors.toList());
-        List<ItemReadDto> repair = wo.getRepairItems().stream()
-                .map(itemMapper::toReadDto)
-                .collect(Collectors.toList());
-        List<ItemInfoDto> fresh = wo.getNewRequests().stream()
-                .map(itemInfoMapper::toReadDto)
-                .collect(Collectors.toList());
-        EmployeeDto req = employeeMapper.toDto(wo.getRequestor());
+
+        UserDto req = userMapper.toDto(wo.getRequestor());
 
         return new WorkOrderReadDto(
                 wo.getId(),
                 wo.getWorkOrderNumber(),
                 wo.getClient(),
                 wo.getWell(),
-                stock,
-                repair,
-                fresh,
+                items,
                 wo.getRequestDate(),
                 wo.getDeliveryDate(),
                 wo.getStatus(),
@@ -83,7 +76,7 @@ public class WorkOrderMapper {
 
         // 2. Related collections (create stubs by ID)
         if (dto.stockItemIds() != null && !dto.stockItemIds().isEmpty()) {
-            wo.setStockItems(
+            wo.setItems(
                     dto.stockItemIds().stream()
                             .map(id -> {
                                 Item item = new Item();
@@ -94,32 +87,9 @@ public class WorkOrderMapper {
             );
         }
 
-        if (dto.repairItemIds() != null && !dto.repairItemIds().isEmpty()) {
-            wo.setRepairItems(
-                    dto.repairItemIds().stream()
-                            .map(id -> {
-                                Item item = new Item();
-                                item.setId(id);
-                                return item;
-                            })
-                            .collect(Collectors.toList())
-            );
-        }
-
-        if (dto.newRequestItemInfoIds() != null && !dto.newRequestItemInfoIds().isEmpty()) {
-            wo.setNewRequests(
-                    dto.newRequestItemInfoIds().stream()
-                            .map(id -> {
-                                ItemInfo info = new ItemInfo();
-                                info.setId(id);
-                                return info;
-                            })
-                            .collect(Collectors.toList())
-            );
-        }
 
         // 3. Requestor stub
-        Employee requestor = new Employee();
+        User requestor = new User();
         requestor.setId(requestorId);
         wo.setRequestor(requestor);
 
@@ -129,7 +99,7 @@ public class WorkOrderMapper {
     /**
      * Update DTO → existing Entity
      */
-    public void updateEntityFromDto(WorkOrderUpdateRequest dto, WorkOrder wo) {
+    /*public void updateEntityFromDto(WorkOrderUpdateRequest dto, WorkOrder wo) {
         if (dto.stockItemIds() != null) {
             wo.setStockItems(dto.stockItemIds().stream()
                     .map(id -> {
@@ -163,5 +133,5 @@ public class WorkOrderMapper {
         if (dto.comments() != null) {
             wo.setComments(dto.comments());
         }
-    }
+    }*/
 }

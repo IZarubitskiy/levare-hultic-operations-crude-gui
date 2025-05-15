@@ -1,15 +1,15 @@
-package com.example.levarehulticops.employees.dto;
+package com.example.levarehulticops.users.dto;
 
-import com.example.levarehulticops.employees.entity.AccessLevel;
+import com.example.levarehulticops.users.entity.AccessLevel;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 /**
- * DTO for creating a new Employee.
+ * DTO for creating a new User.
  * All fields are required.
  */
-public record EmployeeCreateRequest(
+public record UserCreateRequest(
         /** Full name of the employee */
         @NotBlank(message = "Name must not be blank")
         String name,

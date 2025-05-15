@@ -1,6 +1,6 @@
 package com.example.levarehulticops.joborders.entity;
 
-import com.example.levarehulticops.employees.entity.Employee;
+import com.example.levarehulticops.users.entity.User;
 import com.example.levarehulticops.items.entity.Item;
 import com.example.levarehulticops.workorders.entity.WorkOrder;
 import lombok.AllArgsConstructor;
@@ -42,11 +42,11 @@ public class JobOrder {
     private JobOrderStatus status;
 
     /**
-     * Employee responsible for executing this JobOrder
+     * User responsible for executing this JobOrder
      */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "responsible_employee_id", nullable = false)
-    private Employee responsibleEmployee;
+    private User responsibleUser;
 
     /**
      * Free-form comments about this JobOrder

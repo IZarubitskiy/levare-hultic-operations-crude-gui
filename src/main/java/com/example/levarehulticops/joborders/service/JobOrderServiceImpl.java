@@ -1,6 +1,6 @@
 package com.example.levarehulticops.joborders.service;
 
-import com.example.levarehulticops.employees.repository.EmployeeRepository;
+import com.example.levarehulticops.users.repository.UserRepository;
 import com.example.levarehulticops.items.repository.ItemRepository;
 import com.example.levarehulticops.joborders.dto.JobOrderCreateRequest;
 import com.example.levarehulticops.joborders.dto.JobOrderReadDto;
@@ -27,7 +27,7 @@ public class JobOrderServiceImpl implements JobOrderService {
     private final JobOrderRepository jobOrderRepository;
     private final WorkOrderRepository workOrderRepository;
     private final ItemRepository itemRepository;
-    private final EmployeeRepository employeeRepository;
+    private final UserRepository userRepository;
     private final JobOrderMapper mapper;
 
     @Override

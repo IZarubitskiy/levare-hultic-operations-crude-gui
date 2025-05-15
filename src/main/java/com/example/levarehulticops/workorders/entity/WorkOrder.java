@@ -1,7 +1,6 @@
 package com.example.levarehulticops.workorders.entity;
 
-import com.example.levarehulticops.employees.entity.Employee;
-import com.example.levarehulticops.iteminfos.entity.ItemInfo;
+import com.example.levarehulticops.users.entity.User;
 import com.example.levarehulticops.items.entity.Item;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -50,35 +49,11 @@ public class WorkOrder {
      */
     @ManyToMany
     @JoinTable(
-            name = "wo_stock_items",
+            name = "wo_items",
             joinColumns = @JoinColumn(name = "workorder_id"),
             inverseJoinColumns = @JoinColumn(name = "item_id")
     )
-    private List<Item> stockItems = new ArrayList<>();
-
-    /**
-     * 2) Items sent for repair (serial numbers)
-     * link table: wo_repair_items(workorder_id, item_id)
-     */
-    @ManyToMany
-    @JoinTable(
-            name = "wo_repair_items",
-            joinColumns = @JoinColumn(name = "workorder_id"),
-            inverseJoinColumns = @JoinColumn(name = "item_id")
-    )
-    private List<Item> repairItems = new ArrayList<>();
-
-    /**
-     * 3) Items ordered (new), without serial numbers, reference only by item info
-     * link table: wo_new_requests(workorder_id, item_info_id)
-     */
-    @ManyToMany
-    @JoinTable(
-            name = "wo_new_requests",
-            joinColumns = @JoinColumn(name = "workorder_id"),
-            inverseJoinColumns = @JoinColumn(name = "item_info_id")
-    )
-    private List<ItemInfo> newRequests = new ArrayList<>();
+    private List<Item> items = new ArrayList<>();
 
     /**
      * Date when the work order was submitted
@@ -100,11 +75,11 @@ public class WorkOrder {
     private WorkOrderStatus status;
 
     /**
-     * Employee who submitted the work order
+     * User who submitted the work order
      */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "requestor_id", nullable = false)
-    private Employee requestor;
+    private User requestor;
 
     /**
      * Comments for the work order

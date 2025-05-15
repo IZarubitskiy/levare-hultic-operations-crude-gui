@@ -1,6 +1,6 @@
 package com.example.levarehulticops.transactions.entity;
 
-import com.example.levarehulticops.employees.entity.Employee;
+import com.example.levarehulticops.users.entity.User;
 import com.example.levarehulticops.joborders.entity.JobOrder;
 import com.example.levarehulticops.joborders.entity.JobOrderStatus;
 import lombok.AllArgsConstructor;
@@ -53,7 +53,7 @@ public class Transaction {
      */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "changed_by")
-    private Employee changedBy;
+    private User changedBy;
 
     /**
      * Комментарий к записи

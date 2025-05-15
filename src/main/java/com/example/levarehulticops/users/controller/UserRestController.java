@@ -1,7 +1,7 @@
-package com.example.levarehulticops.employees.api;
+package com.example.levarehulticops.users.api;
 
-import com.example.levarehulticops.employees.dto.EmployeeDto;
-import com.example.levarehulticops.employees.service.EmployeeService;
+import com.example.levarehulticops.users.dto.UserDto;
+import com.example.levarehulticops.users.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -12,13 +12,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/employees")
-public class EmployeeRestController {
+public class UserRestController {
 
     @Autowired
-    private EmployeeService service;
+    private UserService service;
 
     @GetMapping
-    public Page<EmployeeDto> list(
+    public Page<UserDto> list(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size
     ) {

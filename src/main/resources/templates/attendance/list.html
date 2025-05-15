@@ -22,8 +22,8 @@
         <td th:text="${iter.index + 1}">1</td>
         <td th:text="${att.workDay.date}">2025-05-10</td>
         <td>
-            <a th:href="@{'/employees/' + ${att.employee.id}}"
-               th:text="${att.employee.name}">John Doe</a>
+            <a th:href="@{'/employees/' + ${att.user.id}}"
+               th:text="${att.user.name}">John Doe</a>
         </td>
         <td th:text="${att.status}">PRESENT</td>
         <td th:text="${att.comments}">—</td>

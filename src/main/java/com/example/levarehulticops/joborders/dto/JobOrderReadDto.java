@@ -1,6 +1,6 @@
 package com.example.levarehulticops.joborders.dto;
 
-import com.example.levarehulticops.employees.dto.EmployeeDto;
+import com.example.levarehulticops.users.dto.UserDto;
 import com.example.levarehulticops.items.dto.ItemReadDto;
 import com.example.levarehulticops.joborders.entity.JobOrderStatus;
 
@@ -21,8 +21,8 @@ public record JobOrderReadDto(
         /** Current status of the job order */
         JobOrderStatus status,
 
-        /** Employee responsible for execution */
-        EmployeeDto responsibleEmployee,
+        /** User responsible for execution */
+        UserDto responsibleEmployee,
 
         /** Any comments */
         String comments,

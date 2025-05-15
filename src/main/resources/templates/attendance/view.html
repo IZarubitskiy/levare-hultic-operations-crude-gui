@@ -9,8 +9,8 @@
     <dd th:text="${attendance.workDay.date}">2025-05-10</dd>
     <dt>Employee:</dt>
     <dd>
-        <a th:href="@{'/employees/' + ${attendance.employee.id}}"
-           th:text="${attendance.employee.name}">John Doe</a>
+        <a th:href="@{'/employees/' + ${attendance.user.id}}"
+           th:text="${attendance.user.name}">John Doe</a>
     </dd>
     <dt>Status:</dt>
     <dd th:text="${attendance.status}">PRESENT</dd>
