@@ -49,7 +49,7 @@
             margin: 0;
             color: #222;
         }
-        /* All equipment table */
+        /* Equipment table */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -86,7 +86,7 @@
             border-radius: 4px;
             text-decoration: none;
             font-size: 1em;
-            margin-bottom: 2rem; /* дополнительный отступ */
+            margin-bottom: 2rem;
         }
         a.button-link:hover {
             background-color: #21867a;
@@ -99,7 +99,7 @@
 
 <h1>Work Order Details</h1>
 
-<!-- Верхняя строка с основными полями -->
+<!-- Top row -->
 <div class="top-row">
     <div class="item">
         <dt>Number</dt>
@@ -123,7 +123,7 @@
     </div>
 </div>
 
-<!-- Остальные поля -->
+<!-- Other details -->
 <dl class="details">
     <dt>Request Date:</dt>
     <dd th:text="${workOrder.requestDate}">2025-01-01</dd>
@@ -135,26 +135,24 @@
     <dd th:text="${workOrder.comments}">Some comments here</dd>
 </dl>
 
-<!-- Общая таблица оборудования -->
+<!-- Equipment list -->
 <label>Equipment List</label>
 <table>
     <thead>
     <tr>
         <th>#</th>
         <th>Type</th>
-        <th>PartNumber</th>
+        <th>Part #</th>
         <th>Description</th>
         <th>Serial</th>
         <th>Ownership</th>
         <th>Condition</th>
-        <th>Actions</th>
         <th>Status</th>
         <th>Comments</th>
     </tr>
     </thead>
     <tbody>
-    <!-- Stock items -->
-    <tr th:each="it, stat : ${workOrder.stockItems}">
+    <tr th:each="it, stat : ${workOrder.items}">
         <td th:text="${stat.index + 1}">1</td>
         <td th:text="${it.itemInfo.itemType}">PUMP</td>
         <td th:text="${it.itemInfo.partNumber}">P-100</td>
@@ -162,46 +160,11 @@
         <td th:text="${it.serialNumber}">SN-001</td>
         <td th:text="${it.ownership}">OTHER</td>
         <td th:text="${it.itemCondition}">USED</td>
-        <td>
-            <button type="button">Edit</button>
-            <button type="button">Remove</button>
-        </td>
         <td th:text="${it.itemStatus}">ON_STOCK</td>
         <td th:text="${it.comments}">In stock</td>
     </tr>
-    <!-- Repair items -->
-    <tr th:each="it, stat : ${workOrder.repairItems}">
-        <td th:text="${workOrder.stockItems.size() + stat.index + 1}">1</td>
-        <td th:text="${it.itemInfo.itemType}">PUMP</td>
-        <td th:text="${it.itemInfo.partNumber}">P-200</td>
-        <td th:text="${it.itemInfo.description}">Valve</td>
-        <td th:text="${it.serialNumber}">SN-002</td>
-        <td th:text="${it.ownership}">OTHER</td>
-        <td th:text="${it.itemCondition}">REPAIR</td>
-        <td>
-            <button type="button">Edit</button>
-            <button type="button">Remove</button>
-        </td>
-        <td th:text="${it.itemStatus}">IN_REPAIR</td>
-        <td th:text="${it.comments}">Sent for repair</td>
-    </tr>
-    <!-- New requests -->
-    <tr th:each="info, stat : ${workOrder.newRequests}">
-        <td th:text="${workOrder.stockItems.size() + workOrder.repairItems.size() + stat.index + 1}">1</td>
-        <td th:text="${info.itemType}">PUMP</td>
-        <td th:text="${info.partNumber}">P-300</td>
-        <td th:text="${info.description}">Seal Kit</td>
-        <td>—</td>
-        <td>—</td>
-        <td>—</td>
-        <td>
-            <button type="button">Cancel</button>
-        </td>
-        <td>REQUESTED</td>
-        <td>—</td>
-    </tr>
-    <tr th:if="${#lists.isEmpty(workOrder.stockItems) and #lists.isEmpty(workOrder.repairItems) and #lists.isEmpty(workOrder.newRequests)}">
-        <td colspan="10" style="text-align:center;">No equipment associated</td>
+    <tr th:if="${#lists.isEmpty(workOrder.items)}">
+        <td colspan="9" style="text-align:center;">No equipment associated</td>
     </tr>
     </tbody>
 </table>

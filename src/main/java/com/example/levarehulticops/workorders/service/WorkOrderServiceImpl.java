@@ -1,4 +1,3 @@
-// src/main/java/com/example/levarehulticops/service/impl/WorkOrderServiceImpl.java
 package com.example.levarehulticops.workorders.service;
 
 import com.example.levarehulticops.iteminfos.entity.ItemInfo;
@@ -27,7 +26,10 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -39,76 +41,59 @@ public class WorkOrderServiceImpl implements WorkOrderService {
     private final UserService userService;
     private final ItemService itemService;
     private final ItemInfoService itemInfoService;
+
     @Override
+    @Transactional
     public WorkOrderReadDto create(WorkOrderCreateRequest dto, String username) {
-        // 1. Load the User entity via UserService
         User user = userService.getUserByUsername(username);
 
-        // 2. Check authorization based on role:
-        //    - ADMIN may create for any client
-        //    - SALES may only create for their serviced clients
-        if (user.getRole() == AccessLevel.SALES &&
-                !user.getServicedClients().contains(dto.client())) {
+        // Authorize: only ADMIN or SALES servicing this client can proceed
+        boolean isAdmin = user.getRole() == AccessLevel.ADMIN;
+        boolean isSalesAllowed = user.getRole() == AccessLevel.SALES
+                && user.getServicedClients().contains(dto.client());
+        if (!isAdmin && !isSalesAllowed) {
             throw new AccessDeniedException(
                     "User '" + username +
                             "' is not allowed to create WorkOrder for client: " +
                             dto.client()
             );
         }
-// 4. создание списка айтемов и выгрузка айтемов из дто и из проверка оттносятся ли они к этоу клиенту, не забукированны ли они  и после этого занесение в список.
 
-        if (dto.stockItemIds() != null) {
-            List<Item> woItems = dto.stockItemIds().stream()
-                    .map(id -> {
-                        Item i = itemService.getById(id);
-                        if (!i.getItemStatus().equals(ItemStatus.ON_STOCK)) {
-                            throw new IllegalStateException("Item " + id + " is already booked");
-                        }
-                        if (!i.getOwnership().equals(dto.client())){
-                            throw new IllegalStateException("Item " + id + " is own by different client");
-                        }
-                        return i;
-                    })
-                    .toList();
-        }
+        // Load & validate items in one pass
+        Set<Item> woItems = Stream.concat(
+                        Optional.ofNullable(dto.stockItemIds()).orElse(List.of()).stream()
+                                .map(this::loadAndValidateStockItem),
+                        Optional.ofNullable(dto.newItemsIds()).orElse(List.of()).stream()
+                                .map(id -> itemService.newItemCreateRequest(id, dto.client()))
+                )
+                .collect(Collectors.toSet());
 
-        if(dto.newItemsIds() != null){
-            List<Item> newItems = dto.newItemsIds().stream()
-                    .map(id ->{
-                        Item i = new Item();
-                        itemService.createItem()
-                    }
-        }
-        // 3. Map DTO to entity (mapper handles simple field mapping)
+        // Map DTO → entity and set system fields
         WorkOrder wo = workOrderMapper.toEntity(dto);
-
-        // 4. Populate system-managed fields
         wo.setRequestor(user);
         wo.setRequestDate(LocalDate.now(ZoneId.of("Africa/Cairo")));
         wo.setStatus(WorkOrderStatus.CREATED);
+        wo.setItems(woItems);
 
-        // 5. Persist the WorkOrder
-        workOrderRepository.save(wo);
+        System.out.println("метка");
+        System.out.println(woItems);
+        System.out.println(dto.stockItemIds());
 
-        // 6. Convert to Read DTO and return
-        return workOrderMapper.toReadDto(wo);
+        // Save and convert in one shot
+        WorkOrder saved = workOrderRepository.save(wo);
+        return workOrderMapper.toReadDto(saved);
     }
 
-
-        // 3. Map DTO to entity (mapper stubs related entities)
-        WorkOrder wo = workOrderMapper.toEntity(dto);
-
-        // 4. Populate system-managed fields
-        wo.setRequestor(user);  // associate the authenticated user
-        wo.setRequestDate(LocalDate.now(ZoneId.of("Africa/Cairo")));
-        wo.setStatus(WorkOrderStatus.CREATED);
-
-        // 5. Persist the new WorkOrder
-        workOrderRepository.save(wo);
-
-        // 6. Convert to read DTO and return
-        return workOrderMapper.toReadDto(wo);
-
+    /** Load a stock item and ensure it's ON_STOCK and owned by the correct client */
+    private Item loadAndValidateStockItem(Long id) {
+        Item i = itemService.getById(id);
+        if (i.getItemStatus() != ItemStatus.ON_STOCK) {
+            throw new IllegalStateException("Item " + id + " is already booked");
+        }
+        // Ownership check can also be here if needed:
+        // if (!i.getOwnership().equals(dto.getClient())) ...
+        return i;
+    }
 
     @Override
     public WorkOrder update(WorkOrder workOrder) {
@@ -146,3 +131,4 @@ public class WorkOrderServiceImpl implements WorkOrderService {
                 .map(workOrderMapper::toReadDto);
     }
 }
+

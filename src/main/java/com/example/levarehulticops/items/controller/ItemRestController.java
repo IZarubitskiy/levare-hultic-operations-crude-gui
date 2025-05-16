@@ -28,11 +28,6 @@ public class ItemRestController {
         return itemService.getAll(pageable);
     }
 
-    @GetMapping("/{id}")
-    public ItemReadDto getById(@PathVariable Long id) {
-        return itemService.getById(id);
-    }
-
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ItemReadDto create(@RequestBody ItemCreateRequest dto) {

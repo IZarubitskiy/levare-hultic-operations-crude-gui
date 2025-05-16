@@ -36,5 +36,5 @@ public interface ItemService {
             List<Client> ownerships,
             Pageable pageable
     );
-    Item newItemCreateRequest (Long itemInfoID);
+    Item newItemCreateRequest(String itemInfoId, Client client) ;
 }

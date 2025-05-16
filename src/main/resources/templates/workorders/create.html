@@ -238,6 +238,9 @@
         <tbody id="itemsTableBody"></tbody>
     </table>
 
+    <!-- Контейнер для скрытых полей -->
+    <div id="hiddenInputs"></div>
+
     <div class="button-row">
         <button type="button" id="addStockItemBtn">Add Item from Stock</button>
         <button type="button" id="addRepairItemBtn">Add Item For Repair</button>
@@ -305,7 +308,7 @@
     </div>
 </div>
 
-<!-- Catalog modal (без изменений) -->
+<!-- Catalog modal -->
 <div id="catalogModalBackdrop"></div>
 <div id="catalogModal">
     <h3>Select Catalog Items</h3>
@@ -341,6 +344,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', () => {
       const tbody     = document.getElementById('itemsTableBody');
+      const hiddenCt  = document.getElementById('hiddenInputs');
       let   rowCount  = 0;
       const clientSel = document.getElementById('client');
       const PAGE_SIZE = 20;
@@ -442,6 +446,12 @@
             ownership:    chk.dataset.ownership,
             condition:    chk.dataset.condition
           });
+          // скрытый input для DTO.stockItemIds
+          const hi = document.createElement('input');
+          hi.type = 'hidden';
+          hi.name = 'stockItemIds';
+          hi.value = chk.dataset.id;
+          hiddenCt.appendChild(hi);
         });
         stockPager.close();
       };
@@ -481,6 +491,12 @@
             ownership:    chk.dataset.ownership,
             condition:    chk.dataset.condition
           });
+          // скрытый input тоже в stockItemIds
+          const hi = document.createElement('input');
+          hi.type = 'hidden';
+          hi.name = 'stockItemIds';
+          hi.value = chk.dataset.id;
+          hiddenCt.appendChild(hi);
         });
         repairPager.close();
       };
@@ -515,6 +531,12 @@
             ownership:    client,
             condition:    'NEW_ASSEMBLY'
           });
+          // скрытый input для DTO.newItemsIds
+          const hi = document.createElement('input');
+          hi.type = 'hidden';
+          hi.name = 'newItemsIds';
+          hi.value = chk.dataset.part;
+          hiddenCt.appendChild(hi);
         });
         catalogPager.close();
       };

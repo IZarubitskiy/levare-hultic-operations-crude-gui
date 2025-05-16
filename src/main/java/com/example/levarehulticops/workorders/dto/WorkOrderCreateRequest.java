@@ -1,6 +1,7 @@
 package com.example.levarehulticops.workorders.dto;
 
 import com.example.levarehulticops.workorders.entity.Client;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotBlank;
@@ -29,9 +30,10 @@ public record WorkOrderCreateRequest(
         List<Long> stockItemIds,
 
         /** Optional list of new item info request IDs */
-        List<Long> newItemsIds,
+        List<String> newItemsIds,
 
         @NotNull(message = "Delivery date must not be null")
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
         LocalDate deliveryDate,
 
         /** Optional comments */

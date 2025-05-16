@@ -168,7 +168,7 @@ public class ItemMvcController {
         model.addAttribute("page", pg);
         return "items/stock_corporate";
     }
-
+/*
     // ==================== Стандартные CRUD-методы ====================
 
     @GetMapping("/new")
@@ -224,5 +224,5 @@ public class ItemMvcController {
     public String delete(@PathVariable Long id) {
         itemService.delete(id);
         return "redirect:/items/stock";
-    }
+    }*/
 }

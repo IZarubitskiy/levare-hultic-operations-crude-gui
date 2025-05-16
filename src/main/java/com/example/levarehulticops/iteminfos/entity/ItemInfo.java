@@ -28,6 +28,7 @@ public class ItemInfo implements Serializable {
         /**
      * Unique catalog key for the part.
      */
+        @Id
     @Column(name = "part_number", nullable = false, unique = true)
     private String partNumber;
 

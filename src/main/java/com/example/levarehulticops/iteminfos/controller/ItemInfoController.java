@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class ItemInfoController {
     private final ItemInfoService service;
-
+/*
     @GetMapping("/{partNumber}")
     public String view(@PathVariable String partNumber, Model model) {
         model.addAttribute("info", service.getById(partNumber));
@@ -43,5 +43,5 @@ public class ItemInfoController {
         info.setPartNumber(partNumber);
         service.update(info);
         return "redirect:/iteminfos";
-    }
+    }*/
 }

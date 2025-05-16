@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "work_orders")
@@ -31,7 +31,7 @@ public class WorkOrder {
     private String workOrderNumber;
 
     /**
-     * Client (Petco, Metco, Ketco, Retco, Rets)
+     * Client (Petco, Metco, etc.)
      */
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -44,19 +44,19 @@ public class WorkOrder {
     private String well;
 
     /**
-     * 1) Items actually taken from stock (serial numbers)
-     * link table: wo_stock_items(workorder_id, item_id)
+     * Items associated with this work order
+     * Many-to-many link to inventory items
      */
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "wo_items",
             joinColumns = @JoinColumn(name = "workorder_id"),
             inverseJoinColumns = @JoinColumn(name = "item_id")
     )
-    private List<Item> items = new ArrayList<>();
+    private Set<Item> items = new HashSet<>();
 
     /**
-     * Date when the work order was submitted
+     * Date when the work order was requested
      */
     @Column(name = "request_date", nullable = false)
     private LocalDate requestDate;
@@ -68,7 +68,7 @@ public class WorkOrder {
     private LocalDate deliveryDate;
 
     /**
-     * Work order status (Created, Approved, InProgress, Done, Cancelled)
+     * Status of the work order
      */
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -82,15 +82,30 @@ public class WorkOrder {
     private User requestor;
 
     /**
-     * Comments for the work order
+     * Additional comments
      */
     @Lob
-    @Column(name = "comments", nullable = true)
     private String comments;
 
     /**
-     * Field for optimistic locking
+     * Version for optimistic locking
      */
     @Version
     private Long version;
+
+    /**
+     * Convenience method to add an item
+     */
+    public void addItem(Item item) {
+        items.add(item);
+        // If bi-directional, also update the opposite side here
+    }
+
+    /**
+     * Convenience method to remove an item
+     */
+    public void removeItem(Item item) {
+        items.remove(item);
+        // If bi-directional, also update the opposite side here
+    }
 }

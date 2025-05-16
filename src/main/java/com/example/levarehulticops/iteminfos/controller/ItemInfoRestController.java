@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class ItemInfoRestController {
     private final ItemInfoService service;
-
+/*
     @GetMapping("/{partNumber}")
     public ItemInfo get(@PathVariable String partNumber) {
         return service.getById(partNumber);
@@ -30,7 +30,7 @@ public class ItemInfoRestController {
                            @RequestBody ItemInfo info) {
         info.setPartNumber(partNumber);
         return service.update(info);
-    }
+    }*/
 
     @GetMapping("/search")
     public Page<ItemInfoDto> search(

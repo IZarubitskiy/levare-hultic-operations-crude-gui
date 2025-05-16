@@ -3,12 +3,16 @@ package com.example.levarehulticops;
 import com.example.levarehulticops.users.entity.AccessLevel;
 import com.example.levarehulticops.users.entity.User;
 import com.example.levarehulticops.users.repository.UserRepository;
+import com.example.levarehulticops.workorders.entity.Client;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+import java.util.List;
+import java.util.Set;
 
 @SpringBootApplication
 public class LevareHulticOperationsApplication {
@@ -32,7 +36,9 @@ public class LevareHulticOperationsApplication {
                         "Admin role",
                         "admin",
                         hash,
-                        AccessLevel.ADMIN
+                        AccessLevel.ADMIN,
+                        null
+
                 ));
 
                 userRepo.save(new User(
@@ -41,7 +47,8 @@ public class LevareHulticOperationsApplication {
                         "sales",
                         "sales",
                         hash,
-                        AccessLevel.SALES
+                        AccessLevel.SALES,
+                        Set.of(Client.METCO)
                 ));
                 userRepo.save(new User(
                         null,
@@ -49,25 +56,28 @@ public class LevareHulticOperationsApplication {
                         "manager",
                         "manager",
                         hash,
-                        AccessLevel.MANAGER
-                ));
-
-                userRepo.save(new User(
-                        null,
-                        "engineer",
-                        "engineer",
-                        "engineer",
-                        hash,
-                        AccessLevel.ENGINEER
+                        AccessLevel.MANAGER,
+                        null
                 ));
 
                 userRepo.save(new User(
                         null,
+                        "engineer",
+                        "engineer",
+                        "engineer",
+                        hash,
+                        AccessLevel.ENGINEER,
+                        null
+                ));
+
+                userRepo.save(new User(
+                        null,
                         "supervisor",
                         "supervisor",
                         "supervisor",
                         hash,
-                        AccessLevel.SUPERVISOR
+                        AccessLevel.SUPERVISOR,
+                        null
                 ));
             }
         };

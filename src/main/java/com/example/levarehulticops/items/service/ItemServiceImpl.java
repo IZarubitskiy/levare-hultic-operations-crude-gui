@@ -11,6 +11,7 @@ import com.example.levarehulticops.items.entity.ItemCondition;
 import com.example.levarehulticops.items.entity.ItemStatus;
 import com.example.levarehulticops.items.mapper.ItemMapper;
 import com.example.levarehulticops.items.repository.ItemRepository;
+import com.example.levarehulticops.items.util.SerialNumberGenerator;
 import com.example.levarehulticops.workorders.entity.Client;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -115,18 +116,15 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Item newItemCreateRequest(String itemInfoId) {
+    public Item newItemCreateRequest(String itemInfoId, Client client) {
         ItemInfo info = itemInfoService.getByPartNumber(itemInfoId);
 
         Item item = new Item();
         item.setItemInfo(info);
-        item.setClientPartNumber(clientPart);
-        item.setSerialNumber(dto.serialNumber());
-        item.setOwnership(dto.ownership());
-        item.setItemCondition(dto.itemCondition());
-        item.setItemStatus(dto.itemStatus());
-        item.setComments(dto.comments());
-        Item saved = itemRepository.save(item);
-
+        item.setSerialNumber(SerialNumberGenerator.generate());
+        item.setOwnership(client);
+        item.setItemCondition(ItemCondition.NEW_ASSEMBLY);
+        item.setItemStatus(ItemStatus.NEW_ASSEMBLY_REQUEST);
+        return itemRepository.save(item);
     }
 }
