@@ -10,10 +10,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
+
 @Controller
 @RequestMapping("/workorders")
 @RequiredArgsConstructor
-public class WorkOrderController {
+public class WorkOrderMvcController {
     private final WorkOrderService workOrderService;
 
     @GetMapping
@@ -44,12 +46,14 @@ public class WorkOrderController {
     }
 
     @PostMapping
-    public String create(
+    public String createWorkOrder(
             @ModelAttribute("workOrder") WorkOrderCreateRequest dto,
-            @RequestHeader("X-Sharer-User-Id") Long requestorId
+            Principal principal        // Spring Security: текущий пользователь
     ) {
-        workOrderService.create(dto, requestorId);
-        return "redirect:/workorders";
+        // внутри сервиса выставится requestorId из principal,
+        // и статус автоматически будет CREATED
+        workOrderService.create(dto, principal.getName());
+        return "redirect:/workorders"; // редирект на список или страницу детали
     }
 
     @GetMapping("/{id}")

@@ -9,7 +9,7 @@ import org.springframework.data.domain.Pageable;
 public interface ItemInfoService {
     Page<ItemInfoDto> getAll(Pageable pageable);
 
-    ItemInfo getById(String partNumber);
+    ItemInfo getByPartNumber(String partNumber);
 
     ItemInfo create(ItemInfo info);
 

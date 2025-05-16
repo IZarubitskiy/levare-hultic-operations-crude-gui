@@ -2,6 +2,7 @@ package com.example.levarehulticops.items.service;
 
 import com.example.levarehulticops.iteminfos.entity.ItemInfo;
 import com.example.levarehulticops.iteminfos.repository.ItemInfoRepository;
+import com.example.levarehulticops.iteminfos.service.ItemInfoService;
 import com.example.levarehulticops.items.dto.ItemCreateRequest;
 import com.example.levarehulticops.items.dto.ItemReadDto;
 import com.example.levarehulticops.items.dto.ItemUpdateRequest;
@@ -27,6 +28,7 @@ public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final ItemInfoRepository itemInfoRepository;
     private final ItemMapper itemMapper;
+    private final ItemInfoService itemInfoService;
 
     @Override
     public ItemReadDto createItem(ItemCreateRequest dto) {
@@ -72,10 +74,9 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public ItemReadDto getById(Long id) {
-        Item item = itemRepository.findById(id)
+    public Item getById(Long id) {
+        return itemRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Item not found: " + id));
-        return itemMapper.toReadDto(item);
     }
 
     @Override
@@ -111,5 +112,21 @@ public class ItemServiceImpl implements ItemService {
                         conditions, statuses, ownerships, pageable
                 )
                 .map(itemMapper::toReadDto);
+    }
+
+    @Override
+    public Item newItemCreateRequest(String itemInfoId) {
+        ItemInfo info = itemInfoService.getByPartNumber(itemInfoId);
+
+        Item item = new Item();
+        item.setItemInfo(info);
+        item.setClientPartNumber(clientPart);
+        item.setSerialNumber(dto.serialNumber());
+        item.setOwnership(dto.ownership());
+        item.setItemCondition(dto.itemCondition());
+        item.setItemStatus(dto.itemStatus());
+        item.setComments(dto.comments());
+        Item saved = itemRepository.save(item);
+
     }
 }

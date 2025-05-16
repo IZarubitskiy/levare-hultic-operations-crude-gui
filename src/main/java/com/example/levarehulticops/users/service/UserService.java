@@ -15,4 +15,13 @@ public interface UserService {
     User getById(Long id);
 
     Page<UserDto> getAll(Pageable pageable);
+
+    /**
+     * Get a user by their username, or throw if not found.
+     *
+     * @param username the username to look up
+     * @return the User entity
+     * @throws EntityNotFoundException if no user exists with that username
+     */
+    User getUserByUsername(String username);
 }

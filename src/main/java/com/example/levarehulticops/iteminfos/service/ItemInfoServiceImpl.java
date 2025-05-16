@@ -29,7 +29,7 @@ public class ItemInfoServiceImpl implements ItemInfoService {
     }
 
     @Override
-    public ItemInfo getById(String partNumber) {
+    public ItemInfo getByPartNumber(String partNumber) {
         return repo.findById(partNumber)
                 .orElseThrow(() -> new IllegalArgumentException("Not found: " + partNumber));
     }

@@ -53,4 +53,13 @@ public class UserServiceImpl implements UserService {
     public Page<UserDto> getAll(Pageable pageable) {
         return repo.findAll(pageable).map(userMapper::toDto);
     }
+
+    @Override
+    public User getUserByUsername(String username) {
+        // Attempt to load the user, or throw if absent
+        return repo.findByUsername(username)
+                .orElseThrow(() ->
+                        new EntityNotFoundException("User not found: " + username)
+                );
+    }
 }

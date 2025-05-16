@@ -8,7 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface WorkOrderService {
-    WorkOrderReadDto create(WorkOrderCreateRequest dto, Long requestorId);
+    WorkOrderReadDto create(WorkOrderCreateRequest dto, String username);
 
     WorkOrder update(WorkOrder workOrder);
 

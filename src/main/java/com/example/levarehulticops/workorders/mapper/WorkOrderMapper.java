@@ -65,7 +65,7 @@ public class WorkOrderMapper {
      * Manual mapping from WorkOrderCreateRequest + requestorId → WorkOrder entity.
      * NOTE: related entities are created as stubs (only ID set) — they will be managed/merged by JPA.
      */
-    public WorkOrder toEntity(WorkOrderCreateRequest dto, Long requestorId) {
+    public WorkOrder toEntity(WorkOrderCreateRequest dto) {
         // 1. Base fields
         WorkOrder wo = new WorkOrder();
         wo.setWorkOrderNumber(dto.workOrderNumber());
@@ -73,25 +73,6 @@ public class WorkOrderMapper {
         wo.setWell(dto.well());
         wo.setDeliveryDate(dto.deliveryDate());
         wo.setComments(dto.comments());
-
-        // 2. Related collections (create stubs by ID)
-        if (dto.stockItemIds() != null && !dto.stockItemIds().isEmpty()) {
-            wo.setItems(
-                    dto.stockItemIds().stream()
-                            .map(id -> {
-                                Item item = new Item();
-                                item.setId(id);
-                                return item;
-                            })
-                            .collect(Collectors.toList())
-            );
-        }
-
-
-        // 3. Requestor stub
-        User requestor = new User();
-        requestor.setId(requestorId);
-        wo.setRequestor(requestor);
 
         return wo;
     }

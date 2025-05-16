@@ -25,14 +25,7 @@ import java.util.Map;
 @AllArgsConstructor
 public class ItemInfo implements Serializable {
 
-    /**
-     * Surrogate primary key.
-     */
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    /**
+        /**
      * Unique catalog key for the part.
      */
     @Column(name = "part_number", nullable = false, unique = true)

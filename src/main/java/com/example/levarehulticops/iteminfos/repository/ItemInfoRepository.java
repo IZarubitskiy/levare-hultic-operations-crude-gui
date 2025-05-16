@@ -21,8 +21,7 @@ public interface ItemInfoRepository extends JpaRepository<ItemInfo, String> {
     /**
      * Find ItemInfo by its primary key (partNumber).
      */
-    @Override
-    Optional<ItemInfo> findById(String partNumber);
+    Optional<ItemInfo> findByPartNumber(String partNumber);
 
     /**
      * Check existence of ItemInfo by its primary key.

@@ -29,7 +29,7 @@ public record WorkOrderCreateRequest(
         List<Long> stockItemIds,
 
         /** Optional list of new item info request IDs */
-        List<Long> newRequestItemInfoIds,
+        List<Long> newItemsIds,
 
         @NotNull(message = "Delivery date must not be null")
         LocalDate deliveryDate,
@@ -38,7 +38,6 @@ public record WorkOrderCreateRequest(
         String comments
 
 ) {
-
     /**
      * Ensure that deliveryDate is today or in the future.
      */
