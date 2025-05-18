@@ -2,14 +2,18 @@ package com.example.levarehulticops.workorders.service;
 
 import com.example.levarehulticops.iteminfos.entity.ItemInfo;
 import com.example.levarehulticops.iteminfos.service.ItemInfoService;
+import com.example.levarehulticops.items.dto.ItemUpdateRequest;
+import com.example.levarehulticops.items.entity.ItemCondition;
 import com.example.levarehulticops.items.entity.ItemStatus;
 import com.example.levarehulticops.items.entity.Item;
+import com.example.levarehulticops.items.mapper.ItemMapper;
 import com.example.levarehulticops.items.service.ItemService;
 import com.example.levarehulticops.users.entity.AccessLevel;
 import com.example.levarehulticops.users.entity.User;
 import com.example.levarehulticops.users.service.UserService;
 import com.example.levarehulticops.workorders.dto.WorkOrderCreateRequest;
 import com.example.levarehulticops.workorders.dto.WorkOrderReadDto;
+import com.example.levarehulticops.workorders.entity.Client;
 import com.example.levarehulticops.workorders.entity.WorkOrder;
 import com.example.levarehulticops.workorders.entity.WorkOrderStatus;
 import com.example.levarehulticops.workorders.mapper.WorkOrderMapper;
@@ -41,6 +45,7 @@ public class WorkOrderServiceImpl implements WorkOrderService {
     private final UserService userService;
     private final ItemService itemService;
     private final ItemInfoService itemInfoService;
+    private final ItemMapper itemMapper;
 
     @Override
     @Transactional
@@ -85,15 +90,41 @@ public class WorkOrderServiceImpl implements WorkOrderService {
     }
 
     /** Load a stock item and ensure it's ON_STOCK and owned by the correct client */
-    private Item loadAndValidateStockItem(Long id) {
+    private Item loadAndValidateAndChangeStatusStockItem(Long id) {
         Item i = itemService.getById(id);
         if (i.getItemStatus() != ItemStatus.ON_STOCK) {
             throw new IllegalStateException("Item " + id + " is already booked");
         }
-        // Ownership check can also be here if needed:
-        // if (!i.getOwnership().equals(dto.getClient())) ...
+
+        if (i.getItemCondition() == ItemCondition.USED ||)
+        ItemUpdateRequest updatedItem = new ItemUpdateRequest(
+                null,
+                i.getSerialNumber(),
+                i.getOwnership(),
+                i.getItemCondition(),
+
+                );
+        /** Serial number */
+        String serialNumber,
+
+        /** Ownership classification */
+        Client ownership,
+
+        /** Current condition of the item */
+        ItemCondition itemCondition,
+
+        /** Current status of the item */
+        ItemStatus itemStatus,
+
+        /** Assigned JobOrder ID (optional) */
+        Long jobOrderId,
+
+        /** Free-form comments */
+        String comments
+
         return i;
     }
+
 
     @Override
     public WorkOrder update(WorkOrder workOrder) {
