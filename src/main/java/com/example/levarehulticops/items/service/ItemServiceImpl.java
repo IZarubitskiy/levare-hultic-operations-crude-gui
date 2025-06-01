@@ -65,6 +65,8 @@ public class ItemServiceImpl implements ItemService {
         return itemMapper.toReadDto(updated);
     }
 
+
+
     @Override
     public void delete(Long id) {
         if (!itemRepository.existsById(id)) {
@@ -126,5 +128,12 @@ public class ItemServiceImpl implements ItemService {
         item.setItemCondition(ItemCondition.NEW_ASSEMBLY);
         item.setItemStatus(ItemStatus.NEW_ASSEMBLY_REQUEST);
         return itemRepository.save(item);
+    }
+
+    @Override
+    public Item statusUpdate(Item i, ItemStatus itemStatus) {
+        Item iUpdate = getById(i.getId());
+        iUpdate.setItemStatus(itemStatus);
+        return itemRepository.save(iUpdate);
     }
 }

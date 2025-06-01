@@ -233,12 +233,13 @@
             <th>Condition</th>
             <th>Status</th>
             <th>Comments</th>
+            <th>Actions</th>
         </tr>
         </thead>
         <tbody id="itemsTableBody"></tbody>
     </table>
 
-    <!-- Контейнер для скрытых полей -->
+    <!-- Container for hidden inputs -->
     <div id="hiddenInputs"></div>
 
     <div class="button-row">
@@ -343,210 +344,251 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const tbody     = document.getElementById('itemsTableBody');
-      const hiddenCt  = document.getElementById('hiddenInputs');
-      let   rowCount  = 0;
-      const clientSel = document.getElementById('client');
-      const PAGE_SIZE = 20;
+        const tbody     = document.getElementById('itemsTableBody');
+        const hiddenCt  = document.getElementById('hiddenInputs');
+        let   rowCount  = 0;
+        const clientSel = document.getElementById('client');
+        const PAGE_SIZE = 20;
 
-      function addRow(fields) {
-        rowCount++;
-        tbody.insertAdjacentHTML('beforeend', `
-          <tr data-id="${fields.id||''}">
-            <td>${rowCount}</td>
-            <td><input name="items[${rowCount}].type"        value="${fields.type}" readonly/></td>
-            <td><input name="items[${rowCount}].partNumber"  value="${fields.partNumber}" readonly/></td>
-            <td><input name="items[${rowCount}].description" value="${fields.description}" readonly/></td>
-            <td><input name="items[${rowCount}].serialNumber"value="${fields.serialNumber}" readonly/></td>
-            <td><input name="items[${rowCount}].ownership"   value="${fields.ownership}" readonly/></td>
-            <td><input name="items[${rowCount}].condition"   value="${fields.condition}" readonly/></td>
-            <td><input name="items[${rowCount}].status"      value="TBA"/></td>
-            <td><input name="items[${rowCount}].comments"    value="TBA"/></td>
-          </tr>
-        `);
-      }
+        // disable client select when items exist, but still submit value via hidden input
+        function toggleClient() {
+            const hasItems = tbody.childElementCount > 0;
+            clientSel.disabled = hasItems;
 
-      function setupPagination(modalId, baseUrlFn, renderRow, filterExisting=false) {
-        let page      = 0;
-        const prevBtn = document.getElementById(`${modalId}PrevBtn`);
-        const nextBtn = document.getElementById(`${modalId}NextBtn`);
-        const info    = document.getElementById(`${modalId}PageInfo`);
-        const modal   = document.getElementById(`${modalId}Modal`);
-        const backdrop= document.getElementById(`${modalId}ModalBackdrop`);
-        const tbodyCt = document.querySelector(`#${modalId}Table tbody`);
-
-        function loadPage() {
-          let existing = null;
-          if (filterExisting) {
-            existing = new Set(
-              Array.from(tbody.querySelectorAll('tr[data-id]'))
-                   .map(r => r.getAttribute('data-id'))
-                   .filter(id => id)
-            );
-          }
-
-          const base = baseUrlFn();
-          const url  = `${base}${base.includes('?') ? '&' : '?'}page=${page}&size=${PAGE_SIZE}`;
-          fetch(url).then(r => r.json()).then(data => {
-            let items = Array.isArray(data)? data : data.content;
-            if (filterExisting) {
-              items = items.filter(it => !existing.has(String(it.id)));
+            // manage hidden input for client
+            let hid = document.getElementById('clientHidden');
+            if (hasItems) {
+                if (!hid) {
+                    hid = document.createElement('input');
+                    hid.type = 'hidden';
+                    hid.id = 'clientHidden';
+                    hid.name = clientSel.getAttribute('name') || 'client';
+                    document.querySelector('form').appendChild(hid);
+                }
+                hid.value = clientSel.value;
+            } else if (hid) {
+                hid.remove();
             }
-            tbodyCt.innerHTML = '';
-            items.forEach(it => renderRow(it, tbodyCt));
-
-            const totalPages = data.totalPages != null ? data.totalPages : 1;
-            prevBtn.disabled = page === 0;
-            nextBtn.disabled = page >= totalPages - 1;
-            info.textContent = `Page ${page + 1} of ${totalPages}`;
-          });
         }
 
-        prevBtn.onclick = () => { page--; loadPage(); };
-        nextBtn.onclick = () => { page++; loadPage(); };
+        // renumber rows & toggle client
+        function renumberRows() {
+            Array.from(tbody.children).forEach((tr, idx) => {
+                tr.children[0].textContent = idx + 1;
+                tr.querySelectorAll('input').forEach(input => {
+                    const name = input.name;
+                    if (name) {
+                        input.name = name.replace(/items\[\d+\]/, `items[${idx}]`);
+                    }
+                });
+            });
+            rowCount = tbody.childElementCount;
+            toggleClient();
+        }
 
-        return {
-          open:  () => { loadPage(); backdrop.style.display = 'block'; modal.style.display = 'block'; },
-          close: () => { backdrop.style.display = 'none';  modal.style.display = 'none';  }
+        // add row with delete button
+        function addRow(fields, hiddenName, hiddenValue) {
+            rowCount++;
+            const tr = document.createElement('tr');
+            tr.dataset.hiddenName = hiddenName;
+            tr.dataset.hiddenValue = hiddenValue;
+            tr.innerHTML = `
+              <td>${rowCount}</td>
+              <td><input name="items[${rowCount}].type"        value="${fields.type}" readonly/></td>
+              <td><input name="items[${rowCount}].partNumber"  value="${fields.partNumber}" readonly/></td>
+              <td><input name="items[${rowCount}].description" value="${fields.description}" readonly/></td>
+              <td><input name="items[${rowCount}].serialNumber"value="${fields.serialNumber}" readonly/></td>
+              <td><input name="items[${rowCount}].ownership"   value="${fields.ownership}" readonly/></td>
+              <td><input name="items[${rowCount}].condition"   value="${fields.condition}" readonly/></td>
+              <td><input name="items[${rowCount}].status"      value="TBA"/></td>
+              <td><input name="items[${rowCount}].comments"    value="TBA"/></td>
+              <td><button type="button" class="deleteItemBtn">Delete</button></td>
+            `;
+            tbody.appendChild(tr);
+
+            // hidden DTO input
+            const hi = document.createElement('input');
+            hi.type = 'hidden';
+            hi.name = hiddenName;
+            hi.value = hiddenValue;
+            hiddenCt.appendChild(hi);
+
+            // delete handler
+            tr.querySelector('.deleteItemBtn').addEventListener('click', () => {
+                const hName  = tr.dataset.hiddenName;
+                const hValue = tr.dataset.hiddenValue;
+                const hid    = hiddenCt.querySelector(`input[name="${hName}"][value="${hValue}"]`);
+                if (hid) hid.remove();
+                tr.remove();
+                renumberRows();
+            });
+
+            toggleClient();
+        }
+
+        function setupPagination(modalId, baseUrlFn, renderRow, filterExisting=false) {
+            let page      = 0;
+            const prevBtn = document.getElementById(`${modalId}PrevBtn`);
+            const nextBtn = document.getElementById(`${modalId}NextBtn`);
+            const info    = document.getElementById(`${modalId}PageInfo`);
+            const modal   = document.getElementById(`${modalId}Modal`);
+            const backdrop= document.getElementById(`${modalId}ModalBackdrop`);
+            const tbodyCt = document.querySelector(`#${modalId}Table tbody`);
+
+            function loadPage() {
+                let existing = new Set();
+                if (filterExisting) {
+                    existing = new Set(
+                      Array.from(tbody.children)
+                           .map(r => r.dataset.hiddenValue)
+                           .filter(v => v)
+                    );
+                }
+                const url = `${baseUrlFn()}${baseUrlFn().includes('?') ? '&' : '?'}page=${page}&size=${PAGE_SIZE}`;
+                fetch(url).then(r => r.json()).then(data => {
+                    let items = Array.isArray(data) ? data : data.content;
+                    if (filterExisting) {
+                        items = items.filter(it => !existing.has(String(it.id)));
+                    }
+                    tbodyCt.innerHTML = '';
+                    items.forEach(it => renderRow(it, tbodyCt));
+                    const totalPages = data.totalPages ?? 1;
+                    prevBtn.disabled = page === 0;
+                    nextBtn.disabled = page >= totalPages - 1;
+                    info.textContent = `Page ${page+1} of ${totalPages}`;
+                });
+            }
+
+            prevBtn.onclick = () => { page--; loadPage(); };
+            nextBtn.onclick = () => { page++; loadPage(); };
+
+            return {
+                open:  () => { loadPage(); backdrop.style.display='block'; modal.style.display='block'; },
+                close: () => { backdrop.style.display='none'; modal.style.display='none'; }
+            };
+        }
+
+        // Stock modal
+        const stockPager = setupPagination(
+            'stock',
+            () => `/api/items/stock?client=${encodeURIComponent(clientSel.value)}`,
+            (item, ct) => ct.insertAdjacentHTML('beforeend', `
+              <tr>
+                <td><input type="checkbox"
+                           data-id="${item.id}"
+                           data-type="Stock"
+                           data-part="${item.itemInfo.partNumber}"
+                           data-serial="${item.serialNumber}"
+                           data-desc="${item.itemInfo.description}"
+                           data-ownership="${item.ownership}"
+                           data-condition="${item.itemCondition}"/></td>
+                <td>${item.id}</td><td>${item.itemInfo.partNumber}</td>
+                <td>${item.serialNumber}</td><td>${item.itemInfo.description}</td>
+                <td>${item.ownership}</td><td>${item.itemCondition}</td>
+              </tr>
+            `),
+            true
+        );
+        document.getElementById('addStockItemBtn').onclick    = stockPager.open;
+        document.getElementById('stockModalCloseBtn').onclick = stockPager.close;
+        document.getElementById('stockModalBackdrop').onclick = stockPager.close;
+        document.getElementById('stockModalAddBtn').onclick   = () => {
+            document.querySelectorAll('#stockTable input[type=checkbox]:checked').forEach(chk => {
+                addRow({
+                    id:           chk.dataset.id,
+                    type:         chk.dataset.type,
+                    partNumber:   chk.dataset.part,
+                    description:  chk.dataset.desc,
+                    serialNumber: chk.dataset.serial,
+                    ownership:    chk.dataset.ownership,
+                    condition:    chk.dataset.condition
+                }, 'stockItemIds', chk.dataset.id);
+            });
+            stockPager.close();
         };
-      }
 
-      // Stock
-      const stockPager = setupPagination(
-        'stock',
-        () => `/api/items/stock?client=${encodeURIComponent(clientSel.value)}`,
-        (item,ct) => ct.insertAdjacentHTML('beforeend', `
-          <tr>
-            <td><input type="checkbox"
-                       data-id="${item.id}"
-                       data-type="Stock"
-                       data-part="${item.itemInfo.partNumber}"
-                       data-serial="${item.serialNumber}"
-                       data-desc="${item.itemInfo.description}"
-                       data-ownership="${item.ownership}"
-                       data-condition="${item.itemCondition}"/></td>
-            <td>${item.id}</td><td>${item.itemInfo.partNumber}</td>
-            <td>${item.serialNumber}</td><td>${item.itemInfo.description}</td>
-            <td>${item.ownership}</td><td>${item.itemCondition}</td>
-          </tr>
-        `),
-        true
-      );
-      document.getElementById('addStockItemBtn').onclick    = stockPager.open;
-      document.getElementById('stockModalCloseBtn').onclick = stockPager.close;
-      document.getElementById('stockModalBackdrop').onclick = stockPager.close;
-      document.getElementById('stockModalAddBtn').onclick   = () => {
-        document.querySelectorAll('#stockTable input[type=checkbox]:checked').forEach(chk => {
-          addRow({
-            id:           chk.dataset.id,
-            type:         chk.dataset.type,
-            partNumber:   chk.dataset.part,
-            description:  chk.dataset.desc,
-            serialNumber: chk.dataset.serial,
-            ownership:    chk.dataset.ownership,
-            condition:    chk.dataset.condition
-          });
-          // скрытый input для DTO.stockItemIds
-          const hi = document.createElement('input');
-          hi.type = 'hidden';
-          hi.name = 'stockItemIds';
-          hi.value = chk.dataset.id;
-          hiddenCt.appendChild(hi);
-        });
-        stockPager.close();
-      };
+        // Repair modal
+        const repairPager = setupPagination(
+            'repair',
+            () => `/api/items/repair?client=${encodeURIComponent(clientSel.value)}`,
+            (item, ct) => ct.insertAdjacentHTML('beforeend', `
+              <tr>
+                <td><input type="checkbox"
+                           data-id="${item.id}"
+                           data-type="Repair"
+                           data-part="${item.itemInfo.partNumber}"
+                           data-serial="${item.serialNumber}"
+                           data-desc="${item.itemInfo.description}"
+                           data-ownership="${item.ownership}"
+                           data-condition="${item.itemCondition}"/></td>
+                <td>${item.id}</td><td>${item.itemInfo.partNumber}</td>
+                <td>${item.serialNumber}</td><td>${item.itemInfo.description}</td>
+                <td>${item.ownership}</td><td>${item.itemCondition}</td>
+              </tr>
+            `),
+            true
+        );
+        document.getElementById('addRepairItemBtn').onclick    = repairPager.open;
+        document.getElementById('repairModalCloseBtn').onclick = repairPager.close;
+        document.getElementById('repairModalBackdrop').onclick = repairPager.close;
+        document.getElementById('repairModalAddBtn').onclick   = () => {
+            document.querySelectorAll('#repairTable input[type=checkbox]:checked').forEach(chk => {
+                addRow({
+                    id:           chk.dataset.id,
+                    type:         chk.dataset.type,
+                    partNumber:   chk.dataset.part,
+                    description:  chk.dataset.desc,
+                    serialNumber: chk.dataset.serial,
+                    ownership:    chk.dataset.ownership,
+                    condition:    chk.dataset.condition
+                }, 'stockItemIds', chk.dataset.id);
+            });
+            repairPager.close();
+        };
 
-      // Repair
-      const repairPager = setupPagination(
-        'repair',
-        () => `/api/items/repair?client=${encodeURIComponent(clientSel.value)}`,
-        (item,ct) => ct.insertAdjacentHTML('beforeend', `
-          <tr>
-            <td><input type="checkbox"
-                       data-id="${item.id}"
-                       data-type="Repair"
-                       data-part="${item.itemInfo.partNumber}"
-                       data-serial="${item.serialNumber}"
-                       data-desc="${item.itemInfo.description}"
-                       data-ownership="${item.ownership}"
-                       data-condition="${item.itemCondition}"/></td>
-            <td>${item.id}</td><td>${item.itemInfo.partNumber}</td>
-            <td>${item.serialNumber}</td><td>${item.itemInfo.description}</td>
-            <td>${item.ownership}</td><td>${item.itemCondition}</td>
-          </tr>
-        `),
-        true
-      );
-      document.getElementById('addRepairItemBtn').onclick    = repairPager.open;
-      document.getElementById('repairModalCloseBtn').onclick = repairPager.close;
-      document.getElementById('repairModalBackdrop').onclick = repairPager.close;
-      document.getElementById('repairModalAddBtn').onclick   = () => {
-        document.querySelectorAll('#repairTable input[type=checkbox]:checked').forEach(chk => {
-          addRow({
-            id:           chk.dataset.id,
-            type:         chk.dataset.type,
-            partNumber:   chk.dataset.part,
-            description:  chk.dataset.desc,
-            serialNumber: chk.dataset.serial,
-            ownership:    chk.dataset.ownership,
-            condition:    chk.dataset.condition
-          });
-          // скрытый input тоже в stockItemIds
-          const hi = document.createElement('input');
-          hi.type = 'hidden';
-          hi.name = 'stockItemIds';
-          hi.value = chk.dataset.id;
-          hiddenCt.appendChild(hi);
-        });
-        repairPager.close();
-      };
+        // Catalog modal
+        let catalogBase = '/api/iteminfos/all';
+        const catalogPager = setupPagination(
+            'catalog',
+            () => catalogBase,
+            (item, ct) => ct.insertAdjacentHTML('beforeend', `
+              <tr>
+                <td><input type="checkbox"
+                           data-type="${item.itemType}"
+                           data-part="${item.partNumber}"
+                           data-desc="${item.description}"/></td>
+                <td>${item.partNumber}</td><td>${item.description}</td><td>${item.itemType}</td>
+              </tr>
+            `)
+        );
+        document.getElementById('addCatalogItemBtn').onclick    = catalogPager.open;
+        document.getElementById('catalogModalCloseBtn').onclick = catalogPager.close;
+        document.getElementById('catalogModalBackdrop').onclick = catalogPager.close;
+        document.getElementById('catalogModalAddBtn').onclick   = () => {
+            const client = clientSel.value;
+            document.querySelectorAll('#catalogTable input[type=checkbox]:checked').forEach(chk => {
+                addRow({
+                    id:           '',
+                    type:         chk.dataset.type,
+                    partNumber:   chk.dataset.part,
+                    description:  chk.dataset.desc,
+                    serialNumber: 'TBA',
+                    ownership:    client,
+                    condition:    'NEW_ASSEMBLY'
+                }, 'newItemsIds', chk.dataset.part);
+            });
+            catalogPager.close();
+        };
+        document.getElementById('catalogFilterBtn').onclick = () => {
+            const pn = encodeURIComponent(document.getElementById('filterPart').value),
+                  dc = encodeURIComponent(document.getElementById('filterDesc').value),
+                  tp = encodeURIComponent(document.getElementById('filterType').value);
+            catalogBase = `/api/iteminfos/search?partNumber=${pn}&description=${dc}&itemType=${tp}`;
+            catalogPager.open();
+        };
 
-      // Catalog
-      let catalogBase = '/api/iteminfos/all';
-      const catalogPager = setupPagination(
-        'catalog',
-        () => catalogBase,
-        (item,ct) => ct.insertAdjacentHTML('beforeend', `
-          <tr>
-            <td><input type="checkbox"
-                       data-type="${item.itemType}"
-                       data-part="${item.partNumber}"
-                       data-desc="${item.description}"/></td>
-            <td>${item.partNumber}</td><td>${item.description}</td><td>${item.itemType}</td>
-          </tr>
-        `)
-      );
-      document.getElementById('addCatalogItemBtn').onclick      = catalogPager.open;
-      document.getElementById('catalogModalCloseBtn').onclick   = catalogPager.close;
-      document.getElementById('catalogModalBackdrop').onclick   = catalogPager.close;
-      document.getElementById('catalogModalAddBtn').onclick     = () => {
-        const client = clientSel.value;
-        document.querySelectorAll('#catalogTable input[type=checkbox]:checked').forEach(chk => {
-          addRow({
-            id:           '',
-            type:         chk.dataset.type,
-            partNumber:   chk.dataset.part,
-            description:  chk.dataset.desc,
-            serialNumber: 'TBA',
-            ownership:    client,
-            condition:    'NEW_ASSEMBLY'
-          });
-          // скрытый input для DTO.newItemsIds
-          const hi = document.createElement('input');
-          hi.type = 'hidden';
-          hi.name = 'newItemsIds';
-          hi.value = chk.dataset.part;
-          hiddenCt.appendChild(hi);
-        });
-        catalogPager.close();
-      };
-      document.getElementById('catalogFilterBtn').onclick       = () => {
-        const pn = encodeURIComponent(document.getElementById('filterPart').value),
-              dc = encodeURIComponent(document.getElementById('filterDesc').value),
-              tp = encodeURIComponent(document.getElementById('filterType').value);
-        catalogBase = `/api/iteminfos/search?partNumber=${pn}&description=${dc}&itemType=${tp}`;
-        catalogPager.open();
-      };
+        // initial toggle
+        toggleClient();
     });
 </script>
 

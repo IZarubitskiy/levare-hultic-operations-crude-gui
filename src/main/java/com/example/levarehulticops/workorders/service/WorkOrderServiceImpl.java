@@ -80,51 +80,30 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         wo.setStatus(WorkOrderStatus.CREATED);
         wo.setItems(woItems);
 
-        System.out.println("метка");
-        System.out.println(woItems);
-        System.out.println(dto.stockItemIds());
-
         // Save and convert in one shot
         WorkOrder saved = workOrderRepository.save(wo);
         return workOrderMapper.toReadDto(saved);
     }
 
     /** Load a stock item and ensure it's ON_STOCK and owned by the correct client */
-    private Item loadAndValidateAndChangeStatusStockItem(Long id) {
+    private Item loadAndValidateStockItem(Long id) {
         Item i = itemService.getById(id);
         if (i.getItemStatus() != ItemStatus.ON_STOCK) {
             throw new IllegalStateException("Item " + id + " is already booked");
         }
+        Item itemUpdated = new Item();
+        if (i.getItemCondition() == ItemCondition.USED){
+            itemUpdated = itemService.statusUpdate(i, ItemStatus.REPAIR_REQUEST);
+        }
+        if (i.getItemCondition() == ItemCondition.NEW){
+            itemUpdated = itemService.statusUpdate(i, ItemStatus.STOCK_REQUEST);
+        }
+        if (i.getItemCondition() == ItemCondition.REPAIRED){
+            itemUpdated = itemService.statusUpdate(i, ItemStatus.STOCK_REQUEST);
+        }
 
-        if (i.getItemCondition() == ItemCondition.USED ||)
-        ItemUpdateRequest updatedItem = new ItemUpdateRequest(
-                null,
-                i.getSerialNumber(),
-                i.getOwnership(),
-                i.getItemCondition(),
-
-                );
-        /** Serial number */
-        String serialNumber,
-
-        /** Ownership classification */
-        Client ownership,
-
-        /** Current condition of the item */
-        ItemCondition itemCondition,
-
-        /** Current status of the item */
-        ItemStatus itemStatus,
-
-        /** Assigned JobOrder ID (optional) */
-        Long jobOrderId,
-
-        /** Free-form comments */
-        String comments
-
-        return i;
+        return itemUpdated;
     }
-
 
     @Override
     public WorkOrder update(WorkOrder workOrder) {
@@ -140,7 +119,6 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         return workOrderRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("WorkOrder not found: " + id));
     }
-
 
     @Override
     @Transactional(readOnly = true)

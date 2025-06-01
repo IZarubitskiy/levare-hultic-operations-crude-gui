@@ -37,4 +37,6 @@ public interface ItemService {
             Pageable pageable
     );
     Item newItemCreateRequest(String itemInfoId, Client client) ;
+
+    Item statusUpdate (Item i, ItemStatus itemStatus);
 }
