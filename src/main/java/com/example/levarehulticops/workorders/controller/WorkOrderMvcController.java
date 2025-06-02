@@ -10,7 +10,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.security.Principal;
+import java.time.LocalDate;
 
 @Controller
 @RequestMapping("/workorders")
@@ -42,12 +44,13 @@ public class WorkOrderMvcController {
                 ""     // comments
         ));
         model.addAttribute("currentUserId", currentUserId);
+        model.addAttribute("today", LocalDate.now().toString());
         return "workorders/create";
     }
 
     @PostMapping
     public String createWorkOrder(
-            @ModelAttribute("workOrder") WorkOrderCreateRequest dto,
+            @Valid @ModelAttribute("workOrder") WorkOrderCreateRequest dto,
             Principal principal        // Spring Security: текущий пользователь
     ) {
         // внутри сервиса выставится requestorId из principal,

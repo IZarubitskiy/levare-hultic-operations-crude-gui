@@ -216,7 +216,14 @@
         </div>
         <div>
             <label for="deliveryDate">Delivery Date</label>
-            <input type="date" id="deliveryDate" th:field="*{deliveryDate}"/>
+            <input
+                    type="date"
+                    id="deliveryDate"
+                    th:field="*{deliveryDate}"
+                    th:attr="min=${today}"
+            />
+            <div th:if="${#fields.hasErrors('deliveryDate')}" class="error"
+                 th:errors="*{deliveryDate}"></div>
         </div>
     </div>
 

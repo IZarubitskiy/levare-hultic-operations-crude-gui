@@ -4,6 +4,7 @@ import com.example.levarehulticops.workorders.entity.Client;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.AssertTrue;
+import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
@@ -34,6 +35,7 @@ public record WorkOrderCreateRequest(
 
         @NotNull(message = "Delivery date must not be null")
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+        @FutureOrPresent
         LocalDate deliveryDate,
 
         /** Optional comments */
