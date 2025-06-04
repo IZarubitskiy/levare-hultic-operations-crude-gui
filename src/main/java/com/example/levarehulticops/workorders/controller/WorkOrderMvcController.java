@@ -1,6 +1,7 @@
 package com.example.levarehulticops.workorders.controller;
 
 import com.example.levarehulticops.workorders.dto.WorkOrderCreateRequest;
+import com.example.levarehulticops.workorders.dto.WorkOrderReadDto;
 import com.example.levarehulticops.workorders.entity.WorkOrder;
 import com.example.levarehulticops.workorders.service.WorkOrderService;
 import lombok.RequiredArgsConstructor;
@@ -66,8 +67,16 @@ public class WorkOrderMvcController {
     }
 
     @GetMapping("/{id}/edit")
-    public String showEditForm(@PathVariable Long id, Model model) {
-        model.addAttribute("workOrder", workOrderService.getById(id));
+    public String showEditForm(
+            @PathVariable Long id,
+            @RequestParam(value = "currentUserId", required = false, defaultValue = "0") Long currentUserId,
+            Model model
+    ) {
+        WorkOrderReadDto dto = workOrderService.getDtoById(id);
+        model.addAttribute("workOrder", dto);
+        model.addAttribute("currentUserId", currentUserId);
+        // добавляем сегодняшнюю дату, чтобы min-атрибут для <input type="date"> формировался корректно
+        model.addAttribute("today", LocalDate.now());
         return "workorders/edit";
     }
 

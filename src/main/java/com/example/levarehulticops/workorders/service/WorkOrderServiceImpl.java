@@ -72,6 +72,14 @@ public class WorkOrderServiceImpl implements WorkOrderService {
                                 .map(id -> itemService.newItemCreateRequest(id, dto.client()))
                 )
                 .collect(Collectors.toSet());
+        System.out.println("Тут создается оборудование");
+        System.out.println(dto.stockItemIds());
+        for (Item woItem : woItems) {
+            System.out.print(woItem);
+            System.out.print(" следуюущее оборудование /n");
+        }
+        System.out.print(woItems.size());
+        System.out.println("Тут создается оборудование закончили");
 
         // Map DTO → entity and set system fields
         WorkOrder wo = workOrderMapper.toEntity(dto);
@@ -138,6 +146,14 @@ public class WorkOrderServiceImpl implements WorkOrderService {
     public Page<WorkOrderReadDto> getByStatus(WorkOrderStatus status, Pageable pageable) {
         return workOrderRepository.findAllByStatus(status, pageable)
                 .map(workOrderMapper::toReadDto);
+    }
+    @Override
+    public WorkOrderReadDto getDtoById(Long id){
+        System.out.println("ТЫ ТУТ");
+        System.out.println(workOrderRepository.findById(id).map(workOrderMapper::toReadDto)
+                .orElseThrow(() -> new EntityNotFoundException("WorkOrder not found: " + id)).items());
+        return workOrderRepository.findById(id).map(workOrderMapper::toReadDto)
+                .orElseThrow(() -> new EntityNotFoundException("WorkOrder not found: " + id));
     }
 }
 

@@ -201,18 +201,25 @@
     <div class="form-row">
         <div>
             <label for="workOrderNumber">Work Order Number</label>
-            <input type="text" id="workOrderNumber" th:field="*{workOrderNumber}"/>
+            <input type="text"
+                   id="workOrderNumber"
+                   th:field="*{workOrderNumber}"
+                   required />
         </div>
         <div>
             <label for="client">Client</label>
             <select id="client" th:field="*{client}">
+                <option value="" disabled selected>— Select Client —</option>
                 <option th:each="c : ${T(com.example.levarehulticops.workorders.entity.Client).values()}"
                         th:value="${c}" th:text="${c}"/>
             </select>
         </div>
         <div>
             <label for="well">Well</label>
-            <input type="text" id="well" th:field="*{well}"/>
+            <input type="text"
+                   id="well"
+                   th:field="*{well}"
+                   required />
         </div>
         <div>
             <label for="deliveryDate">Delivery Date</label>
@@ -221,7 +228,7 @@
                     id="deliveryDate"
                     th:field="*{deliveryDate}"
                     th:attr="min=${today}"
-            />
+                    required />
             <div th:if="${#fields.hasErrors('deliveryDate')}" class="error"
                  th:errors="*{deliveryDate}"></div>
         </div>
@@ -548,7 +555,7 @@
                     serialNumber: chk.dataset.serial,
                     ownership:    chk.dataset.ownership,
                     condition:    chk.dataset.condition
-                }, 'stockItemIds', chk.dataset.id);
+                }, 'repairItemIds', chk.dataset.id);
             });
             repairPager.close();
         };

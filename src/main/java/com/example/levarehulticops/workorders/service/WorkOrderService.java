@@ -19,4 +19,6 @@ public interface WorkOrderService {
     Page<WorkOrder> getAll(Pageable pageable);
 
     Page<WorkOrderReadDto> getByStatus(WorkOrderStatus status, Pageable pageable);
+
+    WorkOrderReadDto getDtoById(Long id);
 }
