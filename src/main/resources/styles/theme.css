@@ -1,0 +1,28 @@
+.root {
+    -fx-font-family: "Segoe UI", "Roboto", "Helvetica Neue", sans-serif;
+    -fx-background-color: #f8f9fa;
+}
+
+.tab-pane {
+    -fx-background-color: white;
+    -fx-border-color: #dee2e6;
+}
+
+.tab {
+    -fx-padding: 8 16;
+}
+
+.label {
+    -fx-font-size: 13px;
+    -fx-text-fill: #343a40;
+}
+
+.button {
+    -fx-background-color: #007bff;
+    -fx-text-fill: white;
+    -fx-background-radius: 4;
+}
+
+.button:hover {
+    -fx-background-color: #0056b3;
+}

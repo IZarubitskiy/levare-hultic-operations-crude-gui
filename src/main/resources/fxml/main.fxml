@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.levare.hultic.ops.main.MainController"
+            stylesheets="@/styles/theme.css">
+
+    <!-- Top navigation -->
+    <top>
+        <TabPane fx:id="tabPane"
+                 tabClosingPolicy="UNAVAILABLE"
+                 style="-fx-background-color: #f8f9fa; -fx-border-color: #dee2e6;">
+            <tabs>
+                <Tab text="WorkOrders" />
+                <Tab text="JobOrders" />
+                <Tab text="Outstanding" />
+                <Tab text="RNE" />
+                <Tab text="Stock" />
+                <Tab text="Corporate" />
+                <Tab text="Transactions" />
+                <Tab text="History" />
+                <Tab text="Reports" />
+                <Tab text="Settings" />
+            </tabs>
+        </TabPane>
+    </top>
+
+    <!-- Central content area -->
+    <center>
+        <AnchorPane fx:id="contentArea" />
+    </center>
+
+    <!-- Bottom: user greeting -->
+    <bottom>
+        <AnchorPane prefHeight="40">
+            <children>
+                <Label fx:id="userGreeting"
+                       layoutX="10"
+                       layoutY="10"
+                       text="Welcome, [user]"
+                       style="-fx-font-size: 14px; -fx-text-fill: #495057;" />
+            </children>
+        </AnchorPane>
+    </bottom>
+</BorderPane>

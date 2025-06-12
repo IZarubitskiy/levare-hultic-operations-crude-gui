@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.levare.hultic.ops.login.LoginController"
+            prefWidth="400" prefHeight="280"
+            style="-fx-background-color: linear-gradient(to bottom right, #f8f9fa, #dee2e6);">
+
+    <children>
+        <VBox spacing="15" layoutX="50" layoutY="50" prefWidth="300">
+            <Label text="Login to Levare Hultic" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+
+            <TextField fx:id="usernameField" promptText="Full name"
+                       style="-fx-background-radius: 6; -fx-padding: 8;"/>
+
+            <TextField fx:id="positionField" promptText="Position"
+                       style="-fx-background-radius: 6; -fx-padding: 8;"/>
+
+            <Button text="Login"
+                    onAction="#handleLogin"
+                    prefWidth="100"
+                    style="-fx-background-color: #007bff; -fx-text-fill: white; -fx-background-radius: 6;"/>
+        </VBox>
+    </children>
+
+</AnchorPane>
