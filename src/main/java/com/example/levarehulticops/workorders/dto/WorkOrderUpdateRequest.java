@@ -10,14 +10,12 @@ import java.util.List;
  * All other fields are managed automatically on the server side.
  */
 public record WorkOrderUpdateRequest(
-        /** Updated list of stock item IDs */
+
+        /** Optional list of item IDs */
         List<Long> stockItemIds,
 
-        /** Updated list of repair item IDs */
-        List<Long> repairItemIds,
-
-        /** Updated list of new request itemInfo IDs */
-        List<Long> newRequestIds,
+        /** Optional list of new item info request IDs */
+        List<String> newItemsIds,
 
         /** Updated delivery date */
         LocalDate deliveryDate,
