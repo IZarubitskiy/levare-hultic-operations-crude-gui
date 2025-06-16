@@ -2,6 +2,7 @@ package com.levare.hultic.ops.login;
 
 import com.levare.hultic.ops.main.MainController;
 import com.levare.hultic.ops.users.entity.User;
+import com.levare.hultic.ops.workorders.service.WorkOrderService;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -18,15 +19,20 @@ public class LoginController {
     @FXML private TextField positionField;
 
     private Stage stage;
+    private WorkOrderService workOrderService;
 
     public void setStage(Stage stage) {
         this.stage = stage;
     }
 
+    public void setWorkOrderService(WorkOrderService service) {
+        this.workOrderService = service;
+    }
+
     @FXML
     public void handleLogin() {
         String name = usernameField.getText().trim();
-        String password = positionField.getText().trim(); // условно как пароль
+        String password = positionField.getText().trim(); // используем как пароль
 
         if (name.equals("1") && password.equals("1")) {
             User fixedUser = new User();
@@ -45,15 +51,14 @@ public class LoginController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/main.fxml"));
             Scene mainScene = new Scene(loader.load());
 
-            Object ctrl = loader.getController();
-            if (ctrl instanceof MainController mainController) {
-                mainController.setCurrentUser(user);
-            }
+            MainController mainController = loader.getController();
+            mainController.setCurrentUser(user);
+            mainController.setWorkOrderService(workOrderService);
 
             stage.setScene(mainScene);
             stage.setTitle("Levare Hultic - " + user.getName());
-            stage.show();
             stage.setMaximized(true);
+            stage.show();
 
         } catch (Exception e) {
             e.printStackTrace();

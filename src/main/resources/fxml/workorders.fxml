@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.levare.hultic.ops.workorders.controller.WorkOrderController">
+
+    <center>
+        <VBox spacing="10">
+            <padding>
+                <Insets top="10" right="10" bottom="10" left="10"/>
+            </padding>
+
+            <!-- Фильтрация и действия -->
+            <HBox spacing="10">
+                <Label text="Status:"/>
+                <ComboBox fx:id="statusFilterCombo" promptText="All statuses" prefWidth="200"/>
+                <Button fx:id="refreshButton" text="Refresh"/>
+                <Button fx:id="createButton" text="New"/>
+                <Button fx:id="updateButton" text="Update"/>
+                <Button fx:id="deleteButton" text="Delete"/>
+                <Button fx:id="clearButton" text="Clear"/>
+            </HBox>
+
+            <!-- Таблица -->
+            <TableView fx:id="workOrderTable" VBox.vgrow="ALWAYS">
+                <columns>
+                    <TableColumn fx:id="idColumn" text="ID"/>
+                    <TableColumn fx:id="numberColumn" text="WO Number"/>
+                    <TableColumn fx:id="clientColumn" text="Client"/>
+                    <TableColumn fx:id="wellColumn" text="Well"/>
+                    <TableColumn fx:id="requestDateColumn" text="Request Date"/>
+                    <TableColumn fx:id="deliveryDateColumn" text="Delivery Date"/>
+                    <TableColumn fx:id="statusColumn" text="Status"/>
+                    <TableColumn fx:id="requestorColumn" text="Requestor"/>
+                    <TableColumn fx:id="commentsColumn" text="Comments"/>
+                </columns>
+            </TableView>
+        </VBox>
+
+    </center>
+</BorderPane>

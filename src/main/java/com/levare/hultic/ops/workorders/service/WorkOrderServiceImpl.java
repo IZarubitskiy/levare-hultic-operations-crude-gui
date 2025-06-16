@@ -22,12 +22,10 @@ import java.util.stream.Collectors;
 public class WorkOrderServiceImpl implements WorkOrderService {
 
     private final WorkOrderDao workOrderDao;
-    private final UserService userService;
     private final ItemService itemService;
 
     public WorkOrderServiceImpl(WorkOrderDao workOrderDao, UserService userService, ItemService itemService) {
         this.workOrderDao = workOrderDao;
-        this.userService = userService;
         this.itemService = itemService;
     }
 

@@ -22,8 +22,8 @@ public class WorkOrderDao {
 
     public List<WorkOrder> findAll() {
         List<WorkOrder> result = new ArrayList<>();
+        System.out.println("🧪 Executing findAll on connection: " + connection);
         String sql = "SELECT * FROM work_orders";
-
         try (PreparedStatement stmt = connection.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {

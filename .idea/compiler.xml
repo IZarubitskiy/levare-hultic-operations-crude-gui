@@ -26,6 +26,7 @@
         <processorPath useClasspath="false">
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.34/lombok-1.18.34.jar" />
         </processorPath>
+        <module name="levare-hultic-ops-gui" />
         <module name="levare-hultic-ops" />
       </profile>
     </annotationProcessing>
