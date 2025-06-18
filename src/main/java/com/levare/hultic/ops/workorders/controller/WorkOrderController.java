@@ -6,8 +6,14 @@ import com.levare.hultic.ops.workorders.service.WorkOrderService;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.input.ContextMenuEvent;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -80,7 +86,7 @@ public class WorkOrderController {
         }
 
         if (refreshButton != null) refreshButton.setOnAction(e -> refreshTable());
-        if (createButton != null) createButton.setOnAction(e -> createWorkOrder());
+        if (createButton != null) createButton.setOnAction(e -> handleNewWorkOrder());
         if (updateButton != null) updateButton.setOnAction(e -> updateWorkOrder());
         if (deleteButton != null) deleteButton.setOnAction(e -> deleteWorkOrder());
         if (clearButton != null) clearButton.setOnAction(e -> clearForm());
@@ -145,20 +151,7 @@ public class WorkOrderController {
         workOrderTable.setItems(FXCollections.observableArrayList(workOrders));
     }
 
-    private void createWorkOrder() {
-        WorkOrder order = new WorkOrder();
-        order.setWorkOrderNumber(numberField.getText().trim());
-        order.setWell(wellField.getText().trim());
-        order.setDeliveryDate(deliveryDatePicker.getValue());
-        order.setComments(commentsArea.getText().trim());
-        if (workOrderService != null) {
-            workOrderService.create(order);
-            refreshTable();
-            clearForm();
-        }
-    }
-
-    private void updateWorkOrder() {
+      private void updateWorkOrder() {
         WorkOrder selected = workOrderTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
             showAlert("No selection", "Please select a work order to update.");
@@ -211,5 +204,29 @@ public class WorkOrderController {
         alert.setHeaderText(null);
         alert.setContentText(content);
         alert.showAndWait();
+    }
+
+    @FXML
+    private void handleNewWorkOrder() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/new_workorder.fxml"));
+            Parent form = loader.load();
+
+            NewWorkOrderController formController = loader.getController();
+            formController.setWorkOrderService(workOrderService); // передаём сервис
+
+            Stage dialog = new Stage();
+            dialog.getIcons().add(new Image(getClass().getResourceAsStream("/icons/new_workorder.png")));
+            dialog.setTitle("New Work Order");
+            dialog.setScene(new Scene(form));
+            dialog.initModality(Modality.APPLICATION_MODAL);
+            dialog.showAndWait();
+
+            // после закрытия — обновим таблицу
+            refreshTable();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

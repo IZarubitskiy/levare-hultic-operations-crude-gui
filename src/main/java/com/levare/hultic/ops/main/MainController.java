@@ -6,6 +6,7 @@ import com.levare.hultic.ops.workorders.service.WorkOrderService;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -30,13 +31,11 @@ public class MainController {
 
     public void setWorkOrderService(WorkOrderService service) {
         this.workOrderService = service;
+
     }
 
     @FXML
     public void initialize() {
-        if (currentUser != null) {
-            userLabel.setText("Logged in as: " + currentUser.getName() + " (" + currentUser.getPosition() + ")");
-        }
 
         tabPane.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {
             if (newTab != null) {
@@ -52,20 +51,24 @@ public class MainController {
     private void loadWorkOrdersView() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/workorders.fxml"));
-            Node node = loader.load();
+            Parent root = loader.load(); // ✅ Тип Parent гарантирует наличие layout-методов
 
             WorkOrderController controller = loader.getController();
             controller.setWorkOrderService(workOrderService);
 
-            // Вставляем в интерфейс
-            contentArea.getChildren().setAll(node);
-            AnchorPane.setTopAnchor(node, 0.0);
-            AnchorPane.setBottomAnchor(node, 0.0);
-            AnchorPane.setLeftAnchor(node, 0.0);
-            AnchorPane.setRightAnchor(node, 0.0);
+            contentArea.getChildren().setAll(root);
+            AnchorPane.setTopAnchor(root, 0.0);
+            AnchorPane.setBottomAnchor(root, 0.0);
+            AnchorPane.setLeftAnchor(root, 0.0);
+            AnchorPane.setRightAnchor(root, 0.0);
 
-            // ⏳ Отложенный вызов — после GUI загрузки
-            javafx.application.Platform.runLater(controller::refreshTable);
+            // ⏳ Отложенный рендеринг, который точно сработает
+            javafx.application.Platform.runLater(() -> {
+                root.requestLayout();             // ✅ гарантированно есть
+                root.applyCss();                 // ⬅️ дополняем
+                root.layout();                   // ⬅️ принудительный layout pass
+                controller.refreshTable();       // ✅ если нужно
+            });
 
         } catch (Exception e) {
             e.printStackTrace();
