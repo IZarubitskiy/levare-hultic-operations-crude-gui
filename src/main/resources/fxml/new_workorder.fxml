@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.levare.hultic.ops.workorders.controller.NewWorkOrderController"
+      spacing="10" alignment="TOP_LEFT" style="-fx-padding: 20;">
+
+    <children>
+        <Label text="Work Order Number"/>
+        <TextField fx:id="numberField" promptText="WO-XXXX"/>
+
+        <Label text="Client"/>
+        <ComboBox fx:id="clientComboBox" promptText="Select client"/>
+
+        <Label text="Well"/>
+        <TextField fx:id="wellField" promptText="Well name or location"/>
+
+        <Label text="Delivery Date"/>
+        <DatePicker fx:id="deliveryDatePicker"/>
+
+        <Label text="Comments"/>
+        <TextArea fx:id="commentsArea" promptText="Additional notes..." prefRowCount="3"/>
+
+        <Label text="Items"/>
+        <TableView fx:id="itemTable" prefHeight="150">
+            <columns>
+                <TableColumn fx:id="partNumberColumn" text="Part Number" />
+                <TableColumn fx:id="descriptionColumn" text="Description" />
+                <TableColumn fx:id="serialNumberColumn" text="Serial" />
+                <TableColumn fx:id="statusColumn" text="Status" />
+            </columns>
+        </TableView>
+
+        <HBox spacing="10">
+            <Button text="NEW" />
+            <Button text="REPAIR" />
+            <Button text="STOCK" />
+            <Button text="RNE" />
+        </HBox>
+
+        <HBox spacing="10" alignment="CENTER_RIGHT">
+            <Button text="Cancel" onAction="#handleCancel" />
+            <Button text="Save" onAction="#handleSave" />
+        </HBox>
+    </children>
+
+</VBox>
