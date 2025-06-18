@@ -3,10 +3,11 @@ package com.levare.hultic.ops.workorders.controller;
 import com.levare.hultic.ops.iteminfos.controller.ItemInfoSelectionController;
 import com.levare.hultic.ops.iteminfos.entity.ItemInfo;
 import com.levare.hultic.ops.iteminfos.service.ItemInfoService;
-import com.levare.hultic.ops.iteminfos.service.ItemInfoServiceImpl;
+import com.levare.hultic.ops.items.entity.Item;
 import com.levare.hultic.ops.workorders.entity.WorkOrder;
 import com.levare.hultic.ops.workorders.entity.WorkOrderStatus;
 import com.levare.hultic.ops.workorders.service.WorkOrderService;
+import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -16,45 +17,62 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
+@RequiredArgsConstructor
 public class NewWorkOrderController {
+
+    private final WorkOrderService workOrderService;
+    private final ItemInfoService itemInfoService;
+    private final ObservableList<Item> selectedItems = FXCollections.observableArrayList();
 
     @FXML private TextField numberField;
     @FXML private TextField wellField;
     @FXML private DatePicker deliveryDatePicker;
     @FXML private TextArea commentsArea;
+    @FXML private TableView<Item> itemsTable;
+    @FXML private TableColumn<Item, String> partNumberColumn;
+    @FXML private TableColumn<Item, String> descriptionColumn;
+    @FXML private TableColumn<Item,String> serialNumberColumn;
+    @FXML private TableColumn<Item,String> ownershipColumn;
+    @FXML private TableColumn<Item,String> conditionColumn;
+    @FXML private TableColumn<Item,String> jobOrderColumn;
+    @FXML private TableColumn<Item,String> commentsColumn;
+    @FXML private Button newItemButton;
     @FXML private Button cancelButton;
 
-    // Table for selected equipment
-    @FXML private TableView<ItemInfo> itemsTable;
-    @FXML private TableColumn<ItemInfo, String> partNumberColumn;
-    @FXML private TableColumn<ItemInfo, String> descriptionColumn;
-    @FXML private Button newItemButton;
-
-    private WorkOrderService workOrderService;
-    private final ItemInfoService itemInfoService = new ItemInfoServiceImpl();
-    private final ObservableList<ItemInfo> selectedItems = FXCollections.observableArrayList();
-
-    public void setWorkOrderService(WorkOrderService service) {
-        this.workOrderService = service;
-    }
-
     @FXML
-    public void initialize() {
-        // Настроим колонки таблицы выбранных ItemInfo
-        partNumberColumn.setCellValueFactory(cell -> cell.getValue().getPartNumber());
-        descriptionColumn.setCellValueFactory(cell -> cell.getValue().getDescription());
+    private void initialize() {
+        // Настраиваем колонки таблицы
+        partNumberColumn.setCellValueFactory(cellData ->
+                new ReadOnlyStringWrapper(cellData.getValue().getItemInfo().getPartNumber()));
+        descriptionColumn.setCellValueFactory(cellData ->
+                new ReadOnlyStringWrapper(cellData.getValue().getItemInfo().getDescription()));
+        serialNumberColumn.setCellValueFactory(cellData ->
+                new ReadOnlyStringWrapper(cellData.getValue().getSerialNumber()));
+        ownershipColumn.setCellValueFactory(cellData ->
+                new ReadOnlyStringWrapper(cellData.getValue().getOwnership().toString()));
+        conditionColumn.setCellValueFactory(cellData ->
+                new ReadOnlyStringWrapper(cellData.getValue().getItemCondition().toString()));
+        jobOrderColumn.setCellValueFactory(cellData ->
+                new ReadOnlyStringWrapper(cellData.getValue().getJobOrder().getId().toString()));
+        commentsColumn.setCellValueFactory(cellData ->
+                new ReadOnlyStringWrapper(cellData.getValue().getComments()));
+        // Связываем список с таблицей
         itemsTable.setItems(selectedItems);
     }
 
     /** Открывает модальное окно выбора оборудования и добавляет выбранное в таблицу */
     @FXML
     private void onNewItem() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/item_info_selection.fxml"));
+        /*try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/fxml/item_info_selection.fxml"));
+            // предполагается, что loader настроен через ControllerFactory и инжектит ItemInfoService
             Parent root = loader.load();
 
             Stage dialog = new Stage();
@@ -71,14 +89,14 @@ public class NewWorkOrderController {
         } catch (Exception e) {
             e.printStackTrace();
             showError("Не удалось открыть диалог выбора оборудования", e.getMessage());
-        }
+        }*/
     }
 
     /** Сохраняет новую заявку вместе с выбранным оборудованием */
     @FXML
     private void handleSave() {
         if (workOrderService == null) {
-            System.err.println("❌ WorkOrderService is not set.");
+            showError("Ошибка конфигурации", "WorkOrderService не задан.");
             return;
         }
 
@@ -90,8 +108,8 @@ public class NewWorkOrderController {
         order.setRequestDate(LocalDate.now());
         order.setStatus(WorkOrderStatus.CREATED);
 
-        // Предполагается, что WorkOrder имеет метод setItems(List<ItemInfo>)
-        order.setItems(List.copyOf(selectedItems));
+        // Добавляем выбранные ItemInfo (требует соответствующего поля и метода в WorkOrder)
+        //order.set(Set.copyOf(selectedItems));
 
         workOrderService.create(order);
         closeWindow();

@@ -8,6 +8,7 @@ import com.levare.hultic.ops.workorders.entity.Client;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
 /**
  * JavaFX controller for interacting with the item list and filter UI.
  */
+@RequiredArgsConstructor
 public class ItemController {
 
     private ItemService itemService;
@@ -39,10 +41,6 @@ public class ItemController {
 
     @FXML
     private Button refreshButton;
-
-    public void setItemService(ItemService itemService) {
-        this.itemService = itemService;
-    }
 
     @FXML
     private void initialize() {

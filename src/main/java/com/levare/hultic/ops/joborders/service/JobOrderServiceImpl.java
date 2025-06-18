@@ -1,8 +1,10 @@
 package com.levare.hultic.ops.joborders.service;
 
+import com.levare.hultic.ops.items.service.ItemService;
 import com.levare.hultic.ops.joborders.dao.JobOrderDao;
 import com.levare.hultic.ops.joborders.entity.JobOrder;
 import com.levare.hultic.ops.joborders.entity.JobOrderStatus;
+import com.levare.hultic.ops.workorders.service.WorkOrderService;
 
 import java.util.List;
 import java.util.Objects;
@@ -15,7 +17,7 @@ public class JobOrderServiceImpl implements JobOrderService {
 
     private final JobOrderDao jobOrderDao;
 
-    public JobOrderServiceImpl(JobOrderDao jobOrderDao) {
+    public JobOrderServiceImpl(JobOrderDao jobOrderDao, WorkOrderService workOrderService, ItemService itemService) {
         this.jobOrderDao = jobOrderDao;
     }
 

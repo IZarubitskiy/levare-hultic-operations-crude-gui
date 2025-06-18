@@ -6,12 +6,14 @@ import com.levare.hultic.ops.joborders.service.JobOrderService;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
 /**
  * JavaFX controller for displaying and managing JobOrders.
  */
+@RequiredArgsConstructor
 public class JobOrderController {
 
     private JobOrderService jobOrderService;
@@ -28,10 +30,6 @@ public class JobOrderController {
     @FXML private Button createButton;
     @FXML private Button updateButton;
     @FXML private Button statusButton;
-
-    public void setJobOrderService(JobOrderService service) {
-        this.jobOrderService = service;
-    }
 
     @FXML
     public void initialize() {

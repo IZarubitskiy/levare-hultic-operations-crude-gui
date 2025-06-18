@@ -1,21 +1,25 @@
 package com.levare.hultic.ops.iteminfos.controller;
 
-import com.levare.hultic.ops.common.ConnectionFactory;
-import com.levare.hultic.ops.iteminfos.dao.ItemInfoDao;
 import com.levare.hultic.ops.iteminfos.entity.ItemInfo;
 import com.levare.hultic.ops.iteminfos.service.ItemInfoService;
-import com.levare.hultic.ops.iteminfos.service.ItemInfoServiceImpl;
-import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.stage.Stage;
+import lombok.RequiredArgsConstructor;
 
-import java.sql.SQLException;
-
+/**
+ * Controller for the modal dialog to select an ItemInfo.
+ * Получает ItemInfoService через конструктор от AppControllerFactory.
+ */
+@RequiredArgsConstructor
 public class ItemInfoSelectionController {
+
+    private final ItemInfoService itemInfoService;
+    private ItemInfo selectedItem;
 
     @FXML private TableView<ItemInfo> tableView;
     @FXML private TableColumn<ItemInfo, String> colPartNumber;
@@ -23,34 +27,20 @@ public class ItemInfoSelectionController {
     @FXML private Button selectButton;
     @FXML private Button cancelButton;
 
-    private final ItemInfoService itemInfoService;
-    private ItemInfo selectedItem;
-
-    public ItemInfoSelectionController() {
-        try {
-            // Инициализируем DAO и сервис через ConnectionFactory
-            this.itemInfoService = new ItemInfoServiceImpl(
-                    new ItemInfoDao(ConnectionFactory.getConnection())
-            );
-        } catch (SQLException e) {
-            throw new RuntimeException("Failed to open database connection for ItemInfoService", e);
-        }
-    }
-
     @FXML
     public void initialize() {
-        // Настраиваем колонки таблицы
-        colPartNumber.setCellValueFactory(
-                cell -> new SimpleStringProperty(cell.getValue().getPartNumber())
-        );
-        colDescription.setCellValueFactory(
-                cell -> new SimpleStringProperty(cell.getValue().getDescription())
-        );
+        // Настраиваем колонки
+        colPartNumber.setCellValueFactory(c ->
+                new ReadOnlyStringWrapper(c.getValue().getPartNumber()));
+        colDescription.setCellValueFactory(c ->
+                new ReadOnlyStringWrapper(c.getValue().getDescription()));
 
-        // Загружаем все записи из сервиса
-        tableView.setItems(FXCollections.observableArrayList(itemInfoService.getAll()));
+        // Загружаем все элементы
+        tableView.setItems(FXCollections.observableArrayList(
+                itemInfoService.getAll()
+        ));
 
-        // Блокируем кнопку Select, если ничего не выбрано
+        // Блокируем Select, если ничего не выбрано
         selectButton.disableProperty()
                 .bind(tableView.getSelectionModel().selectedItemProperty().isNull());
     }

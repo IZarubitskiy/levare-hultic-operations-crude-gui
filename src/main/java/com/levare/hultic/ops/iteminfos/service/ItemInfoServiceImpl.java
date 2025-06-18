@@ -3,6 +3,7 @@ package com.levare.hultic.ops.iteminfos.service;
 import com.levare.hultic.ops.iteminfos.dao.ItemInfoDao;
 import com.levare.hultic.ops.iteminfos.entity.ItemInfo;
 import com.levare.hultic.ops.iteminfos.entity.ItemType;
+import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,13 +12,10 @@ import java.util.Objects;
 /**
  * Default implementation of ItemInfoService using DAO.
  */
+@RequiredArgsConstructor
 public class ItemInfoServiceImpl implements ItemInfoService {
 
     private final ItemInfoDao dao;
-
-    public ItemInfoServiceImpl(ItemInfoDao dao) {
-        this.dao = dao;
-    }
 
     @Override
     public List<ItemInfo> getAll() {

@@ -5,15 +5,20 @@ import com.levare.hultic.ops.users.service.UserService;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.ReadOnlyStringWrapper;
+import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
 /**
- * JavaFX controller for managing User (Employee) entities.
+ * JavaFX controller for managing User entities.
+ * Получает UserService через конструктор от AppControllerFactory.
  */
+@RequiredArgsConstructor
 public class UserController {
 
-    private UserService userService;
+    private final UserService userService;
 
     @FXML private TableView<User> userTable;
     @FXML private TableColumn<User, Long> idColumn;
@@ -28,28 +33,24 @@ public class UserController {
     @FXML private Button deleteButton;
     @FXML private Button clearButton;
 
-    public void setUserService(UserService service) {
-        this.userService = service;
-    }
-
     @FXML
-    private void initialize() {
-        idColumn.setCellValueFactory(c -> new javafx.beans.property.SimpleLongProperty(c.getValue().getId()).asObject());
-        nameColumn.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getName()));
-        positionColumn.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getPosition()));
+    public void initialize() {
+        // Настройка колонок
+        idColumn.setCellValueFactory(c -> new ReadOnlyObjectWrapper<>(c.getValue().getId()));
+        nameColumn.setCellValueFactory(c -> new ReadOnlyStringWrapper(c.getValue().getName()));
+        positionColumn.setCellValueFactory(c -> new ReadOnlyStringWrapper(c.getValue().getPosition()));
 
-        refreshTable();
-
+        // Привязка действий
         createButton.setOnAction(e -> handleCreate());
         updateButton.setOnAction(e -> handleUpdate());
         deleteButton.setOnAction(e -> handleDelete());
         clearButton.setOnAction(e -> clearForm());
 
         userTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> {
-            if (newSel != null) {
-                fillForm(newSel);
-            }
+            if (newSel != null) fillForm(newSel);
         });
+
+        refreshTable();
     }
 
     private void refreshTable() {
@@ -60,12 +61,10 @@ public class UserController {
     private void handleCreate() {
         String name = nameField.getText().trim();
         String position = positionField.getText().trim();
-
         if (name.isEmpty() || position.isEmpty()) {
             showAlert("Validation Error", "Name and Position are required.");
             return;
         }
-
         User user = new User(null, name, position);
         userService.create(user);
         refreshTable();
@@ -78,7 +77,6 @@ public class UserController {
             showAlert("No selection", "Please select a user to update.");
             return;
         }
-
         selected.setName(nameField.getText().trim());
         selected.setPosition(positionField.getText().trim());
         userService.update(selected);
@@ -91,7 +89,6 @@ public class UserController {
             showAlert("No selection", "Please select a user to delete.");
             return;
         }
-
         userService.delete(selected.getId());
         refreshTable();
         clearForm();

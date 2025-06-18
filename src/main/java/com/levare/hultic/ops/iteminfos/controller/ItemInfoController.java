@@ -6,12 +6,14 @@ import com.levare.hultic.ops.iteminfos.service.ItemInfoService;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
 /**
  * JavaFX controller for managing ItemInfo form and table.
  */
+@RequiredArgsConstructor
 public class ItemInfoController {
 
     private ItemInfoService service;
@@ -39,10 +41,6 @@ public class ItemInfoController {
 
     @FXML
     private TableColumn<ItemInfo, ItemType> itemTypeColumn;
-
-    public void setService(ItemInfoService service) {
-        this.service = service;
-    }
 
     @FXML
     private void initialize() {
