@@ -3,6 +3,9 @@ package com.levare.hultic.ops.workorders.controller;
 import com.levare.hultic.ops.iteminfos.controller.ItemInfoSelectionController;
 import com.levare.hultic.ops.iteminfos.entity.ItemInfo;
 import com.levare.hultic.ops.items.entity.Item;
+import com.levare.hultic.ops.items.entity.ItemCondition;
+import com.levare.hultic.ops.items.entity.ItemStatus;
+import com.levare.hultic.ops.workorders.entity.Client;
 import com.levare.hultic.ops.workorders.entity.WorkOrder;
 import com.levare.hultic.ops.workorders.entity.WorkOrderStatus;
 import com.levare.hultic.ops.workorders.service.WorkOrderService;
@@ -28,6 +31,7 @@ public class NewWorkOrderController {
     private final ObservableList<Item> selectedItems = FXCollections.observableArrayList();
 
     @FXML private TextField numberField;
+    @FXML private ComboBox<Client> clientComboBox;
     @FXML private TextField wellField;
     @FXML private DatePicker deliveryDatePicker;
     @FXML private TextArea commentsArea;
@@ -38,6 +42,7 @@ public class NewWorkOrderController {
     @FXML private TableColumn<Item, String> serialNumberColumn;
     @FXML private TableColumn<Item, String> ownershipColumn;
     @FXML private TableColumn<Item, String> conditionColumn;
+    @FXML private TableColumn<Item, String> statusColumn;
     @FXML private TableColumn<Item, String> jobOrderColumn;
     @FXML private TableColumn<Item, String> commentsColumn;
 
@@ -46,40 +51,55 @@ public class NewWorkOrderController {
 
     @FXML
     private void initialize() {
-        // Настраиваем колонки таблицы
-        partNumberColumn.setCellValueFactory(cell ->
-                new ReadOnlyStringWrapper(cell.getValue().getItemInfo().getPartNumber()));
-        descriptionColumn.setCellValueFactory(cell ->
-                new ReadOnlyStringWrapper(cell.getValue().getItemInfo().getDescription()));
-        serialNumberColumn.setCellValueFactory(cell ->
-                new ReadOnlyStringWrapper(cell.getValue().getSerialNumber()));
-        ownershipColumn.setCellValueFactory(cell ->
-                new ReadOnlyStringWrapper(cell.getValue().getOwnership().toString()));
-        conditionColumn.setCellValueFactory(cell ->
-                new ReadOnlyStringWrapper(cell.getValue().getItemCondition().toString()));
-        jobOrderColumn.setCellValueFactory(cell ->
-                new ReadOnlyStringWrapper(cell.getValue().getJobOrder().getId().toString()));
-        commentsColumn.setCellValueFactory(cell ->
-                new ReadOnlyStringWrapper(cell.getValue().getComments()));
+        clientComboBox.setItems(FXCollections.observableArrayList(Client.values()));
+        clientComboBox.getSelectionModel().select(Client.EMPTY);
+        partNumberColumn.setCellValueFactory(c ->
+                new ReadOnlyStringWrapper(c.getValue().getItemInfo().getPartNumber()));
+        descriptionColumn.setCellValueFactory(c ->
+                new ReadOnlyStringWrapper(c.getValue().getItemInfo().getDescription()));
+        serialNumberColumn.setCellValueFactory(c ->
+                new ReadOnlyStringWrapper(c.getValue().getSerialNumber()));
+        ownershipColumn.setCellValueFactory(c ->
+                new ReadOnlyStringWrapper(
+                        c.getValue().getOwnership() != null
+                                ? c.getValue().getOwnership().name()
+                                : ""));
+        conditionColumn.setCellValueFactory(c ->
+                new ReadOnlyStringWrapper(c.getValue().getItemCondition().name()));
+        statusColumn.setCellValueFactory(cell ->
+                new ReadOnlyStringWrapper(
+                        cell.getValue().getItemStatus() != null
+                                ? cell.getValue().getItemStatus().name()
+                                : ""
+                )
+        );
+        jobOrderColumn.setCellValueFactory(c ->
+                new ReadOnlyStringWrapper(
+                        c.getValue().getJobOrder() != null
+                                ? c.getValue().getJobOrder().getId().toString()
+                                : ""));
+        commentsColumn.setCellValueFactory(c ->
+                new ReadOnlyStringWrapper(c.getValue().getComments()));
 
-        // Привязываем список к таблице
+        itemsTable.setItems(selectedItems);
+        itemsTable.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
+
         itemsTable.setItems(selectedItems);
     }
 
-    /** Открывает модальное окно выбора оборудования и добавляет выбранный ItemInfo как новый Item */
+    /** Открывает диалог выбора ItemInfo и создаёт новый Item с дефолтами */
     @FXML
     private void onNewItem() {
         try {
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/fxml/item_info_selection.fxml")
             );
-            // Инжектим ItemInfoService в контроллер выбора
-            loader.setControllerFactory(ctrlClass -> {
-                if (ctrlClass == ItemInfoSelectionController.class) {
+            loader.setControllerFactory(cls -> {
+                if (cls == ItemInfoSelectionController.class) {
                     return new ItemInfoSelectionController(itemInfoService);
                 }
                 try {
-                    return ctrlClass.getDeclaredConstructor().newInstance();
+                    return cls.getDeclaredConstructor().newInstance();
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -92,11 +112,26 @@ public class NewWorkOrderController {
             dialog.setScene(new Scene(root));
             dialog.showAndWait();
 
-            ItemInfoSelectionController selectionCtrl = loader.getController();
-            ItemInfo chosen = selectionCtrl.getSelectedItem();
-            if (chosen != null) {
+            ItemInfoSelectionController ctrl = loader.getController();
+            ItemInfo info = ctrl.getSelectedItem();
+            if (info != null) {
                 Item item = new Item();
-                item.setItemInfo(chosen);
+                item.setItemInfo(info);
+                item.setClientPartNumber(info.getPartNumber());
+                item.setSerialNumber("TBA");
+
+                // ← вот здесь берём текущего клиента из выпадающего списка
+                Client selectedClient = clientComboBox.getValue();
+                item.setOwnership(selectedClient);
+
+                item.setItemCondition(ItemCondition.NEW_ASSEMBLY);
+
+                // ← устанавливаем статус именно NEW_ASSEMBLY_REQUEST
+                item.setItemStatus(ItemStatus.NEW_ASSEMBLY_REQUEST);
+
+                item.setJobOrder(null);
+                item.setComments("");
+
                 selectedItems.add(item);
             }
         } catch (Exception e) {
@@ -105,7 +140,7 @@ public class NewWorkOrderController {
         }
     }
 
-    /** Сохраняет новую заявку вместе с выбранным оборудованием */
+    /** Сохраняет новую заявку вместе со всеми подготовленными Item */
     @FXML
     private void handleSave() {
         if (workOrderService == null) {
@@ -121,7 +156,10 @@ public class NewWorkOrderController {
         order.setRequestDate(LocalDate.now());
         order.setStatus(WorkOrderStatus.CREATED);
 
-        // TODO: добавить selectedItems в order (например, order.setItems(List.copyOf(selectedItems)));
+        // Добавляем все выбранные Items в WorkOrder
+        for (Item item : selectedItems) {
+            order.addItem(item);
+        }
 
         workOrderService.create(order);
         closeWindow();
@@ -138,10 +176,10 @@ public class NewWorkOrderController {
     }
 
     private void showError(String header, String content) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Ошибка");
-        alert.setHeaderText(header);
-        alert.setContentText(content);
-        alert.showAndWait();
+        Alert a = new Alert(Alert.AlertType.ERROR);
+        a.setTitle("Ошибка");
+        a.setHeaderText(header);
+        a.setContentText(content);
+        a.showAndWait();
     }
 }
