@@ -9,8 +9,10 @@ import com.levare.hultic.ops.workorders.entity.Client;
 import com.levare.hultic.ops.workorders.entity.WorkOrder;
 import com.levare.hultic.ops.workorders.entity.WorkOrderStatus;
 import com.levare.hultic.ops.workorders.service.WorkOrderService;
+import com.levare.hultic.ops.users.entity.User;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -34,6 +36,7 @@ public class NewWorkOrderController {
     @FXML private ComboBox<Client> clientComboBox;
     @FXML private TextField wellField;
     @FXML private DatePicker deliveryDatePicker;
+    @FXML private TextField requestorField;
     @FXML private TextArea commentsArea;
 
     @FXML private TableView<Item> itemsTable;
@@ -47,12 +50,16 @@ public class NewWorkOrderController {
     @FXML private TableColumn<Item, String> commentsColumn;
 
     @FXML private Button newItemButton;
+    @FXML private Button deleteItemButton;
     @FXML private Button cancelButton;
 
     @FXML
     private void initialize() {
+        // Populate client dropdown
         clientComboBox.setItems(FXCollections.observableArrayList(Client.values()));
         clientComboBox.getSelectionModel().select(Client.EMPTY);
+
+        // Configure table columns
         partNumberColumn.setCellValueFactory(c ->
                 new ReadOnlyStringWrapper(c.getValue().getItemInfo().getPartNumber()));
         descriptionColumn.setCellValueFactory(c ->
@@ -66,13 +73,11 @@ public class NewWorkOrderController {
                                 : ""));
         conditionColumn.setCellValueFactory(c ->
                 new ReadOnlyStringWrapper(c.getValue().getItemCondition().name()));
-        statusColumn.setCellValueFactory(cell ->
+        statusColumn.setCellValueFactory(c ->
                 new ReadOnlyStringWrapper(
-                        cell.getValue().getItemStatus() != null
-                                ? cell.getValue().getItemStatus().name()
-                                : ""
-                )
-        );
+                        c.getValue().getItemStatus() != null
+                                ? c.getValue().getItemStatus().name()
+                                : ""));
         jobOrderColumn.setCellValueFactory(c ->
                 new ReadOnlyStringWrapper(
                         c.getValue().getJobOrder() != null
@@ -81,13 +86,21 @@ public class NewWorkOrderController {
         commentsColumn.setCellValueFactory(c ->
                 new ReadOnlyStringWrapper(c.getValue().getComments()));
 
+        // Set up table view
         itemsTable.setItems(selectedItems);
         itemsTable.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
 
-        itemsTable.setItems(selectedItems);
+        // Disable client selection once at least one item is added
+        selectedItems.addListener((ListChangeListener<Item>) ch ->
+                clientComboBox.setDisable(!selectedItems.isEmpty())
+        );
+
+        // Enable delete button only when an item is selected
+        deleteItemButton.disableProperty()
+                .bind(itemsTable.getSelectionModel().selectedItemProperty().isNull());
     }
 
-    /** Открывает диалог выбора ItemInfo и создаёт новый Item с дефолтами */
+    /** Opens item selection dialog and creates a new Item with defaults */
     @FXML
     private void onNewItem() {
         try {
@@ -108,7 +121,7 @@ public class NewWorkOrderController {
             Parent root = loader.load();
             Stage dialog = new Stage();
             dialog.initModality(Modality.APPLICATION_MODAL);
-            dialog.setTitle("Выберите оборудование");
+            dialog.setTitle("Select Equipment");
             dialog.setScene(new Scene(root));
             dialog.showAndWait();
 
@@ -119,47 +132,47 @@ public class NewWorkOrderController {
                 item.setItemInfo(info);
                 item.setClientPartNumber(info.getPartNumber());
                 item.setSerialNumber("TBA");
-
-                // ← вот здесь берём текущего клиента из выпадающего списка
-                Client selectedClient = clientComboBox.getValue();
-                item.setOwnership(selectedClient);
-
+                item.setOwnership(clientComboBox.getValue());
                 item.setItemCondition(ItemCondition.NEW_ASSEMBLY);
-
-                // ← устанавливаем статус именно NEW_ASSEMBLY_REQUEST
                 item.setItemStatus(ItemStatus.NEW_ASSEMBLY_REQUEST);
-
                 item.setJobOrder(null);
                 item.setComments("");
-
                 selectedItems.add(item);
             }
         } catch (Exception e) {
             e.printStackTrace();
-            showError("Не удалось открыть диалог выбора оборудования", e.getMessage());
+            showError("Error", "Failed to open equipment selection dialog:\n" + e.getMessage());
         }
     }
 
-    /** Сохраняет новую заявку вместе со всеми подготовленными Item */
+    /** Deletes the selected item from the list */
+    @FXML
+    private void onDeleteItem() {
+        Item sel = itemsTable.getSelectionModel().getSelectedItem();
+        if (sel != null) {
+            selectedItems.remove(sel);
+        }
+    }
+
+    /** Saves new WorkOrder along with the prepared Items */
     @FXML
     private void handleSave() {
         if (workOrderService == null) {
-            showError("Ошибка конфигурации", "WorkOrderService не задан.");
+            showError("Configuration Error", "WorkOrderService is not set.");
             return;
         }
 
         WorkOrder order = new WorkOrder();
         order.setWorkOrderNumber(numberField.getText().trim());
+        order.setClient(clientComboBox.getValue());
         order.setWell(wellField.getText().trim());
         order.setDeliveryDate(deliveryDatePicker.getValue());
+        order.setRequestor(new User(null, requestorField.getText().trim(), null));
         order.setComments(commentsArea.getText().trim());
         order.setRequestDate(LocalDate.now());
         order.setStatus(WorkOrderStatus.CREATED);
 
-        // Добавляем все выбранные Items в WorkOrder
-        for (Item item : selectedItems) {
-            order.addItem(item);
-        }
+        selectedItems.forEach(order::addItem);
 
         workOrderService.create(order);
         closeWindow();
@@ -175,11 +188,11 @@ public class NewWorkOrderController {
         stage.close();
     }
 
-    private void showError(String header, String content) {
-        Alert a = new Alert(Alert.AlertType.ERROR);
-        a.setTitle("Ошибка");
-        a.setHeaderText(header);
-        a.setContentText(content);
-        a.showAndWait();
+    private void showError(String title, String content) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 }
