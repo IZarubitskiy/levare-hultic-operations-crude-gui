@@ -30,7 +30,7 @@ public class ItemInfoDao {
                 item.setId(rs.getLong("id"));
                 item.setPartNumber(rs.getString("part_number"));
                 item.setDescription(rs.getString("description"));
-                item.setItemType(ItemType.valueOf(rs.getString("item_type")));
+                item.setItemType(ItemType.valueOf(rs.getString("item_type").toUpperCase()));
                 item.setComments(rs.getString("comments"));
                 // analogList will be handled separately
                 items.add(item);

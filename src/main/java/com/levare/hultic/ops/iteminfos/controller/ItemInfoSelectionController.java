@@ -27,6 +27,7 @@ public class ItemInfoSelectionController {
     @FXML private Button selectButton;
     @FXML private Button cancelButton;
 
+
     @FXML
     public void initialize() {
         // Настраиваем колонки

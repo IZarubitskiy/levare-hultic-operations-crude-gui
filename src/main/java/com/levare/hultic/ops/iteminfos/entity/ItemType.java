@@ -1,21 +1,22 @@
 package com.levare.hultic.ops.iteminfos.entity;
 
 public enum ItemType {
-    BOHD,
-    COUPLING,
-    PUMP,
-    VAPRO,
-    BOI,
-    GAS_SEPARATOR,
-    METAL_BELLOW,
-    SEAL,
-    MOTOR,
-    SENSOR,
-    MLE,
+
     ADAPTER,
+    BOHD,
+    BOI,
+    COUPLING,
     CONSUMABLES,
     CCCP,
     CLAMP,
+    GAS_SEPARATOR,
+    MLE,
+    MOTOR,
+    METAL_BELLOW,
+    PUMP,
+    SEAL,
+    SENSOR,
+    SUB,
     TUBING,
-    SUB
+    VAPRO
 }

@@ -2,7 +2,6 @@ package com.levare.hultic.ops.workorders.controller;
 
 import com.levare.hultic.ops.iteminfos.controller.ItemInfoSelectionController;
 import com.levare.hultic.ops.iteminfos.entity.ItemInfo;
-import com.levare.hultic.ops.iteminfos.service.ItemInfoService;
 import com.levare.hultic.ops.items.entity.Item;
 import com.levare.hultic.ops.workorders.entity.WorkOrder;
 import com.levare.hultic.ops.workorders.entity.WorkOrderStatus;
@@ -20,76 +19,90 @@ import javafx.stage.Stage;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Set;
 
 @RequiredArgsConstructor
 public class NewWorkOrderController {
 
     private final WorkOrderService workOrderService;
-    private final ItemInfoService itemInfoService;
+    private final com.levare.hultic.ops.iteminfos.service.ItemInfoService itemInfoService;
     private final ObservableList<Item> selectedItems = FXCollections.observableArrayList();
 
     @FXML private TextField numberField;
     @FXML private TextField wellField;
     @FXML private DatePicker deliveryDatePicker;
     @FXML private TextArea commentsArea;
+
     @FXML private TableView<Item> itemsTable;
     @FXML private TableColumn<Item, String> partNumberColumn;
     @FXML private TableColumn<Item, String> descriptionColumn;
-    @FXML private TableColumn<Item,String> serialNumberColumn;
-    @FXML private TableColumn<Item,String> ownershipColumn;
-    @FXML private TableColumn<Item,String> conditionColumn;
-    @FXML private TableColumn<Item,String> jobOrderColumn;
-    @FXML private TableColumn<Item,String> commentsColumn;
+    @FXML private TableColumn<Item, String> serialNumberColumn;
+    @FXML private TableColumn<Item, String> ownershipColumn;
+    @FXML private TableColumn<Item, String> conditionColumn;
+    @FXML private TableColumn<Item, String> jobOrderColumn;
+    @FXML private TableColumn<Item, String> commentsColumn;
+
     @FXML private Button newItemButton;
     @FXML private Button cancelButton;
 
     @FXML
     private void initialize() {
         // Настраиваем колонки таблицы
-        partNumberColumn.setCellValueFactory(cellData ->
-                new ReadOnlyStringWrapper(cellData.getValue().getItemInfo().getPartNumber()));
-        descriptionColumn.setCellValueFactory(cellData ->
-                new ReadOnlyStringWrapper(cellData.getValue().getItemInfo().getDescription()));
-        serialNumberColumn.setCellValueFactory(cellData ->
-                new ReadOnlyStringWrapper(cellData.getValue().getSerialNumber()));
-        ownershipColumn.setCellValueFactory(cellData ->
-                new ReadOnlyStringWrapper(cellData.getValue().getOwnership().toString()));
-        conditionColumn.setCellValueFactory(cellData ->
-                new ReadOnlyStringWrapper(cellData.getValue().getItemCondition().toString()));
-        jobOrderColumn.setCellValueFactory(cellData ->
-                new ReadOnlyStringWrapper(cellData.getValue().getJobOrder().getId().toString()));
-        commentsColumn.setCellValueFactory(cellData ->
-                new ReadOnlyStringWrapper(cellData.getValue().getComments()));
-        // Связываем список с таблицей
+        partNumberColumn.setCellValueFactory(cell ->
+                new ReadOnlyStringWrapper(cell.getValue().getItemInfo().getPartNumber()));
+        descriptionColumn.setCellValueFactory(cell ->
+                new ReadOnlyStringWrapper(cell.getValue().getItemInfo().getDescription()));
+        serialNumberColumn.setCellValueFactory(cell ->
+                new ReadOnlyStringWrapper(cell.getValue().getSerialNumber()));
+        ownershipColumn.setCellValueFactory(cell ->
+                new ReadOnlyStringWrapper(cell.getValue().getOwnership().toString()));
+        conditionColumn.setCellValueFactory(cell ->
+                new ReadOnlyStringWrapper(cell.getValue().getItemCondition().toString()));
+        jobOrderColumn.setCellValueFactory(cell ->
+                new ReadOnlyStringWrapper(cell.getValue().getJobOrder().getId().toString()));
+        commentsColumn.setCellValueFactory(cell ->
+                new ReadOnlyStringWrapper(cell.getValue().getComments()));
+
+        // Привязываем список к таблице
         itemsTable.setItems(selectedItems);
     }
 
-    /** Открывает модальное окно выбора оборудования и добавляет выбранное в таблицу */
+    /** Открывает модальное окно выбора оборудования и добавляет выбранный ItemInfo как новый Item */
     @FXML
     private void onNewItem() {
-        /*try {
+        try {
             FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/fxml/item_info_selection.fxml"));
-            // предполагается, что loader настроен через ControllerFactory и инжектит ItemInfoService
-            Parent root = loader.load();
+                    getClass().getResource("/fxml/item_info_selection.fxml")
+            );
+            // Инжектим ItemInfoService в контроллер выбора
+            loader.setControllerFactory(ctrlClass -> {
+                if (ctrlClass == ItemInfoSelectionController.class) {
+                    return new ItemInfoSelectionController(itemInfoService);
+                }
+                try {
+                    return ctrlClass.getDeclaredConstructor().newInstance();
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            });
 
+            Parent root = loader.load();
             Stage dialog = new Stage();
             dialog.initModality(Modality.APPLICATION_MODAL);
             dialog.setTitle("Выберите оборудование");
             dialog.setScene(new Scene(root));
             dialog.showAndWait();
 
-            ItemInfoSelectionController controller = loader.getController();
-            ItemInfo chosen = controller.getSelectedItem();
+            ItemInfoSelectionController selectionCtrl = loader.getController();
+            ItemInfo chosen = selectionCtrl.getSelectedItem();
             if (chosen != null) {
-                selectedItems.add(chosen);
+                Item item = new Item();
+                item.setItemInfo(chosen);
+                selectedItems.add(item);
             }
         } catch (Exception e) {
             e.printStackTrace();
             showError("Не удалось открыть диалог выбора оборудования", e.getMessage());
-        }*/
+        }
     }
 
     /** Сохраняет новую заявку вместе с выбранным оборудованием */
@@ -108,8 +121,7 @@ public class NewWorkOrderController {
         order.setRequestDate(LocalDate.now());
         order.setStatus(WorkOrderStatus.CREATED);
 
-        // Добавляем выбранные ItemInfo (требует соответствующего поля и метода в WorkOrder)
-        //order.set(Set.copyOf(selectedItems));
+        // TODO: добавить selectedItems в order (например, order.setItems(List.copyOf(selectedItems)));
 
         workOrderService.create(order);
         closeWindow();
