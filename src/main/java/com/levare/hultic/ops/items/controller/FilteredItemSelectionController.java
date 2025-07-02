@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class FilteredItemSelectionController {
-
+/*
     public enum Mode { REPAIR, STOCK, RNE }
 
     private final ItemService itemService;
@@ -47,7 +47,7 @@ public class FilteredItemSelectionController {
                 new ReadOnlyStringWrapper(
                         c.getValue().getItemStatus() != null
                                 ? c.getValue().getItemStatus().name() : ""));
-
+/*
         // подгружаем все и фильтруем
         List<Item> all = itemService.getAll();
         List<Item> filtered = all.stream()
@@ -60,13 +60,13 @@ public class FilteredItemSelectionController {
         selectButton.disableProperty()
                 .bind(tableView.getSelectionModel().selectedItemProperty().isNull());
     }
-
+/*
     private boolean matchesMode(Item item) {
         switch (mode) {
             case REPAIR:
                 return item.getItemCondition() == ItemCondition.USED;
             case STOCK:
-                return item.getItemStatus() == ItemStatus.IN_STOCK;
+                return item.getItemStatus() == ItemStatus.;
             case RNE:
                 return item.getItemStatus() == ItemStatus.READY_FOR_USE;
             default:
@@ -93,4 +93,5 @@ public class FilteredItemSelectionController {
     public Item getSelectedItem() {
         return selectedItem;
     }
+    */
 }
