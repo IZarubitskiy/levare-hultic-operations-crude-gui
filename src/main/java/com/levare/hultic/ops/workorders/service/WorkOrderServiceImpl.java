@@ -80,8 +80,8 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         }
 
         Item updated = switch (i.getItemCondition()) {
-            case USED -> itemService.updateStatus(i, ItemStatus.REPAIR_REQUEST);
-            case NEW, REPAIRED -> itemService.updateStatus(i, ItemStatus.STOCK_REQUEST);
+            case USED -> itemService.updateStatus(i, ItemStatus.REPAIR_BOOKED);
+            case NEW, REPAIRED -> itemService.updateStatus(i, ItemStatus.STOCK_BOOKED);
             default -> throw new IllegalStateException("Unexpected item condition: " + i.getItemCondition());
         };
 

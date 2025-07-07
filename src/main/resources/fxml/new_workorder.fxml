@@ -52,7 +52,7 @@
 
         <!-- Comments moved to bottom -->
         <Label text="Comments"/>
-        <TextArea fx:id="commentsArea"
+        <TextArea fx:id="commentsField"
                   promptText="Additional notes..."
                   prefRowCount="3"/>
 

@@ -87,7 +87,7 @@ public class ItemServiceImpl implements ItemService {
         item.setSerialNumber(SerialNumberGenerator.generate());
         item.setOwnership(client);
         item.setItemCondition(ItemCondition.NEW_ASSEMBLY);
-        item.setItemStatus(ItemStatus.NEW_ASSEMBLY_REQUEST);
+        item.setItemStatus(ItemStatus.NEW_ASSEMBLY_BOOKED);
 
         itemDao.insert(item);
         return item;

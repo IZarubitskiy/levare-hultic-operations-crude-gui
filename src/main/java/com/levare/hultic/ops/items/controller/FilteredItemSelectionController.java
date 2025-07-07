@@ -4,6 +4,7 @@ import com.levare.hultic.ops.items.entity.Item;
 import com.levare.hultic.ops.items.entity.ItemCondition;
 import com.levare.hultic.ops.items.entity.ItemStatus;
 import com.levare.hultic.ops.items.service.ItemService;
+import com.levare.hultic.ops.workorders.entity.Client;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -14,61 +15,81 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class FilteredItemSelectionController {
-/*
+
     public enum Mode { REPAIR, STOCK, RNE }
 
     private final ItemService itemService;
     private final Mode mode;
+    private final Client client;
     private Item selectedItem;
+
+    public FilteredItemSelectionController(ItemService itemService, Mode mode, Client client) {
+        this.itemService = itemService;
+        this.mode        = mode;
+        this.client      = client;
+    }
 
     @FXML private Label titleLabel;
     @FXML private TableView<Item> tableView;
     @FXML private TableColumn<Item,String> partColumn;
     @FXML private TableColumn<Item,String> descColumn;
+    @FXML private TableColumn<Item, String> serialColumn;
     @FXML private TableColumn<Item,String> statusColumn;
     @FXML private Button selectButton;
 
-    public FilteredItemSelectionController(ItemService itemService, Mode mode) {
-        this.itemService = itemService;
-        this.mode = mode;
-    }
-
     @FXML
     private void initialize() {
-        // заголовок диалога
-        titleLabel.setText("Select " + mode.name().toLowerCase() + " items");
+        // dialog title includes the client name
+        titleLabel.setText("Select "
+                + mode.name().toLowerCase()
+                + " items for client "
+                + client.name());
 
-        // настройка колонок
+        // configure columns
         partColumn.setCellValueFactory(c ->
                 new ReadOnlyStringWrapper(c.getValue().getItemInfo().getPartNumber()));
-        descColumn .setCellValueFactory(c ->
+        descColumn.setCellValueFactory(c ->
                 new ReadOnlyStringWrapper(c.getValue().getItemInfo().getDescription()));
+        serialColumn.setCellValueFactory(c ->
+                new ReadOnlyStringWrapper(c.getValue().getSerialNumber()));
         statusColumn.setCellValueFactory(c ->
                 new ReadOnlyStringWrapper(
                         c.getValue().getItemStatus() != null
-                                ? c.getValue().getItemStatus().name() : ""));
-/*
-        // подгружаем все и фильтруем
-        List<Item> all = itemService.getAll();
-        List<Item> filtered = all.stream()
-                .filter(this::matchesMode)
+                                ? c.getValue().getItemStatus().name()
+                                : ""
+                )
+        );
+
+        // load all items and filter by both mode and selected client
+        List<Item> filtered = itemService.getAll().stream()
+                .filter(this::matchesModeAndClient)
                 .collect(Collectors.toList());
 
         tableView.setItems(FXCollections.observableArrayList(filtered));
 
-        // кнопка Select
+        // disable Select button until a row is chosen
         selectButton.disableProperty()
                 .bind(tableView.getSelectionModel().selectedItemProperty().isNull());
     }
-/*
-    private boolean matchesMode(Item item) {
+
+    private boolean matchesModeAndClient(Item item) {
+        // first: must belong to the chosen client
+        if (item.getOwnership() != client) {
+            return false;
+        }
+
+        // then filter by the chosen mode
         switch (mode) {
             case REPAIR:
-                return item.getItemCondition() == ItemCondition.USED;
+                                return item.getItemCondition() == ItemCondition.USED
+                        && item.getItemStatus()    == ItemStatus.ON_STOCK;
             case STOCK:
-                return item.getItemStatus() == ItemStatus.;
+                return (item.getItemCondition() == ItemCondition.REPAIRED
+                        || item.getItemCondition() == ItemCondition.NEW)
+                        && item.getItemStatus()     == ItemStatus.ON_STOCK;
             case RNE:
-                return item.getItemStatus() == ItemStatus.READY_FOR_USE;
+                return item.getItemCondition() == ItemCondition.USED
+                        && item.getItemStatus() == ItemStatus.ON_STOCK;
             default:
                 return false;
         }
@@ -93,5 +114,5 @@ public class FilteredItemSelectionController {
     public Item getSelectedItem() {
         return selectedItem;
     }
-    */
+
 }

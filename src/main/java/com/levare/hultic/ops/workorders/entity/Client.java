@@ -10,5 +10,6 @@ public enum Client {
     RETCO,
     RETS,
     CORP,
+    RNE,
     EMPTY
 }
