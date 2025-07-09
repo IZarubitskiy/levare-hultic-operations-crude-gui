@@ -16,13 +16,13 @@ public class DatabaseInitializer {
             if (in == null) {
                 throw new IllegalStateException("❌ schema.sql not found in classpath under /db/");
             }
-
+/*
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
                 String fullSql = reader.lines().collect(Collectors.joining("\n"));
                 System.out.println("📄 SQL to execute:\n" + fullSql);
 
                 // 🔪 Разбиваем по ;
-                String[] statements = fullSql.split("(?<=;)\n");
+                String[] statements = fullSql.split("(?<=;)\n")
 
                 try (Statement stmt = connection.createStatement()) {
                     for (String sql : statements) {
@@ -34,10 +34,11 @@ public class DatabaseInitializer {
                     System.out.println("✅ Database initialized.");
                 }
             }
-
+*/
         } catch (Exception e) {
             System.err.println("⚠️ Failed to initialize database.");
             e.printStackTrace();
         }
+
     }
 }

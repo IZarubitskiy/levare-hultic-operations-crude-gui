@@ -34,10 +34,7 @@
             <TableColumn fx:id="statusColumn"       text="Status"       prefWidth="100" />
             <TableColumn fx:id="responsibleColumn"  text="Responsible"  prefWidth="120" />
             <TableColumn fx:id="deliveryColumn"     text="Planned Delivery" prefWidth="120" />
-                         prefWidth="120" />
-            <TableColumn fx:id="commentsColumn"
-                         text="Comments"
-                         prefWidth="150" />
+            <TableColumn fx:id="commentsColumn"     text="Comments"     prefWidth="150" />
         </columns>
     </TableView>
 

@@ -118,7 +118,6 @@ public class WorkOrderController {
                     setGraphic(null);
                 } else {
                     Item item = getTableView().getItems().get(getIndex());
-                    // Disable if already has JobOrder
                     btn.setDisable(item.getJobOrderId() != null);
                     setGraphic(btn);
                 }
@@ -129,20 +128,16 @@ public class WorkOrderController {
     private void openJobOrderDialog(Long workOrderId, Long itemId) {
         try {
             FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/fxml/new_joborder.fxml"));
+                    getClass().getResource("/fxml/new_job_order.fxml"));
             loader.setControllerFactory(controllerFactory);
             Parent form = loader.load();
-            Object ctrl = loader.getController();
-            if (ctrl instanceof NewJobOrderController) {
-                ((NewJobOrderController) ctrl)
-                        .initForWorkAndItem(workOrderId, itemId);
-            }
+
+            NewJobOrderController ctrl = loader.getController();
+            ctrl.initForWorkAndItem(workOrderId, itemId);
+
             Stage dlg = new Stage();
             dlg.initModality(Modality.APPLICATION_MODAL);
             dlg.setTitle("New Job Order");
-            dlg.getIcons().add(new Image(
-                    getClass().getResourceAsStream("/icons/joborder.png")
-            ));
             dlg.setScene(new Scene(form));
             dlg.showAndWait();
         } catch (Exception ex) {

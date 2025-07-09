@@ -1,6 +1,8 @@
 package com.levare.hultic.ops.common;
 
 import com.levare.hultic.ops.iteminfos.controller.ItemInfoSelectionController;
+import com.levare.hultic.ops.joborders.controller.JobOrderController;
+import com.levare.hultic.ops.joborders.controller.NewJobOrderController;
 import com.levare.hultic.ops.login.LoginController;
 import com.levare.hultic.ops.main.MainController;
 import com.levare.hultic.ops.users.controller.UserController;
@@ -13,9 +15,7 @@ public class AppControllerFactory implements Callback<Class<?>, Object> {
 
     private User currentUser;
 
-    /**
-     * Called by LoginController after successful login
-     */
+    /** Called by LoginController after successful login */
     public void setCurrentUser(User user) {
         this.currentUser = user;
     }
@@ -23,18 +23,16 @@ public class AppControllerFactory implements Callback<Class<?>, Object> {
     @Override
     public Object call(Class<?> controllerClass) {
         try {
-            // Login screen needs UserService + factory
             if (controllerClass == LoginController.class) {
                 return new LoginController(
                         ServiceRegistry.USER_SERVICE,
                         this
                 );
             }
-            // MainController needs only the factory
+            // MainController теперь принимает только фабрику
             if (controllerClass == MainController.class) {
                 return new MainController(this);
             }
-            // Work orders list
             if (controllerClass == WorkOrderController.class) {
                 return new WorkOrderController(
                         ServiceRegistry.WORK_ORDER_SERVICE,
@@ -43,7 +41,14 @@ public class AppControllerFactory implements Callback<Class<?>, Object> {
                         this
                 );
             }
-            // New work order form
+            if (controllerClass == JobOrderController.class) {
+                return new JobOrderController(
+                        ServiceRegistry.JOB_ORDER_SERVICE,
+                        ServiceRegistry.USER_SERVICE,
+                        ServiceRegistry.ITEM_SERVICE,
+                        this
+                );
+            }
             if (controllerClass == NewWorkOrderController.class) {
                 return new NewWorkOrderController(
                         ServiceRegistry.WORK_ORDER_SERVICE,
@@ -52,19 +57,24 @@ public class AppControllerFactory implements Callback<Class<?>, Object> {
                         ServiceRegistry.USER_SERVICE
                 );
             }
-            // ItemInfo selection dialog
+            if (controllerClass == NewJobOrderController.class) {
+                return new NewJobOrderController(
+                        ServiceRegistry.JOB_ORDER_SERVICE,
+                        ServiceRegistry.ITEM_SERVICE,
+                        ServiceRegistry.USER_SERVICE
+                );
+            }
             if (controllerClass == ItemInfoSelectionController.class) {
                 return new ItemInfoSelectionController(
                         ServiceRegistry.ITEM_INFO_SERVICE
                 );
             }
-            // User management screen
             if (controllerClass == UserController.class) {
                 return new UserController(
                         ServiceRegistry.USER_SERVICE
                 );
             }
-            // Fallback to default no-arg constructor
+            // fallback
             return controllerClass.getDeclaredConstructor().newInstance();
         } catch (Exception e) {
             throw new RuntimeException("Cannot create controller: " + controllerClass, e);

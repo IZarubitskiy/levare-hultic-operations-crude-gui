@@ -36,6 +36,11 @@ public class JobOrder {
     private User responsibleUser;
 
     /**
+     * Type of JobOrder
+     */
+    private JobOrderType jobOrderType;
+
+    /**
      * Free-form comments about this JobOrder
      */
     private String comments;
