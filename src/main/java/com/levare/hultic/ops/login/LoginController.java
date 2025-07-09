@@ -13,74 +13,105 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
+import java.util.List;
+
+/**
+ * Controller for the login screen: проверяет вводимые логин/пароль
+ * против заранее заданного списка и загружает соответствующего пользователя из БД.
+ */
 public class LoginController {
 
-    @FXML private TextField usernameField;
-    @FXML private TextField passwordField;
+    /**
+     * DTO для хранения в коде логина, пароля и связанного userId
+     */
+    private static final class HardcodedUser {
+        final String username, password;
+        final Long userId;
+
+        HardcodedUser(String u, String p, Long id) {
+            this.username = u;
+            this.password = p;
+            this.userId = id;
+        }
+    }
+
+    /**
+     * Список разрешённых «жёстко прописанных» учёток
+     */
+    private static final List<HardcodedUser> ALLOWED = List.of(
+            new HardcodedUser("1", "1", 1L),
+            new HardcodedUser("Magdy", "2", 2L),
+            new HardcodedUser("Rafik", "3", 3L),
+            new HardcodedUser("Amr", "4", 4L)
+    );
+
+    @FXML
+    private TextField usernameField;
+    @FXML
+    private TextField passwordField;
 
     private Stage stage;
     private final UserService userService;
     private final Callback<Class<?>, Object> controllerFactory;
 
-    /**
-     * Конструктор вызывается AppControllerFactory, он подставляет UserService и саму фабрику контроллеров.
-     */
     public LoginController(UserService userService,
                            Callback<Class<?>, Object> controllerFactory) {
         this.userService = userService;
         this.controllerFactory = controllerFactory;
     }
 
-    /** Сеттер Stage, вызывается в Application сразу после загрузки FXML. */
+    /**
+     * Вызывается из Application сразу после загрузки FXML
+     */
     public void setStage(Stage stage) {
         this.stage = stage;
     }
 
     @FXML
     private void handleLogin() {
-        String username = usernameField.getText().trim();
-        String password = passwordField.getText().trim();
+        String login = usernameField.getText().trim();
+        String pass = passwordField.getText().trim();
 
-        // Простая аутентификация: ищем пользователя по имени (пароль пока не хранится)
-        User user = userService.getAll().stream()
-                .filter(u -> u.getName().equals(username))
+        // Ищем среди жёстко прописанных
+        HardcodedUser match = ALLOWED.stream()
+                .filter(h -> h.username.equals(login) && h.password.equals(pass))
                 .findFirst()
                 .orElse(null);
 
-        // Если не найден, даём демо-админа по фиксированным данным
-        if (user == null && "1".equals(username) && "1".equals(password)) {
-            user = new User();
-            user.setId(0L);
-            user.setName("Admin");
-            user.setPosition("Administrator");
-            userService.create(user);
+        if (match == null) {
+            showAlert("Access Denied", "Invalid login or password.");
+            return;
         }
 
-        if (user != null) {
-            // Устанавливаем текущего пользователя в фабрике, затем открываем главное окно
-            ((AppControllerFactory) controllerFactory).setCurrentUser(user);
-            openMainWindow(user);
-        } else {
-            showAlert("Access Denied", "Invalid login or password.");
+        // Загружаем из базы пользователя с найденным ID
+        User user = userService.getAll().stream()
+                .filter(u -> u.getId() != null && u.getId().equals(match.userId))
+                .findFirst()
+                .orElse(null);
+
+        if (user == null) {
+            showAlert("Error", "User with ID " + match.userId + " not found in database.");
+            return;
         }
+
+        // Устанавливаем в фабрике текущего юзера и открываем главное окно
+        ((AppControllerFactory) controllerFactory).setCurrentUser(user);
+        openMainWindow(user);
     }
 
     private void openMainWindow(User user) {
         try {
-            // 1) сообщаем фабрике, кто залогинен
-            ((AppControllerFactory)controllerFactory).setCurrentUser(user);
-
-            // 2) грузим main.fxml через тот же factory
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/main.fxml"));
+            ((AppControllerFactory) controllerFactory).setCurrentUser(user);
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/fxml/main.fxml")
+            );
             loader.setControllerFactory(controllerFactory);
             Parent root = loader.load();
 
-            // 3) инжектим оставшиеся параметры
-            MainController mainController = loader.getController();
-            mainController.setStage(stage);
-            mainController.setCurrentUser(user);
+            MainController mainCtrl = loader.getController();
+            mainCtrl.setStage(stage);
+            mainCtrl.setCurrentUser(user);
 
-            // 4) теперь заголовок уже не упадёт
             stage.setScene(new Scene(root));
             stage.setTitle("Levare Hultic – " + user.getName());
             stage.setMaximized(true);

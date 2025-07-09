@@ -8,7 +8,10 @@ import com.levare.hultic.ops.workorders.entity.Client;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.stage.Stage;
 
 import java.util.List;
@@ -16,7 +19,7 @@ import java.util.stream.Collectors;
 
 public class FilteredItemSelectionController {
 
-    public enum Mode { REPAIR, STOCK, RNE }
+    public enum Mode {REPAIR, STOCK, RNE}
 
     private final ItemService itemService;
     private final Mode mode;
@@ -25,17 +28,24 @@ public class FilteredItemSelectionController {
 
     public FilteredItemSelectionController(ItemService itemService, Mode mode, Client client) {
         this.itemService = itemService;
-        this.mode        = mode;
-        this.client      = client;
+        this.mode = mode;
+        this.client = client;
     }
 
-    @FXML private Label titleLabel;
-    @FXML private TableView<Item> tableView;
-    @FXML private TableColumn<Item,String> partColumn;
-    @FXML private TableColumn<Item,String> descColumn;
-    @FXML private TableColumn<Item, String> serialColumn;
-    @FXML private TableColumn<Item,String> statusColumn;
-    @FXML private Button selectButton;
+    @FXML
+    private Label titleLabel;
+    @FXML
+    private TableView<Item> tableView;
+    @FXML
+    private TableColumn<Item, String> partColumn;
+    @FXML
+    private TableColumn<Item, String> descColumn;
+    @FXML
+    private TableColumn<Item, String> serialColumn;
+    @FXML
+    private TableColumn<Item, String> statusColumn;
+    @FXML
+    private Button selectButton;
 
     @FXML
     private void initialize() {
@@ -81,12 +91,12 @@ public class FilteredItemSelectionController {
         // then filter by the chosen mode
         switch (mode) {
             case REPAIR:
-                                return item.getItemCondition() == ItemCondition.USED
-                        && item.getItemStatus()    == ItemStatus.ON_STOCK;
+                return item.getItemCondition() == ItemCondition.USED
+                        && item.getItemStatus() == ItemStatus.ON_STOCK;
             case STOCK:
                 return (item.getItemCondition() == ItemCondition.REPAIRED
                         || item.getItemCondition() == ItemCondition.NEW)
-                        && item.getItemStatus()     == ItemStatus.ON_STOCK;
+                        && item.getItemStatus() == ItemStatus.ON_STOCK;
             case RNE:
                 return item.getItemCondition() == ItemCondition.USED
                         && item.getItemStatus() == ItemStatus.ON_STOCK;
@@ -108,7 +118,7 @@ public class FilteredItemSelectionController {
     }
 
     private void close() {
-        ((Stage)tableView.getScene().getWindow()).close();
+        ((Stage) tableView.getScene().getWindow()).close();
     }
 
     public Item getSelectedItem() {

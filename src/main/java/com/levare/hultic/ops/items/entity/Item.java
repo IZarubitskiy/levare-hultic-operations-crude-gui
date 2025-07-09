@@ -1,7 +1,6 @@
 package com.levare.hultic.ops.items.entity;
 
 import com.levare.hultic.ops.iteminfos.entity.ItemInfo;
-import com.levare.hultic.ops.joborders.entity.JobOrder;
 import com.levare.hultic.ops.workorders.entity.Client;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,11 +20,6 @@ public class Item {
      * Reference to catalog entry — table `item_info`
      */
     private ItemInfo itemInfo;
-
-    /**
-     * Client-specific part number
-     */
-    private String clientPartNumber;
 
     /**
      * Serial number of the item
@@ -50,10 +44,13 @@ public class Item {
     /**
      * Relation to JobOrder (when this item is assigned to a specific job)
      */
-    private JobOrder jobOrder;
+    private Long jobOrderId;
 
     /**
      * Comments regarding this item
      */
+
+    private Long workOrderId;
+
     private String comments;
 }

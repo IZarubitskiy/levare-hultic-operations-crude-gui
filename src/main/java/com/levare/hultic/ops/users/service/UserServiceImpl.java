@@ -4,7 +4,6 @@ import com.levare.hultic.ops.users.dao.UserDao;
 import com.levare.hultic.ops.users.entity.User;
 
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Default implementation of UserService for GUI applications using plain DAO.

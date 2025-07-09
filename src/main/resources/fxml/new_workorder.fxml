@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox xmlns="http://javafx.com/javafx"
-      xmlns:fx="http://javafx.com/fxml"
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.levare.hultic.ops.workorders.controller.NewWorkOrderController"
       spacing="10" alignment="TOP_LEFT"
       style="-fx-padding: 20;">
@@ -14,7 +13,6 @@
         <Label text="Work Order Number"/>
         <TextField fx:id="numberField" promptText="WO-XXXX"/>
 
-        <!-- Client -->
         <Label text="Client"/>
         <ComboBox fx:id="clientComboBox" promptText="Select client"/>
 
@@ -24,39 +22,37 @@
         <Label text="Delivery Date"/>
         <DatePicker fx:id="deliveryDatePicker"/>
 
+        <!-- Вот этот кусок заменился -->
         <Label text="Requestor"/>
-        <TextField fx:id="requestorField" promptText="Enter requestor"/>
+        <ComboBox fx:id="requestorComboBox" promptText="Select requestor"/>
 
         <Label text="Items"/>
         <TableView fx:id="itemsTable" prefHeight="200" VBox.vgrow="ALWAYS">
             <columns>
-                <TableColumn fx:id="partNumberColumn"   text="Part Number"/>
-                <TableColumn fx:id="descriptionColumn"  text="Description"/>
-                <TableColumn fx:id="serialNumberColumn" text="Serial Number"/>
-                <TableColumn fx:id="ownershipColumn"    text="Ownership"/>
-                <TableColumn fx:id="conditionColumn"    text="Condition"/>
-                <TableColumn fx:id="statusColumn"       text="Status"/>
-                <TableColumn fx:id="jobOrderColumn"     text="Job Order"/>
-                <TableColumn fx:id="commentsColumn"     text="Comments"/>
+                <TableColumn fx:id="partNumberColumn"   text="Part Number"   prefWidth="120"/>
+                <TableColumn fx:id="descriptionColumn"  text="Description"   prefWidth="180"/>
+                <TableColumn fx:id="serialNumberColumn" text="Serial Number" prefWidth="120"/>
+                <TableColumn fx:id="ownershipColumn"    text="Ownership"     prefWidth="120"/>
+                <TableColumn fx:id="conditionColumn"    text="Condition"     prefWidth="120"/>
+                <TableColumn fx:id="statusColumn"       text="Status"        prefWidth="100"/>
+                <TableColumn fx:id="jobOrderColumn"     text="Job Order"     prefWidth="120"/>
+                <TableColumn fx:id="commentsColumn"     text="Comments"      prefWidth="180"/>
             </columns>
         </TableView>
 
-        <!-- Action buttons under table -->
         <HBox spacing="10" alignment="CENTER_LEFT">
-            <Button fx:id="newItemButton"    text="NEW"     onAction="#onNewItem"/>
-            <Button fx:id="deleteItemButton" text="DELETE"  onAction="#onDeleteItem"/>
-            <Button fx:id="repairButton"     text="REPAIR"/>
-            <Button fx:id="stockButton"      text="STOCK"/>
-            <Button fx:id="rneButton"        text="RNE"/>
+            <Button fx:id="newItemButton" text="NEW" onAction="#onNewItem"/>
+            <Button fx:id="repairButton"  text="REPAIR"/>
+            <Button fx:id="stockButton"   text="STOCK"/>
+            <Button fx:id="rneButton"     text="RNE"/>
+            <Button fx:id="deleteItemButton" text="DELETE" onAction="#onDeleteItem"/>
         </HBox>
 
-        <!-- Comments moved to bottom -->
         <Label text="Comments"/>
         <TextArea fx:id="commentsField"
                   promptText="Additional notes..."
                   prefRowCount="3"/>
 
-        <!-- Save and Cancel at very bottom, right-aligned -->
         <HBox spacing="10" alignment="CENTER_RIGHT">
             <Button text="Save"   onAction="#handleSave"/>
             <Button fx:id="cancelButton" text="Cancel" onAction="#handleCancel"/>

@@ -2,11 +2,11 @@ package com.levare.hultic.ops.users.controller;
 
 import com.levare.hultic.ops.users.entity.User;
 import com.levare.hultic.ops.users.service.UserService;
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.beans.property.ReadOnlyStringWrapper;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
@@ -20,18 +20,28 @@ public class UserController {
 
     private final UserService userService;
 
-    @FXML private TableView<User> userTable;
-    @FXML private TableColumn<User, Long> idColumn;
-    @FXML private TableColumn<User, String> nameColumn;
-    @FXML private TableColumn<User, String> positionColumn;
+    @FXML
+    private TableView<User> userTable;
+    @FXML
+    private TableColumn<User, Long> idColumn;
+    @FXML
+    private TableColumn<User, String> nameColumn;
+    @FXML
+    private TableColumn<User, String> positionColumn;
 
-    @FXML private TextField nameField;
-    @FXML private TextField positionField;
+    @FXML
+    private TextField nameField;
+    @FXML
+    private TextField positionField;
 
-    @FXML private Button createButton;
-    @FXML private Button updateButton;
-    @FXML private Button deleteButton;
-    @FXML private Button clearButton;
+    @FXML
+    private Button createButton;
+    @FXML
+    private Button updateButton;
+    @FXML
+    private Button deleteButton;
+    @FXML
+    private Button clearButton;
 
     @FXML
     public void initialize() {

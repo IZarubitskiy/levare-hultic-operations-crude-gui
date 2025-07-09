@@ -1,22 +1,27 @@
 package com.levare.hultic.ops.users.dao;
 
 import com.levare.hultic.ops.users.entity.User;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.experimental.FieldDefaults;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static lombok.AccessLevel.PRIVATE;
+
 /**
  * Data Access Object for User.
  * Handles basic CRUD operations using JDBC.
  */
+
+@Data
+@FieldDefaults(level = PRIVATE, makeFinal = true)
+@AllArgsConstructor
 public class UserDao {
 
-    private final Connection connection;
-
-    public UserDao(Connection connection) {
-        this.connection = connection;
-    }
+    Connection connection;
 
     public List<User> findAll() {
         List<User> users = new ArrayList<>();

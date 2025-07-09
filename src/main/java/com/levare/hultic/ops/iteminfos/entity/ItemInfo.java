@@ -1,6 +1,5 @@
 package com.levare.hultic.ops.iteminfos.entity;
 
-import com.levare.hultic.ops.iteminfos.entity.ItemType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

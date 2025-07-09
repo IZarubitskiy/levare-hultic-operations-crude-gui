@@ -44,3 +44,9 @@ CREATE TABLE IF NOT EXISTS job_orders (
     responsible_user_id INTEGER REFERENCES users(id),
     comments TEXT
 );
+
+CREATE TABLE IF NOT EXISTS work_order_items (
+  work_order_id INTEGER NOT NULL REFERENCES work_orders(id),
+  item_id       INTEGER NOT NULL REFERENCES items(id),
+  PRIMARY KEY (work_order_id, item_id)
+);

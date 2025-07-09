@@ -35,24 +35,23 @@ public final class ServiceRegistry {
 
     static {
         try {
-            // 1. Соединение и инициализация схемы
+            // 1) Создаём соединение и инициализируем схему
             CONNECTION = ConnectionFactory.getConnection();
             DatabaseInitializer.initialize(CONNECTION);
 
-            // 2. DAO
-            USER_DAO       = new UserDao(CONNECTION);
-            ITEM_INFO_DAO  = new ItemInfoDao(CONNECTION);
-            ITEM_DAO       = new ItemDao(CONNECTION);
-            WORK_ORDER_DAO = new WorkOrderDao(CONNECTION);
-            JOB_ORDER_DAO  = new JobOrderDao(CONNECTION);
+            // 2) DAO
+            USER_DAO = new UserDao(CONNECTION);
+            ITEM_INFO_DAO = new ItemInfoDao(CONNECTION);
+            ITEM_DAO = new ItemDao(CONNECTION, ITEM_INFO_DAO);
+            JOB_ORDER_DAO = new JobOrderDao(CONNECTION, USER_DAO);
+            WORK_ORDER_DAO = new WorkOrderDao(CONNECTION, USER_DAO);
 
-            // 3. Сервисы
-            USER_SERVICE         = new UserServiceImpl(USER_DAO);
-            ITEM_INFO_SERVICE    = new ItemInfoServiceImpl(ITEM_INFO_DAO);
-            ITEM_SERVICE         = new ItemServiceImpl(ITEM_DAO, ITEM_INFO_SERVICE);
-            WORK_ORDER_SERVICE   = new WorkOrderServiceImpl(WORK_ORDER_DAO, USER_SERVICE, ITEM_SERVICE);
-            JOB_ORDER_SERVICE    = new JobOrderServiceImpl(JOB_ORDER_DAO, WORK_ORDER_SERVICE, ITEM_SERVICE);
-
+            // 3) Сервисы
+            USER_SERVICE = new UserServiceImpl(USER_DAO);
+            ITEM_INFO_SERVICE = new ItemInfoServiceImpl(ITEM_INFO_DAO);
+            ITEM_SERVICE = new ItemServiceImpl(ITEM_DAO, ITEM_INFO_SERVICE);
+            WORK_ORDER_SERVICE = new WorkOrderServiceImpl(WORK_ORDER_DAO, USER_SERVICE, ITEM_SERVICE);
+            JOB_ORDER_SERVICE = new JobOrderServiceImpl(JOB_ORDER_DAO, WORK_ORDER_SERVICE, ITEM_SERVICE);
 
         } catch (SQLException e) {
             throw new ExceptionInInitializerError("ServiceRegistry init failed: " + e.getMessage());

@@ -1,5 +1,7 @@
 package com.levare.hultic.ops.main;
 
+import com.levare.hultic.ops.joborders.controller.JobOrderController;
+import com.levare.hultic.ops.users.entity.User;
 import com.levare.hultic.ops.workorders.controller.WorkOrderController;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -11,7 +13,6 @@ import javafx.scene.control.TabPane;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.util.Callback;
-import com.levare.hultic.ops.users.entity.User;
 
 public class MainController {
 
@@ -19,29 +20,25 @@ public class MainController {
     @FXML private TabPane tabPane;
     @FXML private AnchorPane contentArea;
 
-    private final Callback<Class<?>,Object> controllerFactory;
+    private final Callback<Class<?>, Object> controllerFactory;
     private User currentUser;
-    private Stage stage;  // <-- add this
+    private Stage stage;
 
-    public MainController(Callback<Class<?>,Object> controllerFactory) {
+    public MainController(Callback<Class<?>, Object> controllerFactory) {
         this.controllerFactory = controllerFactory;
     }
 
-    /** Called by the factory after login */
     public void setCurrentUser(User user) {
         this.currentUser = user;
         if (userLabel != null) {
-            userLabel.setText("Logged in as: " + user.getName() +
-                    " (" + user.getPosition() + ")");
+            userLabel.setText("Logged in as: " + user.getName() + " (" + user.getPosition() + ")");
         }
     }
 
-    /** Expose currentUser for callers like LoginController */
     public User getCurrentUser() {
         return currentUser;
     }
 
-    /** Receive the primary Stage so we can use it later if needed */
     public void setStage(Stage stage) {
         this.stage = stage;
     }
@@ -50,29 +47,50 @@ public class MainController {
     public void initialize() {
         tabPane.getSelectionModel().selectedItemProperty()
                 .addListener((obs, oldTab, newTab) -> {
-                    if (newTab != null && "workOrdersTab".equals(newTab.getId())) {
-                        loadWorkOrdersView();
+                    if (newTab != null) {
+                        String id = newTab.getId();
+                        if ("workOrdersTab".equals(id)) {
+                            loadWorkOrdersView();
+                        } else if ("jobOrdersTab".equals(id)) {
+                            loadJobOrdersView();
+                        }
                     }
                 });
-
-        Platform.runLater(() ->
-                tabPane.getSelectionModel().select(tabPane.getTabs().get(0))
-        );
+        // Select first tab on startup
+        Platform.runLater(() -> tabPane.getSelectionModel().select(0));
     }
 
     private void loadWorkOrdersView() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/workorders.fxml"));
             loader.setControllerFactory(controllerFactory);
-
             Parent root = loader.load();
             WorkOrderController ctrl = loader.getController();
 
             contentArea.getChildren().setAll(root);
-            AnchorPane.setTopAnchor(root,    0.0);
+            AnchorPane.setTopAnchor(root, 0.0);
             AnchorPane.setBottomAnchor(root, 0.0);
-            AnchorPane.setLeftAnchor(root,   0.0);
-            AnchorPane.setRightAnchor(root,  0.0);
+            AnchorPane.setLeftAnchor(root, 0.0);
+            AnchorPane.setRightAnchor(root, 0.0);
+
+            Platform.runLater(ctrl::refreshTable);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadJobOrdersView() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/joborders.fxml"));
+            loader.setControllerFactory(controllerFactory);
+            Parent root = loader.load();
+            JobOrderController ctrl = loader.getController();
+
+            contentArea.getChildren().setAll(root);
+            AnchorPane.setTopAnchor(root, 0.0);
+            AnchorPane.setBottomAnchor(root, 0.0);
+            AnchorPane.setLeftAnchor(root, 0.0);
+            AnchorPane.setRightAnchor(root, 0.0);
 
             Platform.runLater(ctrl::refreshTable);
         } catch (Exception e) {

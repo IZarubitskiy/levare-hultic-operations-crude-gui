@@ -18,18 +18,28 @@ public class JobOrderController {
 
     private JobOrderService jobOrderService;
 
-    @FXML private TableView<JobOrder> jobOrderTable;
-    @FXML private TableColumn<JobOrder, Long> idColumn;
-    @FXML private TableColumn<JobOrder, JobOrderStatus> statusColumn;
-    @FXML private TableColumn<JobOrder, String> commentsColumn;
+    @FXML
+    private TableView<JobOrder> jobOrderTable;
+    @FXML
+    private TableColumn<JobOrder, Long> idColumn;
+    @FXML
+    private TableColumn<JobOrder, JobOrderStatus> statusColumn;
+    @FXML
+    private TableColumn<JobOrder, String> commentsColumn;
 
-    @FXML private ComboBox<JobOrderStatus> statusFilterCombo;
+    @FXML
+    private ComboBox<JobOrderStatus> statusFilterCombo;
 
-    @FXML private Button refreshButton;
-    @FXML private Button deleteButton;
-    @FXML private Button createButton;
-    @FXML private Button updateButton;
-    @FXML private Button statusButton;
+    @FXML
+    private Button refreshButton;
+    @FXML
+    private Button deleteButton;
+    @FXML
+    private Button createButton;
+    @FXML
+    private Button updateButton;
+    @FXML
+    private Button statusButton;
 
     @FXML
     public void initialize() {
@@ -45,7 +55,7 @@ public class JobOrderController {
         statusButton.setOnAction(e -> changeStatusSelected());
     }
 
-    private void refreshTable() {
+    public void refreshTable() {
         List<JobOrder> jobOrders;
         JobOrderStatus status = statusFilterCombo.getValue();
 

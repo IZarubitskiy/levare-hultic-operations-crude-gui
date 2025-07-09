@@ -1,8 +1,6 @@
 package com.levare.hultic.ops.joborders.entity;
 
-import com.levare.hultic.ops.items.entity.Item;
 import com.levare.hultic.ops.users.entity.User;
-import com.levare.hultic.ops.workorders.entity.WorkOrder;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,12 +18,12 @@ public class JobOrder {
     /**
      * WorkOrder to which this JobOrder belongs
      */
-    private WorkOrder workOrder;
+    private Long workOrderId;
 
     /**
      * Equipment item associated with this JobOrder
      */
-    private Item item;
+    private Long itemId;
 
     /**
      * Current status of the JobOrder

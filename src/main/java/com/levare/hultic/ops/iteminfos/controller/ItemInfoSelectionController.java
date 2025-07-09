@@ -6,8 +6,10 @@ import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.Button;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 import java.util.function.Predicate;
@@ -15,22 +17,35 @@ import java.util.regex.Pattern;
 
 public class ItemInfoSelectionController {
 
-    @FXML private TextField filterPartField;
-    @FXML private TextField filterDescField;
+    @FXML
+    private TextField filterPartField;
+    @FXML
+    private TextField filterDescField;
 
-    @FXML private TableView<ItemInfo> tableView;
-    @FXML private TableColumn<ItemInfo,String> colPartNumber;
-    @FXML private TableColumn<ItemInfo,String> colDescription;
-    @FXML private TableColumn<ItemInfo,String> colItemType;
-    @FXML private TableColumn<ItemInfo,String> colComments;
+    @FXML
+    private TableView<ItemInfo> tableView;
+    @FXML
+    private TableColumn<ItemInfo, String> colPartNumber;
+    @FXML
+    private TableColumn<ItemInfo, String> colDescription;
+    @FXML
+    private TableColumn<ItemInfo, String> colItemType;
+    @FXML
+    private TableColumn<ItemInfo, String> colComments;
 
-    @FXML private TextField partNumberField;
-    @FXML private TextField descriptionField;
-    @FXML private TextField itemTypeField;
-    @FXML private TextField commentsField;
+    @FXML
+    private TextField partNumberField;
+    @FXML
+    private TextField descriptionField;
+    @FXML
+    private TextField itemTypeField;
+    @FXML
+    private TextField commentsField;
 
-    @FXML private Button selectButton;
-    @FXML private Button cancelButton;
+    @FXML
+    private Button selectButton;
+    @FXML
+    private Button cancelButton;
 
     private final ItemInfoService itemInfoService;
     private FilteredList<ItemInfo> filteredData;

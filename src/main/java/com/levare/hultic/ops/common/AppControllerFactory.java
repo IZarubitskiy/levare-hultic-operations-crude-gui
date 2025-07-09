@@ -1,19 +1,21 @@
 package com.levare.hultic.ops.common;
 
+import com.levare.hultic.ops.iteminfos.controller.ItemInfoSelectionController;
 import com.levare.hultic.ops.login.LoginController;
 import com.levare.hultic.ops.main.MainController;
-import com.levare.hultic.ops.workorders.controller.WorkOrderController;
-import com.levare.hultic.ops.workorders.controller.NewWorkOrderController;
-import com.levare.hultic.ops.iteminfos.controller.ItemInfoSelectionController;
 import com.levare.hultic.ops.users.controller.UserController;
 import com.levare.hultic.ops.users.entity.User;
+import com.levare.hultic.ops.workorders.controller.NewWorkOrderController;
+import com.levare.hultic.ops.workorders.controller.WorkOrderController;
 import javafx.util.Callback;
 
 public class AppControllerFactory implements Callback<Class<?>, Object> {
 
     private User currentUser;
 
-    /** Called by LoginController after successful login */
+    /**
+     * Called by LoginController after successful login
+     */
     public void setCurrentUser(User user) {
         this.currentUser = user;
     }
@@ -36,6 +38,8 @@ public class AppControllerFactory implements Callback<Class<?>, Object> {
             if (controllerClass == WorkOrderController.class) {
                 return new WorkOrderController(
                         ServiceRegistry.WORK_ORDER_SERVICE,
+                        ServiceRegistry.USER_SERVICE,
+                        ServiceRegistry.ITEM_SERVICE,
                         this
                 );
             }
@@ -44,7 +48,8 @@ public class AppControllerFactory implements Callback<Class<?>, Object> {
                 return new NewWorkOrderController(
                         ServiceRegistry.WORK_ORDER_SERVICE,
                         ServiceRegistry.ITEM_INFO_SERVICE,
-                        ServiceRegistry.ITEM_SERVICE
+                        ServiceRegistry.ITEM_SERVICE,
+                        ServiceRegistry.USER_SERVICE
                 );
             }
             // ItemInfo selection dialog

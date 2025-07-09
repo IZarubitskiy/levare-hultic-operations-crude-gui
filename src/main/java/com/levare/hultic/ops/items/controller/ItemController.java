@@ -7,7 +7,10 @@ import com.levare.hultic.ops.items.service.ItemService;
 import com.levare.hultic.ops.workorders.entity.Client;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;

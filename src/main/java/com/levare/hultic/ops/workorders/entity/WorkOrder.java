@@ -1,6 +1,5 @@
 package com.levare.hultic.ops.workorders.entity;
 
-import com.levare.hultic.ops.items.entity.Item;
 import com.levare.hultic.ops.users.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -38,10 +37,10 @@ public class WorkOrder {
     private String well;
 
     /**
-     * Items associated with this work order
+     * IDs of items associated with this work order
      */
     @Builder.Default
-    private Set<Item> items = new HashSet<>();
+    private Set<Long> itemsId = new HashSet<>();
 
     /**
      * Date when the work order was requested
@@ -69,18 +68,18 @@ public class WorkOrder {
     private String comments;
 
     /**
-     * Convenience method to add an item
+     * Convenience method to add an item ID
      */
-    public void addItem(Item item) {
-        if (item != null) {
-            items.add(item);
+    public void addItemId(Long itemId) {
+        if (itemId != null) {
+            itemsId.add(itemId);
         }
     }
 
     /**
-     * Convenience method to remove an item
+     * Convenience method to remove an item ID
      */
-    public void removeItem(Item item) {
-        items.remove(item);
+    public void removeItemId(Long itemId) {
+        itemsId.remove(itemId);
     }
 }

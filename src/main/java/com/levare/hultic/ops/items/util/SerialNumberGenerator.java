@@ -12,7 +12,8 @@ public final class SerialNumberGenerator {
     private static final SecureRandom RANDOM = new SecureRandom();
 
     // Private constructor to prevent instantiation
-    private SerialNumberGenerator() { }
+    private SerialNumberGenerator() {
+    }
 
     /**
      * Generates a random serial number of the default length (10 characters).
