@@ -4,7 +4,6 @@ import com.levare.hultic.ops.iteminfos.controller.ItemInfoSelectionController;
 import com.levare.hultic.ops.iteminfos.entity.ItemInfo;
 import com.levare.hultic.ops.iteminfos.service.ItemInfoService;
 import com.levare.hultic.ops.items.controller.FilteredItemSelectionController;
-import com.levare.hultic.ops.items.controller.FilteredItemSelectionController.Mode;
 import com.levare.hultic.ops.items.entity.Item;
 import com.levare.hultic.ops.items.entity.ItemCondition;
 import com.levare.hultic.ops.items.entity.ItemStatus;
@@ -29,62 +28,44 @@ import javafx.stage.Stage;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @RequiredArgsConstructor
 public class NewWorkOrderController {
 
-    private final WorkOrderService workOrderService;
-    private final ItemInfoService itemInfoService;
-    private final ItemService itemService;
-    private final UserService userService;
+    private final WorkOrderService    workOrderService;
+    private final ItemInfoService     itemInfoService;
+    private final ItemService         itemService;
+    private final UserService         userService;
 
     private final ObservableList<Item> selectedItems = FXCollections.observableArrayList();
 
-    @FXML
-    private TextField numberField;
-    @FXML
-    private ComboBox<Client> clientComboBox;
-    @FXML
-    private TextField wellField;
-    @FXML
-    private DatePicker deliveryDatePicker;
+    @FXML private TextField    numberField;
+    @FXML private ComboBox<Client> clientComboBox;
+    @FXML private TextField    wellField;
+    @FXML private DatePicker   deliveryDatePicker;
 
-    @FXML
-    private ComboBox<User> requestorComboBox;
-    @FXML
-    private TextArea commentsField;
+    @FXML private ComboBox<User> requestorComboBox;
+    @FXML private TextArea      commentsField;
 
-    @FXML
-    private TableView<Item> itemsTable;
-    @FXML
-    private TableColumn<Item, String> partNumberColumn;
-    @FXML
-    private TableColumn<Item, String> descriptionColumn;
-    @FXML
-    private TableColumn<Item, String> serialNumberColumn;
-    @FXML
-    private TableColumn<Item, String> ownershipColumn;
-    @FXML
-    private TableColumn<Item, String> conditionColumn;
-    @FXML
-    private TableColumn<Item, String> statusColumn;
-    @FXML
-    private TableColumn<Item, String> jobOrderColumn;
-    @FXML
-    private TableColumn<Item, String> commentsColumn;
+    @FXML private TableView<Item> itemsTable;
+    @FXML private TableColumn<Item,String> partNumberColumn;
+    @FXML private TableColumn<Item,String> descriptionColumn;
+    @FXML private TableColumn<Item,String> serialNumberColumn;
+    @FXML private TableColumn<Item,String> ownershipColumn;
+    @FXML private TableColumn<Item,String> conditionColumn;
+    @FXML private TableColumn<Item,String> statusColumn;
+    @FXML private TableColumn<Item,String> jobOrderColumn;
+    @FXML private TableColumn<Item,String> commentsColumn;
 
-    @FXML
-    private Button newItemButton;
-    @FXML
-    private Button deleteItemButton;
-    @FXML
-    private Button repairButton;
-    @FXML
-    private Button stockButton;
-    @FXML
-    private Button rneButton;
-    @FXML
-    private Button cancelButton;
+    @FXML private Button newItemButton;
+    @FXML private Button deleteItemButton;
+    @FXML private Button repairButton;
+    @FXML private Button stockButton;
+    @FXML private Button rneButton;
+
+    @FXML private Button saveButton;
+    @FXML private Button cancelButton;
 
     @FXML
     private void initialize() {
@@ -92,26 +73,17 @@ public class NewWorkOrderController {
         clientComboBox.setItems(FXCollections.observableArrayList(Client.values()));
         clientComboBox.getSelectionModel().select(Client.EMPTY);
 
-        // Реквесторы — только имена
-        requestorComboBox.setItems(FXCollections.observableArrayList(
-                userService.getAll()
-        ));
+        // Реквесторы
+        requestorComboBox.setItems(FXCollections.observableArrayList(userService.getAll()));
         requestorComboBox.setCellFactory(lv -> new ListCell<>() {
-            @Override
-            protected void updateItem(User user, boolean empty) {
-                super.updateItem(user, empty);
-                setText(empty || user == null ? null : user.getName());
+            @Override protected void updateItem(User u, boolean empty){
+                super.updateItem(u,empty);
+                setText(empty||u==null?null:u.getName());
             }
         });
-        requestorComboBox.setButtonCell(new ListCell<>() {
-            @Override
-            protected void updateItem(User user, boolean empty) {
-                super.updateItem(user, empty);
-                setText(empty || user == null ? null : user.getName());
-            }
-        });
+        requestorComboBox.setButtonCell(requestorComboBox.getCellFactory().call(null));
 
-        // Таблица
+        // Таблица items
         partNumberColumn.setCellValueFactory(c ->
                 new ReadOnlyStringWrapper(c.getValue().getItemInfo().getPartNumber()));
         descriptionColumn.setCellValueFactory(c ->
@@ -119,26 +91,23 @@ public class NewWorkOrderController {
         serialNumberColumn.setCellValueFactory(c ->
                 new ReadOnlyStringWrapper(c.getValue().getSerialNumber()));
         ownershipColumn.setCellValueFactory(c ->
-                new ReadOnlyStringWrapper(
-                        c.getValue().getOwnership() != null
-                                ? c.getValue().getOwnership().name() : ""));
+                new ReadOnlyStringWrapper(c.getValue().getOwnership()!=null
+                        ? c.getValue().getOwnership().name() : ""));
         conditionColumn.setCellValueFactory(c ->
                 new ReadOnlyStringWrapper(c.getValue().getItemCondition().name()));
         statusColumn.setCellValueFactory(c ->
-                new ReadOnlyStringWrapper(
-                        c.getValue().getItemStatus() != null
-                                ? c.getValue().getItemStatus().name() : ""));
+                new ReadOnlyStringWrapper(c.getValue().getItemStatus()!=null
+                        ? c.getValue().getItemStatus().name() : ""));
         jobOrderColumn.setCellValueFactory(c ->
-                new ReadOnlyStringWrapper(
-                        c.getValue().getJobOrderId() != null
-                                ? c.getValue().getJobOrderId().toString() : ""));
+                new ReadOnlyStringWrapper(c.getValue().getJobOrderId()!=null
+                        ? c.getValue().getJobOrderId().toString() : ""));
         commentsColumn.setCellValueFactory(c ->
                 new ReadOnlyStringWrapper(c.getValue().getComments()));
 
         itemsTable.setItems(selectedItems);
         itemsTable.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
 
-        // Блокировка смены клиента при наличии записей
+        // Блокировка смены клиента при наличии строк
         selectedItems.addListener((ListChangeListener<Item>) ch ->
                 clientComboBox.setDisable(!selectedItems.isEmpty())
         );
@@ -147,151 +116,132 @@ public class NewWorkOrderController {
         deleteItemButton.disableProperty()
                 .bind(itemsTable.getSelectionModel().selectedItemProperty().isNull());
 
-        // Фильтрующие кнопки
-        repairButton.setOnAction(e -> openFilteredDialog(Mode.REPAIR));
-        stockButton.setOnAction(e -> openFilteredDialog(Mode.STOCK));
-        rneButton.setOnAction(e -> openFilteredDialog(Mode.RNE));
+        // Кнопки фильтрации
+        repairButton.setOnAction(e -> openFilteredDialog(
+                List.of(clientComboBox.getValue()),
+                List.of(ItemCondition.USED),
+                List.of(ItemStatus.ON_STOCK)
+        ));
+        stockButton.setOnAction(e -> openFilteredDialog(
+                List.of(clientComboBox.getValue()),
+                List.of(ItemCondition.NEW, ItemCondition.REPAIRED),
+                List.of(ItemStatus.ON_STOCK)
+        ));
+        rneButton.setOnAction(e -> openFilteredDialog(
+                List.of(Client.RNE, Client.CORPORATE),
+                List.of(ItemCondition.USED),
+                List.of(ItemStatus.ON_STOCK)
+        ));
+
+        // Новый из каталога
+        newItemButton.setOnAction(e -> onNewItem());
+
+        // Сохранить/отмена
+        saveButton.setOnAction(e -> handleSave());
+        cancelButton.setOnAction(e -> closeWindow());
     }
 
-    /**
-     * Добавить элемент из общего каталога
-     */
-    @FXML
     private void onNewItem() {
         try {
             FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/fxml/item_info_selection.fxml"));
+                    getClass().getResource("/fxml/item_info_selection.fxml")
+            );
             loader.setControllerFactory(cls -> {
                 if (cls == ItemInfoSelectionController.class) {
                     return new ItemInfoSelectionController(itemInfoService);
                 }
-                try {
-                    return cls.getDeclaredConstructor().newInstance();
-                } catch (Exception ex) {
-                    throw new RuntimeException(ex);
-                }
+                try { return cls.getDeclaredConstructor().newInstance(); }
+                catch (Exception ex) { throw new RuntimeException(ex); }
             });
-
             Parent root = loader.load();
-            Stage dlg = new Stage();
-            dlg.initModality(Modality.APPLICATION_MODAL);
+            Stage dlg = new Stage(); dlg.initModality(Modality.APPLICATION_MODAL);
             dlg.setTitle("Select Equipment");
             dlg.setScene(new Scene(root));
             dlg.showAndWait();
 
-            var ctrl = loader.<ItemInfoSelectionController>getController();
-            ItemInfo info = ctrl.getSelectedItem();
+            var info = loader.<ItemInfoSelectionController>getController().getSelectedItem();
             if (info != null) {
-                Item item = new Item();
-                item.setItemInfo(info);
-                item.setSerialNumber("TBA");
-                item.setOwnership(clientComboBox.getValue());
-                item.setItemCondition(ItemCondition.NEW_ASSEMBLY);
-                item.setItemStatus(ItemStatus.NEW_ASSEMBLY_BOOKED);
-                item.setJobOrderId(null);
-                item.setComments("");
-                selectedItems.add(item);
+                Item it = new Item();
+                it.setItemInfo(info);
+                it.setOwnership(clientComboBox.getValue());
+                it.setSerialNumber("TBA");
+                it.setItemCondition(ItemCondition.NEW_ASSEMBLY);
+                it.setItemStatus(ItemStatus.NEW_ASSEMBLY_BOOKED);
+                it.setJobOrderId(null);
+                it.setComments("");
+                selectedItems.add(it);
             }
         } catch (Exception ex) {
             ex.printStackTrace();
-            showError("Error", "Cannot open selection dialog:\n" + ex.getMessage());
+            showError("Error", "Cannot open selection dialog:\n"+ex.getMessage());
         }
     }
 
     /**
-     * Общий фильтрующий диалог
+     * Открывает окно фильтрации c любыми списками
      */
-    private void openFilteredDialog(Mode mode) {
+    private void openFilteredDialog(List<Client> clients,
+                                    List<ItemCondition> conds,
+                                    List<ItemStatus> stats) {
         try {
             FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/fxml/filtered_item_selection.fxml"));
+                    getClass().getResource("/fxml/filtered_item_selection.fxml")
+            );
             loader.setControllerFactory(cls -> {
                 if (cls == FilteredItemSelectionController.class) {
                     return new FilteredItemSelectionController(
-                            itemService, mode, clientComboBox.getValue());
+                            itemService, clients, conds, stats
+                    );
                 }
-                try {
-                    return cls.getDeclaredConstructor().newInstance();
-                } catch (Exception ex) {
-                    throw new RuntimeException(ex);
-                }
+                try { return cls.getDeclaredConstructor().newInstance(); }
+                catch (Exception ex) { throw new RuntimeException(ex); }
             });
-
             Parent root = loader.load();
-            Stage dlg = new Stage();
-            dlg.initModality(Modality.APPLICATION_MODAL);
-            dlg.setTitle("Select " + mode.name());
+            Stage dlg = new Stage(); dlg.initModality(Modality.APPLICATION_MODAL);
+            dlg.setTitle("Select Items");
             dlg.setScene(new Scene(root));
             dlg.showAndWait();
 
-            var ctrl = loader.<FilteredItemSelectionController>getController();
-            Item chosen = ctrl.getSelectedItem();
-            if (chosen != null) {
-                selectedItems.add(chosen);
-            }
+            var chosen = loader.<FilteredItemSelectionController>getController().getSelectedItem();
+            if (chosen != null) selectedItems.add(chosen);
+
         } catch (Exception ex) {
             ex.printStackTrace();
-            showError("Error", "Cannot open filtered dialog:\n" + ex.getMessage());
+            showError("Error", "Cannot open filtered dialog:\n"+ex.getMessage());
         }
     }
 
-    /**
-     * Удалить выделенный элемент
-     */
-    @FXML
-    private void onDeleteItem() {
-        Item sel = itemsTable.getSelectionModel().getSelectedItem();
-        if (sel != null) selectedItems.remove(sel);
-    }
-
-    /**
-     * Сохранить заявку
-     */
-    @FXML
-    private void handleSave() {
-        if (workOrderService == null) {
-            showError("Configuration Error", "WorkOrderService is not set.");
-            return;
-        }
-
+    @FXML private void handleSave() {
         User req = requestorComboBox.getValue();
         if (req == null) {
-            showError("Validation Error", "Please select a requestor.");
+            showError("Validation Error","Select a requestor.");
             return;
         }
-
-        WorkOrder order = new WorkOrder();
-        order.setWorkOrderNumber(numberField.getText().trim());
-        order.setClient(clientComboBox.getValue());
-        order.setWell(wellField.getText().trim());
-        order.setDeliveryDate(deliveryDatePicker.getValue());
-        order.setRequestor(req);
-        order.setComments(commentsField.getText().trim());
-        order.setRequestDate(LocalDate.now());
-        order.setStatus(WorkOrderStatus.CREATED);
-
-        // Collect only item IDs
-        selectedItems.forEach(item -> order.addItemId(item.getId()));
-
-        workOrderService.create(order);
+        WorkOrder o = new WorkOrder();
+        o.setWorkOrderNumber(numberField.getText().trim());
+        o.setClient(clientComboBox.getValue());
+        o.setWell(wellField.getText().trim());
+        o.setDeliveryDate(deliveryDatePicker.getValue());
+        o.setRequestDate(LocalDate.now());
+        o.setRequestor(req);
+        o.setComments(commentsField.getText().trim());
+        o.setStatus(WorkOrderStatus.CREATED);
+        selectedItems.forEach(it -> o.addItemId(it.getId()));
+        workOrderService.create(o);
         closeWindow();
     }
 
-    @FXML
-    private void handleCancel() {
+    @FXML private void handleCancel() {
         closeWindow();
     }
-
     private void closeWindow() {
-        Stage stage = (Stage) numberField.getScene().getWindow();
-        stage.close();
+        Stage st = (Stage) numberField.getScene().getWindow();
+        st.close();
     }
-
-    private void showError(String header, String content) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Error");
-        alert.setHeaderText(header);
-        alert.setContentText(content);
-        alert.showAndWait();
+    private void showError(String hdr, String txt) {
+        var a = new Alert(Alert.AlertType.ERROR);
+        a.setHeaderText(hdr);
+        a.setContentText(txt);
+        a.showAndWait();
     }
 }

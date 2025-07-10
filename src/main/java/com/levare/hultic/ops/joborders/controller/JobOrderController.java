@@ -2,13 +2,21 @@ package com.levare.hultic.ops.joborders.controller;
 
 import com.levare.hultic.ops.items.controller.FilteredItemSelectionController;
 import com.levare.hultic.ops.items.entity.Item;
+import com.levare.hultic.ops.items.entity.ItemCondition;
+import com.levare.hultic.ops.items.entity.ItemStatus;
 import com.levare.hultic.ops.items.service.ItemService;
 import com.levare.hultic.ops.joborders.controller.NewJobOrderController;
 import com.levare.hultic.ops.joborders.entity.JobOrder;
 import com.levare.hultic.ops.joborders.entity.JobOrderStatus;
 import com.levare.hultic.ops.joborders.service.JobOrderService;
+import com.levare.hultic.ops.users.entity.User;
 import com.levare.hultic.ops.users.service.UserService;
 import com.levare.hultic.ops.workorders.entity.Client;
+import com.levare.hultic.ops.workorders.entity.WorkOrder;
+import com.levare.hultic.ops.workorders.service.WorkOrderService;
+import javafx.beans.property.SimpleLongProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -20,41 +28,98 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 import lombok.RequiredArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RequiredArgsConstructor
 public class JobOrderController {
 
-    private final JobOrderService    jobOrderService;
-    private final UserService        userService;
-    private final ItemService        itemService;
-    private final Callback<Class<?>, Object> controllerFactory;
 
-    @FXML private TableView<JobOrder> jobOrderTable;
-    @FXML private TableColumn<JobOrder, Long>        idColumn;
-    @FXML private TableColumn<JobOrder, JobOrderStatus> statusColumn;
-    @FXML private TableColumn<JobOrder, String>      commentsColumn;
+    private final JobOrderService               jobOrderService;
+    private final UserService                   userService;
+    private final ItemService                   itemService;
+    private final WorkOrderService              workOrderService;
+    private final Callback<Class<?>, Object>    controllerFactory;
 
-    @FXML private ComboBox<JobOrderStatus> statusFilterCombo;
-    @FXML private Button refreshButton, deleteButton, createButton, updateButton;
+    @FXML private TableView<JobOrder>                         jobOrderTable;
+    @FXML private TableColumn<JobOrder, Long>                 idColumn;
+    @FXML private TableColumn<JobOrder, String>               partNumberColumn;
+    @FXML private TableColumn<JobOrder, String>               serialColumn;
+    @FXML private TableColumn<JobOrder, String>               descriptionColumn;
+    @FXML private TableColumn<JobOrder, String>               clientColumn;
+    @FXML private TableColumn<JobOrder, JobOrderStatus>       statusColumn;
+    @FXML private TableColumn<JobOrder, String>               responsibleColumn;
+    @FXML private TableColumn<JobOrder, LocalDate>            deliveryColumn;
+    @FXML private TableColumn<JobOrder, String>               commentsColumn;
+
+    @FXML private ComboBox<JobOrderStatus>                    statusFilterCombo;
+    @FXML private Button                                      refreshButton;
+    @FXML private Button                                      deleteButton;
+    @FXML private Button                                      createButton;
+    @FXML private Button                                      updateButton;
 
     @FXML
     public void initialize() {
+        // 1) ID
         idColumn.setCellValueFactory(c ->
-                new javafx.beans.property.SimpleLongProperty(c.getValue().getId()).asObject());
+                new SimpleLongProperty(c.getValue().getId()).asObject()
+        );
+
+        // 2) Part Number, Serial, Description (через itemService)
+        partNumberColumn.setCellValueFactory(c -> {
+            Item it = itemService.getById(c.getValue().getItemId());
+            return new SimpleStringProperty(it.getItemInfo().getPartNumber());
+        });
+        serialColumn.setCellValueFactory(c -> {
+            Item it = itemService.getById(c.getValue().getItemId());
+            return new SimpleStringProperty(it.getSerialNumber());
+        });
+        descriptionColumn.setCellValueFactory(c -> {
+            Item it = itemService.getById(c.getValue().getItemId());
+            return new SimpleStringProperty(it.getItemInfo().getDescription());
+        });
+
+        // 3) Client и Planned Delivery (через workOrderService)
+        clientColumn.setCellValueFactory(c -> {
+            Item it = itemService.getById(c.getValue().getItemId());;
+            return new SimpleStringProperty(it.getOwnership().name());
+        });
+        deliveryColumn.setCellValueFactory(c -> {
+            Long woId = c.getValue().getWorkOrderId();
+            if (woId == null || woId == 0) {
+                return new SimpleObjectProperty<>(null);
+            }
+            WorkOrder wo = workOrderService.getById(woId);
+            return new SimpleObjectProperty<>(wo.getDeliveryDate());
+        });
+
+        // 4) Status
         statusColumn.setCellValueFactory(c ->
-                new javafx.beans.property.SimpleObjectProperty<>(c.getValue().getStatus()));
+                new SimpleObjectProperty<>(c.getValue().getStatus())
+        );
+
+        // 5) Responsible
+        responsibleColumn.setCellValueFactory(c -> {
+            User u = c.getValue().getResponsibleUser();
+            return new SimpleStringProperty(u!=null ? u.getName() : "");
+        });
+
+        // 6) Comments
         commentsColumn.setCellValueFactory(c ->
-                new javafx.beans.property.SimpleStringProperty(c.getValue().getComments()));
+                new SimpleStringProperty(c.getValue().getComments())
+        );
 
+        // Фильтрация и кнопки
         statusFilterCombo.setItems(FXCollections.observableArrayList(JobOrderStatus.values()));
-        refreshButton.setOnAction(e -> refreshTable());
-        deleteButton .setOnAction(e -> deleteSelected());
-        createButton .setOnAction(e -> createNew());
-        updateButton .setOnAction(e -> updateSelected());
+        refreshButton .setOnAction(e -> refreshTable());
+        deleteButton  .setOnAction(e -> deleteSelected());
+        createButton  .setOnAction(e -> createNew());
+        updateButton  .setOnAction(e -> updateSelected());
 
+        // Первая загрузка
         refreshTable();
     }
+
 
     public void refreshTable() {
         List<JobOrder> list = statusFilterCombo.getValue() != null
@@ -87,8 +152,9 @@ public class JobOrderController {
                 if (cls == FilteredItemSelectionController.class) {
                     return new FilteredItemSelectionController(
                             itemService,
-                            FilteredItemSelectionController.Mode.STOCK,
-                            Client.METCO    // можно заменить на конкретного клиента
+                            List.of(Client.RNE, Client.CORPORATE),
+                            List.of(),
+                            List.of(ItemStatus.ON_STOCK)
                     );
                 }
                 return controllerFactory.call(cls);

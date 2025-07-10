@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS work_orders (
 
 CREATE TABLE IF NOT EXISTS job_orders (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    work_order_id INTEGER NOT NULL REFERENCES work_orders(id),
+    work_order_id INTEGER REFERENCES work_orders(id),
     item_id INTEGER NOT NULL REFERENCES items(id),
     status TEXT NOT NULL, -- enum JobOrderStatus
     responsible_user_id INTEGER REFERENCES users(id),

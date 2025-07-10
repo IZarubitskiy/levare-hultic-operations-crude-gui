@@ -4,12 +4,25 @@ package com.levare.hultic.ops.workorders.entity;
  * Клиенты/владельцы оборудования
  */
 public enum Client {
-    PETCO,
-    METCO,
-    KETCO,
-    RETCO,
-    RETS,
-    CORP,
+    AGIBA,
+    BAPETCO,
+    BPCO,
+    BURAPETCO,
+    DAPETCO,
+    ENPETCO,
+    GEMSA,
+    GPC,
+    GUPCO,
+    KPC,
+    NORPETCO,
+    PETROAMIR,
+    PETROBAKR,
+    PETROBEL,
+    PETROFARAH,
+    PETROGULF,
+    PETROSHAHD,
+    PETROZENIMA,
+    CORPORATE,
     RNE,
     EMPTY
 }

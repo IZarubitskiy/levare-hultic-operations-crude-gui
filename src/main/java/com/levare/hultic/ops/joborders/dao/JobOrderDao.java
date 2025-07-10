@@ -84,7 +84,11 @@ public class JobOrderDao {
         String sql = "INSERT INTO job_orders (work_order_id, item_id, status, responsible_user_id, comments) " +
                 "VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setLong(1, jobOrder.getWorkOrderId());
+            if (jobOrder.getWorkOrderId() != null) {
+                stmt.setLong(1, jobOrder.getWorkOrderId());
+            } else {
+                stmt.setNull(1, java.sql.Types.BIGINT);
+            }
             stmt.setLong(2, jobOrder.getItemId());
             stmt.setString(3, jobOrder.getStatus().name());
             stmt.setLong(4, jobOrder.getResponsibleUser().getId());

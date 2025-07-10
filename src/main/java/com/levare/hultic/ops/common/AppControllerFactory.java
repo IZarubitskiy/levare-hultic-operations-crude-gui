@@ -46,6 +46,7 @@ public class AppControllerFactory implements Callback<Class<?>, Object> {
                         ServiceRegistry.JOB_ORDER_SERVICE,
                         ServiceRegistry.USER_SERVICE,
                         ServiceRegistry.ITEM_SERVICE,
+                        ServiceRegistry.WORK_ORDER_SERVICE,
                         this
                 );
             }

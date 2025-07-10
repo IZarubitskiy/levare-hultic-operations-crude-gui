@@ -8,10 +8,7 @@ import com.levare.hultic.ops.workorders.entity.Client;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 
 import java.util.List;
@@ -19,43 +16,44 @@ import java.util.stream.Collectors;
 
 public class FilteredItemSelectionController {
 
-    public enum Mode {REPAIR, STOCK, RNE}
+    private final ItemService              itemService;
+    private final List<Client>             clients;
+    private final List<ItemCondition>      conditions;
+    private final List<ItemStatus>         statuses;
 
-    private final ItemService itemService;
-    private final Mode mode;
-    private final Client client;
     private Item selectedItem;
 
-    public FilteredItemSelectionController(ItemService itemService, Mode mode, Client client) {
+    /**
+     * @param itemService  сервис доступа к Item
+     * @param clients      список клиентов (если пустой — без фильтра по клиенту)
+     * @param conditions   список состояний (если пустой — без фильтра по condition)
+     * @param statuses     список статусов (если пустой — без фильтра по status)
+     */
+    public FilteredItemSelectionController(ItemService itemService,
+                                           List<Client> clients,
+                                           List<ItemCondition> conditions,
+                                           List<ItemStatus> statuses) {
         this.itemService = itemService;
-        this.mode = mode;
-        this.client = client;
+        this.clients     = clients;
+        this.conditions  = conditions;
+        this.statuses    = statuses;
     }
 
-    @FXML
-    private Label titleLabel;
-    @FXML
-    private TableView<Item> tableView;
-    @FXML
-    private TableColumn<Item, String> partColumn;
-    @FXML
-    private TableColumn<Item, String> descColumn;
-    @FXML
-    private TableColumn<Item, String> serialColumn;
-    @FXML
-    private TableColumn<Item, String> statusColumn;
-    @FXML
-    private Button selectButton;
+    @FXML private Label titleLabel;
+    @FXML private TableView<Item> tableView;
+    @FXML private TableColumn<Item, String> partColumn, descColumn, serialColumn, statusColumn;
+    @FXML private Button selectButton, cancelButton;
 
     @FXML
     private void initialize() {
-        // dialog title includes the client name
-        titleLabel.setText("Select "
-                + mode.name().toLowerCase()
-                + " items for client "
-                + client.name());
+        // Заголовок с перечислением фильтров
+        String clientsStr    = clients.isEmpty()   ? "all" : clients.stream().map(Client::name).collect(Collectors.joining(", "));
+        String condsStr      = conditions.isEmpty()? "all" : conditions.stream().map(Enum::name).collect(Collectors.joining(", "));
+        String statusesStr   = statuses.isEmpty()  ? "all" : statuses.stream().map(Enum::name).collect(Collectors.joining(", "));
+        titleLabel.setText(String.format("Items — clients: [%s], conditions: [%s], statuses: [%s]",
+                clientsStr, condsStr, statusesStr));
 
-        // configure columns
+        // колонки
         partColumn.setCellValueFactory(c ->
                 new ReadOnlyStringWrapper(c.getValue().getItemInfo().getPartNumber()));
         descColumn.setCellValueFactory(c ->
@@ -63,46 +61,34 @@ public class FilteredItemSelectionController {
         serialColumn.setCellValueFactory(c ->
                 new ReadOnlyStringWrapper(c.getValue().getSerialNumber()));
         statusColumn.setCellValueFactory(c ->
-                new ReadOnlyStringWrapper(
-                        c.getValue().getItemStatus() != null
-                                ? c.getValue().getItemStatus().name()
-                                : ""
-                )
+                new ReadOnlyStringWrapper(c.getValue().getItemStatus() != null
+                        ? c.getValue().getItemStatus().name() : "")
         );
 
-        // load all items and filter by both mode and selected client
+        // загрузка и фильтрация
         List<Item> filtered = itemService.getAll().stream()
-                .filter(this::matchesModeAndClient)
+                .filter(this::matchesAll)
                 .collect(Collectors.toList());
-
         tableView.setItems(FXCollections.observableArrayList(filtered));
 
-        // disable Select button until a row is chosen
+        // кнопка ОК
         selectButton.disableProperty()
                 .bind(tableView.getSelectionModel().selectedItemProperty().isNull());
+        selectButton.setOnAction(e -> {
+            selectedItem = tableView.getSelectionModel().getSelectedItem();
+            close();
+        });
+        cancelButton.setOnAction(e -> {
+            selectedItem = null;
+            close();
+        });
     }
 
-    private boolean matchesModeAndClient(Item item) {
-        // first: must belong to the chosen client
-        if (item.getOwnership() != client) {
-            return false;
-        }
-
-        // then filter by the chosen mode
-        switch (mode) {
-            case REPAIR:
-                return item.getItemCondition() == ItemCondition.USED
-                        && item.getItemStatus() == ItemStatus.ON_STOCK;
-            case STOCK:
-                return (item.getItemCondition() == ItemCondition.REPAIRED
-                        || item.getItemCondition() == ItemCondition.NEW)
-                        && item.getItemStatus() == ItemStatus.ON_STOCK;
-            case RNE:
-                return item.getItemCondition() == ItemCondition.USED
-                        && item.getItemStatus() == ItemStatus.ON_STOCK;
-            default:
-                return false;
-        }
+    private boolean matchesAll(Item item) {
+        boolean okClient    = clients.isEmpty()    || clients.contains(item.getOwnership());
+        boolean okCondition = conditions.isEmpty() || conditions.contains(item.getItemCondition());
+        boolean okStatus    = statuses.isEmpty()   || statuses.contains(item.getItemStatus());
+        return okClient && okCondition && okStatus;
     }
 
     @FXML
@@ -116,7 +102,6 @@ public class FilteredItemSelectionController {
         selectedItem = null;
         close();
     }
-
     private void close() {
         ((Stage) tableView.getScene().getWindow()).close();
     }
@@ -124,5 +109,4 @@ public class FilteredItemSelectionController {
     public Item getSelectedItem() {
         return selectedItem;
     }
-
 }
