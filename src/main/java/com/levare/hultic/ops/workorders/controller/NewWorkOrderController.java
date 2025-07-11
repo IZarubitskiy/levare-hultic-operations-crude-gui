@@ -242,7 +242,7 @@ public class NewWorkOrderController {
         newWorkOrder.setStatus(WorkOrderStatus.CREATED);
         selectedItems.forEach(it -> {
             if(it.getId() == null && it.getItemCondition() == ItemCondition.NEW_ASSEMBLY) {
-                newWorkOrder.addItemId(itemService.create(it).getId());
+                newWorkOrder.addItemId(itemService.newItemFromCatalog(it.getItemInfo().getPartNumber(),clientComboBox.getValue()).getId());
             } else {
                 newWorkOrder.addItemId(it.getId());
             }

@@ -39,13 +39,14 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         // Validate and book each item by ID
         for (Long itemId : workOrder.getItemsId()) {
             Item item = itemService.getById(itemId);
-            if (item.getItemStatus() != ItemStatus.ON_STOCK) {
+            if (item.getItemStatus() != ItemStatus.ON_STOCK && item.getItemStatus() != ItemStatus.NEW_ASSEMBLY_BOOKED) {
                 System.out.println("Item " + itemId + " is not on stock");
                 throw new IllegalStateException();
             } else {
                 switch (item.getItemCondition()) {
                     case USED -> itemService.updateStatus(item, ItemStatus.REPAIR_BOOKED);
                     case NEW, REPAIRED -> itemService.updateStatus(item, ItemStatus.STOCK_BOOKED);
+                    case NEW_ASSEMBLY -> itemService.updateStatus(item, ItemStatus.NEW_ASSEMBLY_BOOKED) ;
                     default -> throw new IllegalStateException(
                             "Unexpected item condition: " + item.getItemCondition());
                 }

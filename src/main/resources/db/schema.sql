@@ -2,7 +2,8 @@ CREATE TABLE IF NOT EXISTS item_info (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     part_number TEXT NOT NULL UNIQUE,
     description TEXT,
-    item_type TEXT NOT NULL, -- enum ItemType
+    item_type TEXT NOT NULL,
+    series INTEGER,
     comments TEXT
 );
 
@@ -51,9 +52,8 @@ CREATE TABLE IF NOT EXISTS work_order_items (
   PRIMARY KEY (work_order_id, item_id)
 );
 
-CREATE TABLE serial_numbers (
-  id             BIGINT       IDENTITY(1,1) NOT NULL,
+CREATE TABLE IF NOT EXISTS serial_numbers (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
   serial_number  NVARCHAR(20) NOT NULL UNIQUE,
-  part_number    NVARCHAR(50) NOT NULL,
-  PRIMARY KEY (id)
+  part_number    NVARCHAR(50) NOT NULL
 );

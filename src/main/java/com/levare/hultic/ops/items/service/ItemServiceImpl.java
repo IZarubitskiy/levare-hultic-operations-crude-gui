@@ -3,10 +3,10 @@ package com.levare.hultic.ops.items.service;
 import com.levare.hultic.ops.iteminfos.entity.ItemInfo;
 import com.levare.hultic.ops.iteminfos.service.ItemInfoService;
 import com.levare.hultic.ops.items.dao.ItemDao;
+import com.levare.hultic.ops.items.dao.SerialNumberDao;
 import com.levare.hultic.ops.items.entity.Item;
 import com.levare.hultic.ops.items.entity.ItemCondition;
 import com.levare.hultic.ops.items.entity.ItemStatus;
-import com.levare.hultic.ops.items.util.SerialNumberGenerator;
 import com.levare.hultic.ops.workorders.entity.Client;
 
 import java.time.LocalDate;
@@ -21,10 +21,12 @@ public class ItemServiceImpl implements ItemService {
 
     private final ItemDao itemDao;
     private final ItemInfoService itemInfoService;
+    private final SerialNumberDao serialNumberDao;
 
-    public ItemServiceImpl(ItemDao itemDao, ItemInfoService itemInfoService) {
+    public ItemServiceImpl(ItemDao itemDao, ItemInfoService itemInfoService, SerialNumberDao serialNumberDao) {
         this.itemDao = itemDao;
         this.itemInfoService = itemInfoService;
+        this.serialNumberDao = serialNumberDao;
     }
 
     @Override
@@ -88,16 +90,15 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Item newItemFromCatalog(String itemInfoId, Client client) {
-        ItemInfo info = itemInfoService.getByPartNumber(itemInfoId);
+    public Item newItemFromCatalog(String itemInfoPartNumber, Client client) {
+        ItemInfo info = itemInfoService.getByPartNumber(itemInfoPartNumber);
 
         Item item = new Item();
         item.setItemInfo(info);
-        item.setSerialNumber(SerialNumberGenerator.generate());
         item.setOwnership(client);
         item.setItemCondition(ItemCondition.NEW_ASSEMBLY);
         item.setItemStatus(ItemStatus.NEW_ASSEMBLY_BOOKED);
-
+        item.setSerialNumber(generateSerialNumber(item));
         itemDao.insert(item);
         return item;
     }
@@ -110,8 +111,7 @@ public class ItemServiceImpl implements ItemService {
         return existing;
     }
 
-    public Item serialNuimberGenerator (Item item){
-
+    public String generateSerialNumber (Item item){
         if (item.getItemStatus() == ItemStatus.NEW_ASSEMBLY_BOOKED && item.getItemCondition() == ItemCondition.NEW_ASSEMBLY){
             StringBuilder sn = new StringBuilder(11);
             switch (item.getItemInfo().getItemType()) {
@@ -156,6 +156,9 @@ public class ItemServiceImpl implements ItemService {
 
             sn.append("A");
 
+            String lastTwo = String.valueOf(LocalDate.now().getYear()).substring(String.valueOf(LocalDate.now().getYear()).length() - 2);
+            sn.append(lastTwo);
+
             switch (LocalDate.now().getMonthValue()) {
                 case 1 -> sn.append("A");
                 case 2 -> sn.append("B");
@@ -171,7 +174,17 @@ public class ItemServiceImpl implements ItemService {
                 case 12 -> sn.append("L");
             }
 
-            item.setSerialNumber(sn.toString());
+            String number = Long.toString(serialNumberDao.getNextId());
+            switch (number.length()){
+                case 1 ->sn.append("0000");
+                case 2 ->sn.append("000");
+                case 3 ->sn.append("00");
+                case 4 ->sn.append("0");
+            }
+
+            sn.append(number);
+            serialNumberDao.insert(sn.toString(), item.getItemInfo().getPartNumber());
+            return sn.toString();
 
         } else {
             throw new IllegalStateException( "Unexpected item condition: " + item.getItemCondition());

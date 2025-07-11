@@ -28,7 +28,7 @@ public class ItemInfoDao {
      */
     public List<ItemInfo> findAll() {
         List<ItemInfo> items = new ArrayList<>();
-        String sql = "SELECT id, part_number, description, item_type, comments FROM item_info";
+        String sql = "SELECT id, part_number, description, item_type, series, comments FROM item_info";
 
         try (PreparedStatement stmt = connection.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
@@ -46,7 +46,7 @@ public class ItemInfoDao {
      * Ищет запись по её первичному ключу.
      */
     public ItemInfo findById(long id) {
-        String sql = "SELECT id, part_number, description, item_type, comments FROM item_info WHERE id = ?";
+        String sql = "SELECT id, part_number, description, item_type, series, comments FROM item_info WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setLong(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -121,6 +121,7 @@ public class ItemInfoDao {
         item.setPartNumber(rs.getString("part_number"));
         item.setDescription(rs.getString("description"));
         item.setItemType(ItemType.valueOf(rs.getString("item_type").toUpperCase()));
+        item.setSeries(rs.getInt("series"));
         item.setComments(rs.getString("comments"));
         return item;
     }

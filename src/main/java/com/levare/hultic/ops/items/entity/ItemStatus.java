@@ -1,7 +1,6 @@
 package com.levare.hultic.ops.items.entity;
 
 public enum ItemStatus {
-    PLANNED,
     DISMANTLED,
     ASSEMBLED,
     TESTED,
