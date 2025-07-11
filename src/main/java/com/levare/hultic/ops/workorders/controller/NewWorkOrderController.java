@@ -40,13 +40,13 @@ public class NewWorkOrderController {
 
     private final ObservableList<Item> selectedItems = FXCollections.observableArrayList();
 
-    @FXML private TextField    numberField;
+    @FXML private TextField       numberField;
     @FXML private ComboBox<Client> clientComboBox;
-    @FXML private TextField    wellField;
-    @FXML private DatePicker   deliveryDatePicker;
+    @FXML private TextField       wellField;
+    @FXML private DatePicker      deliveryDatePicker;
 
-    @FXML private ComboBox<User> requestorComboBox;
-    @FXML private TextArea      commentsField;
+    @FXML private ComboBox<User>  requestorComboBox;
+    @FXML private TextArea        commentsField;
 
     @FXML private TableView<Item> itemsTable;
     @FXML private TableColumn<Item,String> partNumberColumn;
@@ -63,6 +63,7 @@ public class NewWorkOrderController {
     @FXML private Button repairButton;
     @FXML private Button stockButton;
     @FXML private Button rneButton;
+    @FXML private Button wipButton;     // ← новая кнопка WIP
 
     @FXML private Button saveButton;
     @FXML private Button cancelButton;
@@ -91,16 +92,16 @@ public class NewWorkOrderController {
         serialNumberColumn.setCellValueFactory(c ->
                 new ReadOnlyStringWrapper(c.getValue().getSerialNumber()));
         ownershipColumn.setCellValueFactory(c ->
-                new ReadOnlyStringWrapper(c.getValue().getOwnership()!=null
-                        ? c.getValue().getOwnership().name() : ""));
+                new ReadOnlyStringWrapper(
+                        c.getValue().getOwnership()!=null ? c.getValue().getOwnership().name() : ""));
         conditionColumn.setCellValueFactory(c ->
                 new ReadOnlyStringWrapper(c.getValue().getItemCondition().name()));
         statusColumn.setCellValueFactory(c ->
-                new ReadOnlyStringWrapper(c.getValue().getItemStatus()!=null
-                        ? c.getValue().getItemStatus().name() : ""));
+                new ReadOnlyStringWrapper(
+                        c.getValue().getItemStatus()!=null ? c.getValue().getItemStatus().name() : ""));
         jobOrderColumn.setCellValueFactory(c ->
-                new ReadOnlyStringWrapper(c.getValue().getJobOrderId()!=null
-                        ? c.getValue().getJobOrderId().toString() : ""));
+                new ReadOnlyStringWrapper(
+                        c.getValue().getJobOrderId()!=null ? c.getValue().getJobOrderId().toString() : ""));
         commentsColumn.setCellValueFactory(c ->
                 new ReadOnlyStringWrapper(c.getValue().getComments()));
 
@@ -116,7 +117,7 @@ public class NewWorkOrderController {
         deleteItemButton.disableProperty()
                 .bind(itemsTable.getSelectionModel().selectedItemProperty().isNull());
 
-        // Кнопки фильтрации
+        // Фильтрующие кнопки
         repairButton.setOnAction(e -> openFilteredDialog(
                 List.of(clientComboBox.getValue()),
                 List.of(ItemCondition.USED),
@@ -132,15 +133,17 @@ public class NewWorkOrderController {
                 List.of(ItemCondition.USED),
                 List.of(ItemStatus.ON_STOCK)
         ));
+        wipButton.setOnAction(e -> onWip());  // обработчик новой кнопки
 
         // Новый из каталога
         newItemButton.setOnAction(e -> onNewItem());
 
         // Сохранить/отмена
         saveButton.setOnAction(e -> handleSave());
-        cancelButton.setOnAction(e -> closeWindow());
+        cancelButton.setOnAction(e -> handleCancel());
     }
 
+    @FXML
     private void onNewItem() {
         try {
             FXMLLoader loader = new FXMLLoader(
@@ -159,7 +162,7 @@ public class NewWorkOrderController {
             dlg.setScene(new Scene(root));
             dlg.showAndWait();
 
-            var info = loader.<ItemInfoSelectionController>getController().getSelectedItem();
+            ItemInfo info = loader.<ItemInfoSelectionController>getController().getSelectedItem();
             if (info != null) {
                 Item it = new Item();
                 it.setItemInfo(info);
@@ -177,9 +180,6 @@ public class NewWorkOrderController {
         }
     }
 
-    /**
-     * Открывает окно фильтрации c любыми списками
-     */
     private void openFilteredDialog(List<Client> clients,
                                     List<ItemCondition> conds,
                                     List<ItemStatus> stats) {
@@ -189,9 +189,7 @@ public class NewWorkOrderController {
             );
             loader.setControllerFactory(cls -> {
                 if (cls == FilteredItemSelectionController.class) {
-                    return new FilteredItemSelectionController(
-                            itemService, clients, conds, stats
-                    );
+                    return new FilteredItemSelectionController(itemService, clients, conds, stats);
                 }
                 try { return cls.getDeclaredConstructor().newInstance(); }
                 catch (Exception ex) { throw new RuntimeException(ex); }
@@ -202,7 +200,7 @@ public class NewWorkOrderController {
             dlg.setScene(new Scene(root));
             dlg.showAndWait();
 
-            var chosen = loader.<FilteredItemSelectionController>getController().getSelectedItem();
+            Item chosen = loader.<FilteredItemSelectionController>getController().getSelectedItem();
             if (chosen != null) selectedItems.add(chosen);
 
         } catch (Exception ex) {
@@ -211,7 +209,23 @@ public class NewWorkOrderController {
         }
     }
 
-    @FXML private void handleSave() {
+    @FXML
+    private void onDeleteItem() {
+        Item sel = itemsTable.getSelectionModel().getSelectedItem();
+        if (sel != null) {
+            selectedItems.remove(sel);
+        }
+    }
+
+    /** Обработчик WIP-кнопки */
+    @FXML
+    private void onWip() {
+        // TODO: здесь ваша логика пометки выбранных позиций как WIP
+
+    }
+
+    @FXML
+    private void handleSave() {
         User req = requestorComboBox.getValue();
         if (req == null) {
             showError("Validation Error","Select a requestor.");
@@ -231,15 +245,18 @@ public class NewWorkOrderController {
         closeWindow();
     }
 
-    @FXML private void handleCancel() {
+    @FXML
+    private void handleCancel() {
         closeWindow();
     }
+
     private void closeWindow() {
         Stage st = (Stage) numberField.getScene().getWindow();
         st.close();
     }
+
     private void showError(String hdr, String txt) {
-        var a = new Alert(Alert.AlertType.ERROR);
+        Alert a = new Alert(Alert.AlertType.ERROR);
         a.setHeaderText(hdr);
         a.setContentText(txt);
         a.showAndWait();

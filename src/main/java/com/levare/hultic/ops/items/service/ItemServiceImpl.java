@@ -42,6 +42,14 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    public void updateWithJobOrder(Long itemId, Long jobOrderId){
+        Item itemUpdated = getById(itemId);
+        itemUpdated.setJobOrderId(jobOrderId);
+        itemDao.update(itemUpdated);
+    }
+
+
+    @Override
     public void delete(Long id) {
         Item existing = getById(id);
         itemDao.deleteById(existing.getId());

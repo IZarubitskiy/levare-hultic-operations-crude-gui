@@ -45,6 +45,7 @@
             <Button fx:id="repairButton"  text="REPAIR"/>
             <Button fx:id="stockButton"   text="STOCK"/>
             <Button fx:id="rneButton"     text="RNE"/>
+            <Button fx:id="wipButton"        text="WIP"    onAction="#onWip"/>
             <Button fx:id="deleteItemButton" text="DELETE" onAction="#onDeleteItem"/>
         </HBox>
 
@@ -54,8 +55,8 @@
                   prefRowCount="3"/>
 
         <HBox spacing="10" alignment="CENTER_RIGHT">
-            <Button text="Save"   onAction="#handleSave"/>
-            <Button fx:id="cancelButton" text="Cancel" onAction="#handleCancel"/>
+            <Button fx:id="saveButton"    text="Save"   onAction="#handleSave"   />
+            <Button fx:id="cancelButton"  text="Cancel" onAction="#handleCancel" />
         </HBox>
     </children>
 </VBox>

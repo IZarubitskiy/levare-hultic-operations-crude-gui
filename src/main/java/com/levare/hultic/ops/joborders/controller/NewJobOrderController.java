@@ -115,7 +115,8 @@ public class NewJobOrderController {
         jo.setJobOrderType(jobTypeCombo.getValue());
         jo.setComments(commentsArea.getText());
 
-        jobOrderService.create(jo);
+        Long jobOrderId = jobOrderService.create(jo).getId();
+        itemService.updateWithJobOrder(itemId, jobOrderId);
         close();
     }
 
