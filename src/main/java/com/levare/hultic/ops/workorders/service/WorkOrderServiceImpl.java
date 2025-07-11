@@ -40,7 +40,8 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         for (Long itemId : workOrder.getItemsId()) {
             Item item = itemService.getById(itemId);
             if (item.getItemStatus() != ItemStatus.ON_STOCK) {
-                throw new IllegalStateException("Item " + itemId + " is not on stock");
+                System.out.println("Item " + itemId + " is not on stock");
+                throw new IllegalStateException();
             } else {
                 switch (item.getItemCondition()) {
                     case USED -> itemService.updateStatus(item, ItemStatus.REPAIR_BOOKED);

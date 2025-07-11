@@ -50,3 +50,10 @@ CREATE TABLE IF NOT EXISTS work_order_items (
   item_id       INTEGER NOT NULL REFERENCES items(id),
   PRIMARY KEY (work_order_id, item_id)
 );
+
+CREATE TABLE serial_numbers (
+  id             BIGINT       IDENTITY(1,1) NOT NULL,
+  serial_number  NVARCHAR(20) NOT NULL UNIQUE,
+  part_number    NVARCHAR(50) NOT NULL,
+  PRIMARY KEY (id)
+);

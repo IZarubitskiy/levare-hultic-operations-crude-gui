@@ -18,5 +18,12 @@ public enum ItemType {
     SENSOR,
     SUB,
     TUBING,
-    VAPRO
+    VAPRO,
+    THRUST_CHAMBER,
+    HPS_UNIT,
+    M2M_MLE,
+    SWITCHBOARD,
+    TRANSFORMER,
+    VSD,
+    CABLE
 }

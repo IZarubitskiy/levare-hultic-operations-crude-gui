@@ -231,17 +231,23 @@ public class NewWorkOrderController {
             showError("Validation Error","Select a requestor.");
             return;
         }
-        WorkOrder o = new WorkOrder();
-        o.setWorkOrderNumber(numberField.getText().trim());
-        o.setClient(clientComboBox.getValue());
-        o.setWell(wellField.getText().trim());
-        o.setDeliveryDate(deliveryDatePicker.getValue());
-        o.setRequestDate(LocalDate.now());
-        o.setRequestor(req);
-        o.setComments(commentsField.getText().trim());
-        o.setStatus(WorkOrderStatus.CREATED);
-        selectedItems.forEach(it -> o.addItemId(it.getId()));
-        workOrderService.create(o);
+        WorkOrder newWorkOrder = new WorkOrder();
+        newWorkOrder.setWorkOrderNumber(numberField.getText().trim());
+        newWorkOrder.setClient(clientComboBox.getValue());
+        newWorkOrder.setWell(wellField.getText().trim());
+        newWorkOrder.setDeliveryDate(deliveryDatePicker.getValue());
+        newWorkOrder.setRequestDate(LocalDate.now());
+        newWorkOrder.setRequestor(req);
+        newWorkOrder.setComments(commentsField.getText().trim());
+        newWorkOrder.setStatus(WorkOrderStatus.CREATED);
+        selectedItems.forEach(it -> {
+            if(it.getId() == null && it.getItemCondition() == ItemCondition.NEW_ASSEMBLY) {
+                newWorkOrder.addItemId(itemService.create(it).getId());
+            } else {
+                newWorkOrder.addItemId(it.getId());
+            }
+        });
+        workOrderService.create(newWorkOrder);
         closeWindow();
     }
 

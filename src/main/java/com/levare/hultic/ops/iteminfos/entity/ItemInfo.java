@@ -23,5 +23,7 @@ public class ItemInfo {
 
     private List<ItemInfo> analogList = new ArrayList<>();
 
+    private int Series;
+
     private String comments;
 }
