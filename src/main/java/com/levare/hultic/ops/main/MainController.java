@@ -1,14 +1,14 @@
 package com.levare.hultic.ops.main;
 
 import com.levare.hultic.ops.joborders.controller.JobOrderController;
-import com.levare.hultic.ops.users.entity.User;
 import com.levare.hultic.ops.workorders.controller.WorkOrderController;
+import com.levare.hultic.ops.tracking.controller.TrackingRecordController;
+import com.levare.hultic.ops.users.entity.User;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
-import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
@@ -53,6 +53,8 @@ public class MainController {
                             loadWorkOrdersView();
                         } else if ("jobOrdersTab".equals(id)) {
                             loadJobOrdersView();
+                        } else if ("trackingTab".equals(id)) {
+                            loadTrackingRecordsView();
                         }
                     }
                 });
@@ -85,6 +87,25 @@ public class MainController {
             loader.setControllerFactory(controllerFactory);
             Parent root = loader.load();
             JobOrderController ctrl = loader.getController();
+
+            contentArea.getChildren().setAll(root);
+            AnchorPane.setTopAnchor(root, 0.0);
+            AnchorPane.setBottomAnchor(root, 0.0);
+            AnchorPane.setLeftAnchor(root, 0.0);
+            AnchorPane.setRightAnchor(root, 0.0);
+
+            Platform.runLater(ctrl::refreshTable);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadTrackingRecordsView() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/tracking_records.fxml"));
+            loader.setControllerFactory(controllerFactory);
+            Parent root = loader.load();
+            TrackingRecordController ctrl = loader.getController();
 
             contentArea.getChildren().setAll(root);
             AnchorPane.setTopAnchor(root, 0.0);

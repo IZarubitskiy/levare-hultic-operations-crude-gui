@@ -20,7 +20,7 @@
                 <Tab fx:id="rneTab" text="RNE" />
                 <Tab fx:id="stockTab" text="Stock" />
                 <Tab fx:id="corporateTab" text="Corporate" />
-                <Tab fx:id="transactionsTab" text="Transactions" />
+                <Tab fx:id="trackingTab" text="Tracking" />
                 <Tab fx:id="historyTab" text="History" />
                 <Tab fx:id="reportsTab" text="Reports" />
                 <Tab fx:id="settingsTab" text="Settings" />

@@ -5,7 +5,6 @@ package com.levare.hultic.ops.workorders.entity;
  */
 public enum WorkOrderStatus {
     CREATED,
-    APPROVED,
     IN_PROGRESS,
     DONE,
     CANCELLED

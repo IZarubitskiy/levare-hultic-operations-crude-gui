@@ -131,7 +131,9 @@ public class JobOrderController {
     private void deleteSelected() {
         JobOrder sel = jobOrderTable.getSelectionModel().getSelectedItem();
         if (sel != null) {
+            itemService.updateWithJobOrder(sel.getItemId(), null);
             jobOrderService.delete(sel.getId());
+
             refreshTable();
         } else {
             showAlert("No selection", "Please select a job order to delete.");

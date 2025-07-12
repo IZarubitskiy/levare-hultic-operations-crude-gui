@@ -57,3 +57,32 @@ CREATE TABLE IF NOT EXISTS serial_numbers (
   serial_number  NVARCHAR(20) NOT NULL UNIQUE,
   part_number    NVARCHAR(50) NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS tracking_records (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    record_date TEXT    NOT NULL,  -- хранится в формате 'YYYY-MM-DD'
+    action_target TEXT  NOT NULL,  -- одно из значений ActionTarget.name()
+    action_type TEXT    NOT NULL,  -- одно из значений ActionType.name()
+    target_work_order_id INTEGER,  -- nullable, ссылка на work_orders.id
+    target_job_order_id  INTEGER,  -- nullable, ссылка на job_orders.id
+    target_pn            TEXT,     -- part number
+    target_sn            TEXT,     -- serial number
+    target_description   TEXT,     -- описание
+    reason               TEXT      -- причина действия
+);
+
+-- Индексы для ускорения поиска по часто фильтруемым полям
+CREATE INDEX IF NOT EXISTS idx_tracking_date
+    ON tracking_records(record_date);
+
+CREATE INDEX IF NOT EXISTS idx_tracking_target
+    ON tracking_records(action_target);
+
+CREATE INDEX IF NOT EXISTS idx_tracking_action
+    ON tracking_records(action_type);
+
+CREATE INDEX IF NOT EXISTS idx_tracking_wo
+    ON tracking_records(target_work_order_id);
+
+CREATE INDEX IF NOT EXISTS idx_tracking_jo
+    ON tracking_records(target_job_order_id);

@@ -5,6 +5,7 @@ import com.levare.hultic.ops.joborders.controller.JobOrderController;
 import com.levare.hultic.ops.joborders.controller.NewJobOrderController;
 import com.levare.hultic.ops.login.LoginController;
 import com.levare.hultic.ops.main.MainController;
+import com.levare.hultic.ops.tracking.controller.TrackingRecordController;
 import com.levare.hultic.ops.users.controller.UserController;
 import com.levare.hultic.ops.users.entity.User;
 import com.levare.hultic.ops.workorders.controller.NewWorkOrderController;
@@ -73,6 +74,11 @@ public class AppControllerFactory implements Callback<Class<?>, Object> {
             if (controllerClass == UserController.class) {
                 return new UserController(
                         ServiceRegistry.USER_SERVICE
+                );
+            }
+            if (controllerClass == TrackingRecordController.class) {
+                return new TrackingRecordController(
+                        ServiceRegistry.TRACKING_RECORD_SERVICE
                 );
             }
             // fallback

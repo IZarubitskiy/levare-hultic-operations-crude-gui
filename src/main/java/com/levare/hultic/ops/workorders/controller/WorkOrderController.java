@@ -263,6 +263,12 @@ public class WorkOrderController {
     private void deleteWorkOrder() {
         WorkOrder sel = workOrderTable.getSelectionModel().getSelectedItem();
         if (sel == null) { alert("No selection", "Select a work order to delete."); return; }
+        for( Long id: sel.getItemsId()) {
+            if (itemService.getById(id).getJobOrderId() != null) {
+                alert("Job Order presence", "Selected WorkOrder have associated Job Orders.");
+                return;
+            }
+        }
         workOrderService.delete(sel.getId());
         refreshTable(); clearForm();
     }
