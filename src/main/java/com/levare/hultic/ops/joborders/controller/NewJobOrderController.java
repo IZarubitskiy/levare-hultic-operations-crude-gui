@@ -1,14 +1,14 @@
 package com.levare.hultic.ops.joborders.controller;
 
+import com.levare.hultic.ops.items.entity.ItemCondition;
+import com.levare.hultic.ops.items.service.ItemService;
 import com.levare.hultic.ops.joborders.entity.JobOrder;
 import com.levare.hultic.ops.joborders.entity.JobOrderStatus;
 import com.levare.hultic.ops.joborders.entity.JobOrderType;
 import com.levare.hultic.ops.joborders.service.JobOrderService;
-import com.levare.hultic.ops.items.entity.ItemCondition;
-import com.levare.hultic.ops.items.service.ItemService;
-import com.levare.hultic.ops.workorders.entity.Client;
 import com.levare.hultic.ops.users.entity.User;
 import com.levare.hultic.ops.users.service.UserService;
+import com.levare.hultic.ops.workorders.entity.Client;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -20,32 +20,43 @@ import javafx.stage.Stage;
 public class NewJobOrderController {
 
     private final JobOrderService jobOrderService;
-    private final ItemService     itemService;
-    private final UserService     userService;
+    private final ItemService itemService;
+    private final UserService userService;
 
     private Long workOrderId;
     private Long itemId;
 
-    @FXML private TextField partNumberField;
-    @FXML private TextField serialField;
-    @FXML private TextArea  descriptionArea;
-    @FXML private ComboBox<ItemCondition> conditionCombo;
-    @FXML private ComboBox<Client>        ownerCombo;
-    @FXML private ComboBox<JobOrderType>  jobTypeCombo;
-    @FXML private ComboBox<User>          responsibleCombo;
-    @FXML private Button availableStockButton;
-    @FXML private Button saveButton;
-    @FXML private Button cancelButton;
-    @FXML private TextArea commentsArea;
+    @FXML
+    private TextField partNumberField;
+    @FXML
+    private TextField serialField;
+    @FXML
+    private TextArea descriptionArea;
+    @FXML
+    private ComboBox<ItemCondition> conditionCombo;
+    @FXML
+    private ComboBox<Client> ownerCombo;
+    @FXML
+    private ComboBox<JobOrderType> jobTypeCombo;
+    @FXML
+    private ComboBox<User> responsibleCombo;
+    @FXML
+    private Button availableStockButton;
+    @FXML
+    private Button saveButton;
+    @FXML
+    private Button cancelButton;
+    @FXML
+    private TextArea commentsArea;
 
     public NewJobOrderController(
             JobOrderService jobOrderService,
-            ItemService     itemService,
-            UserService     userService
+            ItemService itemService,
+            UserService userService
     ) {
         this.jobOrderService = jobOrderService;
-        this.itemService     = itemService;
-        this.userService     = userService;
+        this.itemService = itemService;
+        this.userService = userService;
     }
 
     /**
@@ -53,7 +64,7 @@ public class NewJobOrderController {
      */
     public void initForWorkAndItem(Long workOrderId, Long itemId) {
         this.workOrderId = workOrderId;
-        this.itemId      = itemId;
+        this.itemId = itemId;
 
         var item = itemService.getById(itemId);
         partNumberField.setText(item.getItemInfo().getPartNumber());

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.levare.hultic.ops.main.MainController"
@@ -14,16 +14,16 @@
                  tabClosingPolicy="UNAVAILABLE"
                  style="-fx-background-color: #f8f9fa; -fx-border-color: #dee2e6;">
             <tabs>
-                <Tab fx:id="workOrdersTab" text="WorkOrders" />
-                <Tab fx:id="jobOrdersTab" text="JobOrders" />
-                <Tab fx:id="outstandingTab" text="Outstanding" />
-                <Tab fx:id="rneTab" text="RNE" />
-                <Tab fx:id="stockTab" text="Stock" />
-                <Tab fx:id="corporateTab" text="Corporate" />
-                <Tab fx:id="trackingTab" text="Tracking" />
-                <Tab fx:id="historyTab" text="History" />
-                <Tab fx:id="reportsTab" text="Reports" />
-                <Tab fx:id="settingsTab" text="Settings" />
+                <Tab fx:id="workOrdersTab" text="WorkOrders"/>
+                <Tab fx:id="jobOrdersTab" text="JobOrders"/>
+                <Tab fx:id="outstandingTab" text="Outstanding"/>
+                <Tab fx:id="rneTab" text="RNE"/>
+                <Tab fx:id="stockTab" text="Stock"/>
+                <Tab fx:id="corporateTab" text="Corporate"/>
+                <Tab fx:id="trackingTab" text="Tracking"/>
+                <Tab fx:id="historyTab" text="History"/>
+                <Tab fx:id="reportsTab" text="Reports"/>
+                <Tab fx:id="settingsTab" text="Settings"/>
             </tabs>
         </TabPane>
     </top>
@@ -41,7 +41,7 @@
                        layoutX="10"
                        layoutY="10"
                        text="Welcome, [user]"
-                       style="-fx-font-size: 14px; -fx-text-fill: #495057;" />
+                       style="-fx-font-size: 14px; -fx-text-fill: #495057;"/>
             </children>
         </AnchorPane>
     </bottom>

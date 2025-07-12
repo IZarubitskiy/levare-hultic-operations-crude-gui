@@ -16,7 +16,9 @@ public class AppControllerFactory implements Callback<Class<?>, Object> {
 
     private User currentUser;
 
-    /** Called by LoginController after successful login */
+    /**
+     * Called by LoginController after successful login
+     */
     public void setCurrentUser(User user) {
         this.currentUser = user;
     }

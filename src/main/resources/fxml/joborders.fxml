@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.geometry.Insets?>
-<?import javafx.geometry.Pos?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
 
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       spacing="15" alignment="TOP_LEFT"
@@ -11,30 +10,30 @@
       fx:controller="com.levare.hultic.ops.joborders.controller.JobOrderController">
 
     <!-- Заголовок -->
-    <Label text="Job Orders" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
+    <Label text="Job Orders" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
 
     <!-- Фильтр по статусу -->
     <HBox spacing="10" alignment="CENTER_LEFT">
-        <Label text="Status:" />
-        <ComboBox fx:id="statusFilterCombo" promptText="All statuses" />
-        <Button fx:id="refreshButton" text="Refresh" />
-        <Button fx:id="createButton"  text="New" />
-        <Button fx:id="updateButton"  text="Update" />
-        <Button fx:id="deleteButton"  text="Delete" />
+        <Label text="Status:"/>
+        <ComboBox fx:id="statusFilterCombo" promptText="All statuses"/>
+        <Button fx:id="refreshButton" text="Refresh"/>
+        <Button fx:id="createButton" text="New"/>
+        <Button fx:id="updateButton" text="Update"/>
+        <Button fx:id="deleteButton" text="Delete"/>
     </HBox>
 
     <!-- Таблица JobOrder -->
     <TableView fx:id="jobOrderTable" VBox.vgrow="ALWAYS">
         <columns>
-            <TableColumn fx:id="idColumn"           text="ID"            prefWidth="60" />
-            <TableColumn fx:id="partNumberColumn"   text="Part Number"  prefWidth="120" />
-            <TableColumn fx:id="serialColumn"       text="Serial #"     prefWidth="100" />
-            <TableColumn fx:id="descriptionColumn"  text="Description"  prefWidth="150" />
-            <TableColumn fx:id="clientColumn"       text="Client"       prefWidth="100" />
-            <TableColumn fx:id="statusColumn"       text="Status"       prefWidth="100" />
-            <TableColumn fx:id="responsibleColumn"  text="Responsible"  prefWidth="120" />
-            <TableColumn fx:id="deliveryColumn"     text="Planned Delivery" prefWidth="120" />
-            <TableColumn fx:id="commentsColumn"     text="Comments"     prefWidth="150" />
+            <TableColumn fx:id="idColumn" text="ID" prefWidth="60"/>
+            <TableColumn fx:id="partNumberColumn" text="Part Number" prefWidth="120"/>
+            <TableColumn fx:id="serialColumn" text="Serial #" prefWidth="100"/>
+            <TableColumn fx:id="descriptionColumn" text="Description" prefWidth="150"/>
+            <TableColumn fx:id="clientColumn" text="Client" prefWidth="100"/>
+            <TableColumn fx:id="statusColumn" text="Status" prefWidth="100"/>
+            <TableColumn fx:id="responsibleColumn" text="Responsible" prefWidth="120"/>
+            <TableColumn fx:id="deliveryColumn" text="Planned Delivery" prefWidth="120"/>
+            <TableColumn fx:id="commentsColumn" text="Comments" prefWidth="150"/>
         </columns>
     </TableView>
 

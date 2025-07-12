@@ -1,8 +1,8 @@
 package com.levare.hultic.ops.tracking.controller;
 
-import com.levare.hultic.ops.tracking.model.TrackingRecord;
 import com.levare.hultic.ops.tracking.model.ActionTarget;
 import com.levare.hultic.ops.tracking.model.ActionType;
+import com.levare.hultic.ops.tracking.model.TrackingRecord;
 import com.levare.hultic.ops.tracking.service.TrackingRecordService;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
@@ -21,23 +21,39 @@ public class TrackingRecordController {
         this.trackingService = trackingService;
     }
 
-    @FXML private TableView<TrackingRecord> trackingTable;
-    @FXML private TableColumn<TrackingRecord, Long>       idColumn;
-    @FXML private TableColumn<TrackingRecord, LocalDate>  dateColumn;
-    @FXML private TableColumn<TrackingRecord, ActionTarget> targetColumn;
-    @FXML private TableColumn<TrackingRecord, ActionType>   typeColumn;
-    @FXML private TableColumn<TrackingRecord, Long>       woColumn;
-    @FXML private TableColumn<TrackingRecord, Long>       joColumn;
-    @FXML private TableColumn<TrackingRecord, String>     pnColumn;
-    @FXML private TableColumn<TrackingRecord, String>     snColumn;
-    @FXML private TableColumn<TrackingRecord, String>     descColumn;
-    @FXML private TableColumn<TrackingRecord, String>     reasonColumn;
+    @FXML
+    private TableView<TrackingRecord> trackingTable;
+    @FXML
+    private TableColumn<TrackingRecord, Long> idColumn;
+    @FXML
+    private TableColumn<TrackingRecord, LocalDate> dateColumn;
+    @FXML
+    private TableColumn<TrackingRecord, ActionTarget> targetColumn;
+    @FXML
+    private TableColumn<TrackingRecord, ActionType> typeColumn;
+    @FXML
+    private TableColumn<TrackingRecord, Long> woColumn;
+    @FXML
+    private TableColumn<TrackingRecord, Long> joColumn;
+    @FXML
+    private TableColumn<TrackingRecord, String> pnColumn;
+    @FXML
+    private TableColumn<TrackingRecord, String> snColumn;
+    @FXML
+    private TableColumn<TrackingRecord, String> descColumn;
+    @FXML
+    private TableColumn<TrackingRecord, String> reasonColumn;
 
-    @FXML private DatePicker       fromDatePicker, toDatePicker;
-    @FXML private ComboBox<ActionTarget> targetFilterCombo;
-    @FXML private ComboBox<ActionType>   typeFilterCombo;
-    @FXML private TextField      workOrderField, jobOrderField, pnField, snField;
-    @FXML private Button searchButton, clearButton;
+    @FXML
+    private DatePicker fromDatePicker, toDatePicker;
+    @FXML
+    private ComboBox<ActionTarget> targetFilterCombo;
+    @FXML
+    private ComboBox<ActionType> typeFilterCombo;
+    @FXML
+    private TextField workOrderField, jobOrderField, pnField, snField;
+    @FXML
+    private Button searchButton, clearButton;
 
     @FXML
     public void initialize() {
@@ -76,9 +92,9 @@ public class TrackingRecordController {
 
     public void refreshTable() {
         LocalDate from = fromDatePicker.getValue();
-        LocalDate to   = toDatePicker.getValue();
+        LocalDate to = toDatePicker.getValue();
         ActionTarget at = targetFilterCombo.getValue();
-        ActionType   ty = typeFilterCombo.getValue();
+        ActionType ty = typeFilterCombo.getValue();
 
         Long wo = parseLong(workOrderField.getText());
         Long jo = parseLong(jobOrderField.getText());

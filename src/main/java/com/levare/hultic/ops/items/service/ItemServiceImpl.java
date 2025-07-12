@@ -45,7 +45,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public void updateWithJobOrder(Long itemId, Long jobOrderId){
+    public void updateWithJobOrder(Long itemId, Long jobOrderId) {
         Item itemUpdated = getById(itemId);
         itemUpdated.setJobOrderId(jobOrderId);
         itemDao.update(itemUpdated);
@@ -111,8 +111,8 @@ public class ItemServiceImpl implements ItemService {
         return existing;
     }
 
-    public String generateSerialNumber (Item item){
-        if (item.getItemStatus() == ItemStatus.NEW_ASSEMBLY_BOOKED && item.getItemCondition() == ItemCondition.NEW_ASSEMBLY){
+    public String generateSerialNumber(Item item) {
+        if (item.getItemStatus() == ItemStatus.NEW_ASSEMBLY_BOOKED && item.getItemCondition() == ItemCondition.NEW_ASSEMBLY) {
             StringBuilder sn = new StringBuilder(11);
             switch (item.getItemInfo().getItemType()) {
                 case MOTOR -> sn.append("1");
@@ -132,7 +132,7 @@ public class ItemServiceImpl implements ItemService {
                 default -> throw new IllegalStateException(
                         "Unexpected item type : " + item.getItemInfo().getItemType());
             }
-            switch (item.getItemInfo().getSeries()){
+            switch (item.getItemInfo().getSeries()) {
                 case 338 -> sn.append("A");
                 case 338375 -> sn.append("B");
                 case 375 -> sn.append("C");
@@ -175,11 +175,11 @@ public class ItemServiceImpl implements ItemService {
             }
 
             String number = Long.toString(serialNumberDao.getNextId());
-            switch (number.length()){
-                case 1 ->sn.append("0000");
-                case 2 ->sn.append("000");
-                case 3 ->sn.append("00");
-                case 4 ->sn.append("0");
+            switch (number.length()) {
+                case 1 -> sn.append("0000");
+                case 2 -> sn.append("000");
+                case 3 -> sn.append("00");
+                case 4 -> sn.append("0");
             }
 
             sn.append(number);
@@ -187,7 +187,7 @@ public class ItemServiceImpl implements ItemService {
             return sn.toString();
 
         } else {
-            throw new IllegalStateException( "Unexpected item condition: " + item.getItemCondition());
+            throw new IllegalStateException("Unexpected item condition: " + item.getItemCondition());
         }
 
     }

@@ -120,7 +120,7 @@ public class WorkOrderDao {
         }
     }
 
-    public void insert(WorkOrder order) {
+    public WorkOrder insert(WorkOrder order) {
         String sql = """
                 INSERT INTO work_orders
                   (work_order_number, client, well,
@@ -147,12 +147,13 @@ public class WorkOrderDao {
             }
             // Insert associations in join table
             saveItemLinks(order);
+            return order;
         } catch (SQLException e) {
             throw new RuntimeException("Error inserting WorkOrder", e);
         }
     }
 
-    public void update(WorkOrder order) {
+    public WorkOrder update(WorkOrder order) {
         String sql = """
                 UPDATE work_orders SET
                   work_order_number = ?,
@@ -179,6 +180,7 @@ public class WorkOrderDao {
             // Refresh join table links
             clearItemLinks(order.getId());
             saveItemLinks(order);
+            return order;
         } catch (SQLException e) {
             throw new RuntimeException("Error updating WorkOrder id=" + order.getId(), e);
         }

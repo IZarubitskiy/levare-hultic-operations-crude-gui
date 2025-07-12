@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
 
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 <VBox xmlns="http://javafx.com/javafx/21"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.levare.hultic.ops.workorders.controller.NewWorkOrderController"
@@ -29,23 +29,23 @@
         <Label text="Items"/>
         <TableView fx:id="itemsTable" prefHeight="200" VBox.vgrow="ALWAYS">
             <columns>
-                <TableColumn fx:id="partNumberColumn"   text="Part Number"   prefWidth="120"/>
-                <TableColumn fx:id="descriptionColumn"  text="Description"   prefWidth="180"/>
+                <TableColumn fx:id="partNumberColumn" text="Part Number" prefWidth="120"/>
+                <TableColumn fx:id="descriptionColumn" text="Description" prefWidth="180"/>
                 <TableColumn fx:id="serialNumberColumn" text="Serial Number" prefWidth="120"/>
-                <TableColumn fx:id="ownershipColumn"    text="Ownership"     prefWidth="120"/>
-                <TableColumn fx:id="conditionColumn"    text="Condition"     prefWidth="120"/>
-                <TableColumn fx:id="statusColumn"       text="Status"        prefWidth="100"/>
-                <TableColumn fx:id="jobOrderColumn"     text="Job Order"     prefWidth="120"/>
-                <TableColumn fx:id="commentsColumn"     text="Comments"      prefWidth="180"/>
+                <TableColumn fx:id="ownershipColumn" text="Ownership" prefWidth="120"/>
+                <TableColumn fx:id="conditionColumn" text="Condition" prefWidth="120"/>
+                <TableColumn fx:id="statusColumn" text="Status" prefWidth="100"/>
+                <TableColumn fx:id="jobOrderColumn" text="Job Order" prefWidth="120"/>
+                <TableColumn fx:id="commentsColumn" text="Comments" prefWidth="180"/>
             </columns>
         </TableView>
 
         <HBox spacing="10" alignment="CENTER_LEFT">
             <Button fx:id="newItemButton" text="NEW" onAction="#onNewItem"/>
-            <Button fx:id="repairButton"  text="REPAIR"/>
-            <Button fx:id="stockButton"   text="STOCK"/>
-            <Button fx:id="rneButton"     text="RNE"/>
-            <Button fx:id="wipButton"        text="WIP"    onAction="#onWip"/>
+            <Button fx:id="repairButton" text="REPAIR"/>
+            <Button fx:id="stockButton" text="STOCK"/>
+            <Button fx:id="rneButton" text="RNE"/>
+            <Button fx:id="wipButton" text="WIP" onAction="#onWip"/>
             <Button fx:id="deleteItemButton" text="DELETE" onAction="#onDeleteItem"/>
         </HBox>
 
@@ -55,8 +55,8 @@
                   prefRowCount="3"/>
 
         <HBox spacing="10" alignment="CENTER_RIGHT">
-            <Button fx:id="saveButton"    text="Save"   onAction="#handleSave"   />
-            <Button fx:id="cancelButton"  text="Cancel" onAction="#handleCancel" />
+            <Button fx:id="saveButton" text="Save" onAction="#handleSave"/>
+            <Button fx:id="cancelButton" text="Cancel" onAction="#handleCancel"/>
         </HBox>
     </children>
 </VBox>

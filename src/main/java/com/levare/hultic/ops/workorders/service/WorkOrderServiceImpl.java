@@ -3,6 +3,8 @@ package com.levare.hultic.ops.workorders.service;
 import com.levare.hultic.ops.items.entity.Item;
 import com.levare.hultic.ops.items.entity.ItemStatus;
 import com.levare.hultic.ops.items.service.ItemService;
+import com.levare.hultic.ops.tracking.model.ActionType;
+import com.levare.hultic.ops.tracking.service.TrackingRecordService;
 import com.levare.hultic.ops.users.entity.User;
 import com.levare.hultic.ops.users.service.UserService;
 import com.levare.hultic.ops.workorders.dao.WorkOrderDao;
@@ -19,15 +21,18 @@ import java.util.List;
 public class WorkOrderServiceImpl implements WorkOrderService {
 
     private final WorkOrderDao workOrderDao;
-    private final ItemService   itemService;
-    private final UserService   userService;
+    private final ItemService itemService;
+    private final UserService userService;
+    private final TrackingRecordService trackingRecordService;
 
     public WorkOrderServiceImpl(WorkOrderDao workOrderDao,
                                 UserService userService,
-                                ItemService itemService) {
+                                ItemService itemService,
+                                TrackingRecordService trackingRecordService) {
         this.workOrderDao = workOrderDao;
-        this.userService  = userService;
-        this.itemService  = itemService;
+        this.userService = userService;
+        this.itemService = itemService;
+        this.trackingRecordService = trackingRecordService;
     }
 
     @Override
@@ -46,15 +51,14 @@ public class WorkOrderServiceImpl implements WorkOrderService {
                 switch (item.getItemCondition()) {
                     case USED -> itemService.updateStatus(item, ItemStatus.REPAIR_BOOKED);
                     case NEW, REPAIRED -> itemService.updateStatus(item, ItemStatus.STOCK_BOOKED);
-                    case NEW_ASSEMBLY -> itemService.updateStatus(item, ItemStatus.NEW_ASSEMBLY_BOOKED) ;
+                    case NEW_ASSEMBLY -> itemService.updateStatus(item, ItemStatus.NEW_ASSEMBLY_BOOKED);
                     default -> throw new IllegalStateException(
                             "Unexpected item condition: " + item.getItemCondition());
                 }
             }
         }
 
-        // Persist work order (DAO handles item links and requestor ID)
-        workOrderDao.insert(workOrder);
+        trackingRecordService.workOrderTracking(workOrderDao.insert(workOrder), ActionType.CREATION, "new WO created");
         return workOrder;
     }
 

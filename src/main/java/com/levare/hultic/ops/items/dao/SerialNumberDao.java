@@ -19,9 +19,9 @@ public class SerialNumberDao {
      */
     public long getNextId() {
         String sql = """
-            SELECT COALESCE(MAX(id), 0) + 1
-              FROM serial_numbers
-        """;
+                    SELECT COALESCE(MAX(id), 0) + 1
+                      FROM serial_numbers
+                """;
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             if (rs.next()) {
@@ -38,9 +38,9 @@ public class SerialNumberDao {
      */
     public void insert(String serialNumber, String partNumber) {
         String sql = """
-            INSERT INTO serial_numbers (serial_number, part_number)
-            VALUES (?, ?)
-        """;
+                    INSERT INTO serial_numbers (serial_number, part_number)
+                    VALUES (?, ?)
+                """;
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, serialNumber);
             ps.setString(2, partNumber);

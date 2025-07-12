@@ -2,10 +2,8 @@ package com.levare.hultic.ops.joborders.controller;
 
 import com.levare.hultic.ops.items.controller.FilteredItemSelectionController;
 import com.levare.hultic.ops.items.entity.Item;
-import com.levare.hultic.ops.items.entity.ItemCondition;
 import com.levare.hultic.ops.items.entity.ItemStatus;
 import com.levare.hultic.ops.items.service.ItemService;
-import com.levare.hultic.ops.joborders.controller.NewJobOrderController;
 import com.levare.hultic.ops.joborders.entity.JobOrder;
 import com.levare.hultic.ops.joborders.entity.JobOrderStatus;
 import com.levare.hultic.ops.joborders.service.JobOrderService;
@@ -35,28 +33,43 @@ import java.util.List;
 public class JobOrderController {
 
 
-    private final JobOrderService               jobOrderService;
-    private final UserService                   userService;
-    private final ItemService                   itemService;
-    private final WorkOrderService              workOrderService;
-    private final Callback<Class<?>, Object>    controllerFactory;
+    private final JobOrderService jobOrderService;
+    private final UserService userService;
+    private final ItemService itemService;
+    private final WorkOrderService workOrderService;
+    private final Callback<Class<?>, Object> controllerFactory;
 
-    @FXML private TableView<JobOrder>                         jobOrderTable;
-    @FXML private TableColumn<JobOrder, Long>                 idColumn;
-    @FXML private TableColumn<JobOrder, String>               partNumberColumn;
-    @FXML private TableColumn<JobOrder, String>               serialColumn;
-    @FXML private TableColumn<JobOrder, String>               descriptionColumn;
-    @FXML private TableColumn<JobOrder, String>               clientColumn;
-    @FXML private TableColumn<JobOrder, JobOrderStatus>       statusColumn;
-    @FXML private TableColumn<JobOrder, String>               responsibleColumn;
-    @FXML private TableColumn<JobOrder, LocalDate>            deliveryColumn;
-    @FXML private TableColumn<JobOrder, String>               commentsColumn;
+    @FXML
+    private TableView<JobOrder> jobOrderTable;
+    @FXML
+    private TableColumn<JobOrder, Long> idColumn;
+    @FXML
+    private TableColumn<JobOrder, String> partNumberColumn;
+    @FXML
+    private TableColumn<JobOrder, String> serialColumn;
+    @FXML
+    private TableColumn<JobOrder, String> descriptionColumn;
+    @FXML
+    private TableColumn<JobOrder, String> clientColumn;
+    @FXML
+    private TableColumn<JobOrder, JobOrderStatus> statusColumn;
+    @FXML
+    private TableColumn<JobOrder, String> responsibleColumn;
+    @FXML
+    private TableColumn<JobOrder, LocalDate> deliveryColumn;
+    @FXML
+    private TableColumn<JobOrder, String> commentsColumn;
 
-    @FXML private ComboBox<JobOrderStatus>                    statusFilterCombo;
-    @FXML private Button                                      refreshButton;
-    @FXML private Button                                      deleteButton;
-    @FXML private Button                                      createButton;
-    @FXML private Button                                      updateButton;
+    @FXML
+    private ComboBox<JobOrderStatus> statusFilterCombo;
+    @FXML
+    private Button refreshButton;
+    @FXML
+    private Button deleteButton;
+    @FXML
+    private Button createButton;
+    @FXML
+    private Button updateButton;
 
     @FXML
     public void initialize() {
@@ -81,7 +94,7 @@ public class JobOrderController {
 
         // 3) Client и Planned Delivery (через workOrderService)
         clientColumn.setCellValueFactory(c -> {
-            Item it = itemService.getById(c.getValue().getItemId());;
+            Item it = itemService.getById(c.getValue().getItemId());
             return new SimpleStringProperty(it.getOwnership().name());
         });
         deliveryColumn.setCellValueFactory(c -> {
@@ -101,7 +114,7 @@ public class JobOrderController {
         // 5) Responsible
         responsibleColumn.setCellValueFactory(c -> {
             User u = c.getValue().getResponsibleUser();
-            return new SimpleStringProperty(u!=null ? u.getName() : "");
+            return new SimpleStringProperty(u != null ? u.getName() : "");
         });
 
         // 6) Comments
@@ -111,10 +124,10 @@ public class JobOrderController {
 
         // Фильтрация и кнопки
         statusFilterCombo.setItems(FXCollections.observableArrayList(JobOrderStatus.values()));
-        refreshButton .setOnAction(e -> refreshTable());
-        deleteButton  .setOnAction(e -> deleteSelected());
-        createButton  .setOnAction(e -> createNew());
-        updateButton  .setOnAction(e -> updateSelected());
+        refreshButton.setOnAction(e -> refreshTable());
+        deleteButton.setOnAction(e -> deleteSelected());
+        createButton.setOnAction(e -> createNew());
+        updateButton.setOnAction(e -> updateSelected());
 
         // Первая загрузка
         refreshTable();

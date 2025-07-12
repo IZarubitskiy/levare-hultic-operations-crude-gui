@@ -80,7 +80,7 @@ public class JobOrderDao {
     /**
      * Insert a new JobOrder
      */
-    public void insert(JobOrder jobOrder) {
+    public JobOrder insert(JobOrder jobOrder) {
         String sql = "INSERT INTO job_orders (work_order_id, item_id, status, responsible_user_id, comments) " +
                 "VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -100,6 +100,7 @@ public class JobOrderDao {
                     jobOrder.setId(keys.getLong(1));
                 }
             }
+            return jobOrder;
         } catch (SQLException e) {
             throw new RuntimeException("Error inserting JobOrder", e);
         }

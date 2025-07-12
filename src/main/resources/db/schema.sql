@@ -63,6 +63,7 @@ CREATE TABLE IF NOT EXISTS tracking_records (
     record_date TEXT    NOT NULL,  -- хранится в формате 'YYYY-MM-DD'
     action_target TEXT  NOT NULL,  -- одно из значений ActionTarget.name()
     action_type TEXT    NOT NULL,  -- одно из значений ActionType.name()
+    client TEXT,
     target_work_order_id INTEGER,  -- nullable, ссылка на work_orders.id
     target_job_order_id  INTEGER,  -- nullable, ссылка на job_orders.id
     target_pn            TEXT,     -- part number

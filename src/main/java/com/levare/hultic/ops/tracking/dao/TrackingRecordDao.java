@@ -1,8 +1,9 @@
 package com.levare.hultic.ops.tracking.dao;
 
-import com.levare.hultic.ops.tracking.model.TrackingRecord;
 import com.levare.hultic.ops.tracking.model.ActionTarget;
 import com.levare.hultic.ops.tracking.model.ActionType;
+import com.levare.hultic.ops.tracking.model.TrackingRecord;
+import com.levare.hultic.ops.workorders.entity.Client;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -18,12 +19,12 @@ public class TrackingRecordDao {
 
     public TrackingRecord insert(TrackingRecord record) {
         String sql = """
-            INSERT INTO tracking_records
-                (record_date, action_target, action_type,
-                 target_work_order_id, target_job_order_id,
-                 target_pn, target_sn, target_description, reason)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """;
+                INSERT INTO tracking_records
+                    (record_date, action_target, action_type,
+                     target_work_order_id, target_job_order_id,
+                     target_pn, target_sn, target_description, reason)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """;
         try (PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setDate(1, Date.valueOf(record.getRecordDate()));
             ps.setString(2, record.getActionTarget().name());
@@ -83,9 +84,9 @@ public class TrackingRecordDao {
     ) {
         // Построим динамический WHERE
         StringBuilder sql = new StringBuilder("""
-            SELECT * FROM tracking_records
-            WHERE 1=1
-            """);
+                SELECT * FROM tracking_records
+                WHERE 1=1
+                """);
         List<Object> params = new ArrayList<>();
 
         if (from != null) {
@@ -143,6 +144,7 @@ public class TrackingRecordDao {
                 rs.getDate("record_date").toLocalDate(),
                 ActionTarget.valueOf(rs.getString("action_target")),
                 ActionType.valueOf(rs.getString("action_type")),
+                Client.valueOf(rs.getString("client")),
                 rs.getObject("target_work_order_id", Long.class),
                 rs.getObject("target_job_order_id", Long.class),
                 rs.getString("target_pn"),

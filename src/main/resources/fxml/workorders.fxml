@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.input.ContextMenuEvent?>
-<?import javafx.stage.*?>
-<?import javafx.util.Callback?>
 
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 <SplitPane xmlns="http://javafx.com/javafx"
            xmlns:fx="http://javafx.com/fxml"
            fx:controller="com.levare.hultic.ops.workorders.controller.WorkOrderController"
@@ -18,39 +13,45 @@
             <VBox spacing="10">
                 <GridPane hgap="10" vgap="8">
                     <columnConstraints>
-                        <ColumnConstraints halignment="RIGHT" />
-                        <ColumnConstraints hgrow="ALWAYS" />
+                        <ColumnConstraints halignment="RIGHT"/>
+                        <ColumnConstraints hgrow="ALWAYS"/>
                     </columnConstraints>
-                    <Label text="Work Order №:" style="-fx-font-weight: bold" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                    <Label text="Work Order №:" style="-fx-font-weight: bold" GridPane.rowIndex="0"
+                           GridPane.columnIndex="0"/>
                     <Label fx:id="detailNumberLabel" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
                     <Label text="Client:" style="-fx-font-weight: bold" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
                     <Label fx:id="detailClientLabel" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
                     <Label text="Well:" style="-fx-font-weight: bold" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
                     <Label fx:id="detailWellLabel" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
-                    <Label text="Request Date:" style="-fx-font-weight: bold" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                    <Label text="Request Date:" style="-fx-font-weight: bold" GridPane.rowIndex="3"
+                           GridPane.columnIndex="0"/>
                     <Label fx:id="detailRequestDateLabel" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
-                    <Label text="Delivery Date:" style="-fx-font-weight: bold" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                    <Label text="Delivery Date:" style="-fx-font-weight: bold" GridPane.rowIndex="4"
+                           GridPane.columnIndex="0"/>
                     <Label fx:id="detailDeliveryDateLabel" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
                     <Label text="Status:" style="-fx-font-weight: bold" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
                     <Label fx:id="detailStatusLabel" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
-                    <Label text="Requestor:" style="-fx-font-weight: bold" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
+                    <Label text="Requestor:" style="-fx-font-weight: bold" GridPane.rowIndex="6"
+                           GridPane.columnIndex="0"/>
                     <Label fx:id="detailRequestorLabel" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
-                    <Label text="Comments:" style="-fx-font-weight: bold" GridPane.rowIndex="7" GridPane.columnIndex="0" GridPane.valignment="TOP"/>
-                    <TextArea fx:id="detailCommentsArea" prefRowCount="2" wrapText="true" editable="false" GridPane.rowIndex="7" GridPane.columnIndex="1"/>
+                    <Label text="Comments:" style="-fx-font-weight: bold" GridPane.rowIndex="7" GridPane.columnIndex="0"
+                           GridPane.valignment="TOP"/>
+                    <TextArea fx:id="detailCommentsArea" prefRowCount="2" wrapText="true" editable="false"
+                              GridPane.rowIndex="7" GridPane.columnIndex="1"/>
                 </GridPane>
             </VBox>
             <VBox spacing="5" HBox.hgrow="ALWAYS">
                 <Label text="Equipment" style="-fx-font-size: 14px; -fx-font-weight: bold;"/>
                 <TableView fx:id="equipmentTable" VBox.vgrow="ALWAYS">
                     <columns>
-                        <TableColumn fx:id="eqPartColumn"      text="Part Number"   prefWidth="100"/>
-                        <TableColumn fx:id="eqDescColumn"      text="Description"   prefWidth="150"/>
-                        <TableColumn fx:id="eqSerialColumn"    text="Serial #"      prefWidth="100"/>
-                        <TableColumn fx:id="eqConditionColumn" text="Condition"     prefWidth="100"/>
-                        <TableColumn fx:id="eqStatusColumn"    text="Status"        prefWidth="100"/>
-                        <TableColumn fx:id="eqJobOrderColumn"  text="Job Order"     prefWidth="80"/>
+                        <TableColumn fx:id="eqPartColumn" text="Part Number" prefWidth="100"/>
+                        <TableColumn fx:id="eqDescColumn" text="Description" prefWidth="150"/>
+                        <TableColumn fx:id="eqSerialColumn" text="Serial #" prefWidth="100"/>
+                        <TableColumn fx:id="eqConditionColumn" text="Condition" prefWidth="100"/>
+                        <TableColumn fx:id="eqStatusColumn" text="Status" prefWidth="100"/>
+                        <TableColumn fx:id="eqJobOrderColumn" text="Job Order" prefWidth="80"/>
                         <!-- Column with Assign button -->
-                        <TableColumn fx:id="assignColumn"      text="Assign"        prefWidth="80"/>
+                        <TableColumn fx:id="assignColumn" text="Assign" prefWidth="80"/>
                     </columns>
                 </TableView>
             </VBox>
@@ -62,22 +63,22 @@
                 <Label text="Status:"/>
                 <ComboBox fx:id="statusFilterCombo" promptText="All statuses" prefWidth="200"/>
                 <Button fx:id="refreshButton" text="Refresh"/>
-                <Button fx:id="createButton"  text="New"/>
-                <Button fx:id="updateButton"  text="Update"/>
-                <Button fx:id="deleteButton"  text="Delete"/>
-                <Button fx:id="clearButton"   text="Clear"/>
+                <Button fx:id="createButton" text="New"/>
+                <Button fx:id="updateButton" text="Update"/>
+                <Button fx:id="deleteButton" text="Delete"/>
+                <Button fx:id="clearButton" text="Clear"/>
             </HBox>
             <TableView fx:id="workOrderTable" VBox.vgrow="ALWAYS">
                 <columns>
-                    <TableColumn fx:id="idColumn"           text="ID"            prefWidth="50"/>
-                    <TableColumn fx:id="numberColumn"       text="WO Number"    prefWidth="120"/>
-                    <TableColumn fx:id="clientColumn"       text="Client"       prefWidth="100"/>
-                    <TableColumn fx:id="wellColumn"         text="Well"         prefWidth="100"/>
-                    <TableColumn fx:id="requestDateColumn"  text="Req. Date"    prefWidth="100"/>
-                    <TableColumn fx:id="deliveryDateColumn" text="Deliv. Date"  prefWidth="100"/>
-                    <TableColumn fx:id="statusColumn"       text="Status"       prefWidth="100"/>
-                    <TableColumn fx:id="requestorColumn"    text="Requestor"    prefWidth="120"/>
-                    <TableColumn fx:id="commentsColumn"     text="Comments"     prefWidth="150"/>
+                    <TableColumn fx:id="idColumn" text="ID" prefWidth="50"/>
+                    <TableColumn fx:id="numberColumn" text="WO Number" prefWidth="120"/>
+                    <TableColumn fx:id="clientColumn" text="Client" prefWidth="100"/>
+                    <TableColumn fx:id="wellColumn" text="Well" prefWidth="100"/>
+                    <TableColumn fx:id="requestDateColumn" text="Req. Date" prefWidth="100"/>
+                    <TableColumn fx:id="deliveryDateColumn" text="Deliv. Date" prefWidth="100"/>
+                    <TableColumn fx:id="statusColumn" text="Status" prefWidth="100"/>
+                    <TableColumn fx:id="requestorColumn" text="Requestor" prefWidth="120"/>
+                    <TableColumn fx:id="commentsColumn" text="Comments" prefWidth="150"/>
                 </columns>
             </TableView>
         </VBox>

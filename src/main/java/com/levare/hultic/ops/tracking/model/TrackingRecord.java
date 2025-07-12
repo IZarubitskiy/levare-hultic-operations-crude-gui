@@ -1,5 +1,6 @@
 package com.levare.hultic.ops.tracking.model;
 
+import com.levare.hultic.ops.workorders.entity.Client;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,10 +16,11 @@ public class TrackingRecord {
     private LocalDate recordDate;
     private ActionTarget actionTarget;
     private ActionType actionType;
+    private Client client;
     private Long targetWorkOrderId;
     private Long targetJobOrderId;
     private String targetPN;
     private String targetSN;
     private String targetDescription;
     private String reason;
-    }
+}

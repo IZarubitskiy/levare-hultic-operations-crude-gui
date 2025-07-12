@@ -3,11 +3,11 @@ package com.levare.hultic.ops.workorders.controller;
 import com.levare.hultic.ops.items.entity.Item;
 import com.levare.hultic.ops.items.service.ItemService;
 import com.levare.hultic.ops.joborders.controller.NewJobOrderController;
+import com.levare.hultic.ops.users.entity.User;
+import com.levare.hultic.ops.users.service.UserService;
 import com.levare.hultic.ops.workorders.entity.WorkOrder;
 import com.levare.hultic.ops.workorders.entity.WorkOrderStatus;
 import com.levare.hultic.ops.workorders.service.WorkOrderService;
-import com.levare.hultic.ops.users.entity.User;
-import com.levare.hultic.ops.users.service.UserService;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
@@ -33,45 +33,76 @@ import java.util.stream.Collectors;
 public class WorkOrderController {
 
     private final WorkOrderService workOrderService;
-    private final UserService      userService;
-    private final ItemService      itemService;
+    private final UserService userService;
+    private final ItemService itemService;
     private final Callback<Class<?>, Object> controllerFactory;
 
-    @FXML private Label detailNumberLabel;
-    @FXML private Label detailClientLabel;
-    @FXML private Label detailWellLabel;
-    @FXML private Label detailRequestDateLabel;
-    @FXML private Label detailDeliveryDateLabel;
-    @FXML private Label detailStatusLabel;
-    @FXML private Label detailRequestorLabel;
-    @FXML private TextArea detailCommentsArea;
+    @FXML
+    private Label detailNumberLabel;
+    @FXML
+    private Label detailClientLabel;
+    @FXML
+    private Label detailWellLabel;
+    @FXML
+    private Label detailRequestDateLabel;
+    @FXML
+    private Label detailDeliveryDateLabel;
+    @FXML
+    private Label detailStatusLabel;
+    @FXML
+    private Label detailRequestorLabel;
+    @FXML
+    private TextArea detailCommentsArea;
 
-    @FXML private TableView<Item> equipmentTable;
-    @FXML private TableColumn<Item, String> eqPartColumn;
-    @FXML private TableColumn<Item, String> eqDescColumn;
-    @FXML private TableColumn<Item, String> eqSerialColumn;
-    @FXML private TableColumn<Item, String> eqConditionColumn;
-    @FXML private TableColumn<Item, String> eqStatusColumn;
-    @FXML private TableColumn<Item, String> eqJobOrderColumn;
-    @FXML private TableColumn<Item, Void> assignColumn;
+    @FXML
+    private TableView<Item> equipmentTable;
+    @FXML
+    private TableColumn<Item, String> eqPartColumn;
+    @FXML
+    private TableColumn<Item, String> eqDescColumn;
+    @FXML
+    private TableColumn<Item, String> eqSerialColumn;
+    @FXML
+    private TableColumn<Item, String> eqConditionColumn;
+    @FXML
+    private TableColumn<Item, String> eqStatusColumn;
+    @FXML
+    private TableColumn<Item, String> eqJobOrderColumn;
+    @FXML
+    private TableColumn<Item, Void> assignColumn;
 
-    @FXML private TableView<WorkOrder> workOrderTable;
-    @FXML private TableColumn<WorkOrder, Long> idColumn;
-    @FXML private TableColumn<WorkOrder, String> numberColumn;
-    @FXML private TableColumn<WorkOrder, String> clientColumn;
-    @FXML private TableColumn<WorkOrder, String> wellColumn;
-    @FXML private TableColumn<WorkOrder, LocalDate> requestDateColumn;
-    @FXML private TableColumn<WorkOrder, LocalDate> deliveryDateColumn;
-    @FXML private TableColumn<WorkOrder, WorkOrderStatus> statusColumn;
-    @FXML private TableColumn<WorkOrder, String> requestorColumn;
-    @FXML private TableColumn<WorkOrder, String> commentsColumn;
+    @FXML
+    private TableView<WorkOrder> workOrderTable;
+    @FXML
+    private TableColumn<WorkOrder, Long> idColumn;
+    @FXML
+    private TableColumn<WorkOrder, String> numberColumn;
+    @FXML
+    private TableColumn<WorkOrder, String> clientColumn;
+    @FXML
+    private TableColumn<WorkOrder, String> wellColumn;
+    @FXML
+    private TableColumn<WorkOrder, LocalDate> requestDateColumn;
+    @FXML
+    private TableColumn<WorkOrder, LocalDate> deliveryDateColumn;
+    @FXML
+    private TableColumn<WorkOrder, WorkOrderStatus> statusColumn;
+    @FXML
+    private TableColumn<WorkOrder, String> requestorColumn;
+    @FXML
+    private TableColumn<WorkOrder, String> commentsColumn;
 
-    @FXML private ComboBox<WorkOrderStatus> statusFilterCombo;
-    @FXML private Button createButton, updateButton, deleteButton, clearButton, refreshButton;
+    @FXML
+    private ComboBox<WorkOrderStatus> statusFilterCombo;
+    @FXML
+    private Button createButton, updateButton, deleteButton, clearButton, refreshButton;
 
-    @FXML private TextField numberField, wellField;
-    @FXML private DatePicker deliveryDatePicker;
-    @FXML private TextArea commentsArea;
+    @FXML
+    private TextField numberField, wellField;
+    @FXML
+    private DatePicker deliveryDatePicker;
+    @FXML
+    private TextArea commentsArea;
 
     public WorkOrderController(
             WorkOrderService workOrderService,
@@ -80,9 +111,9 @@ public class WorkOrderController {
             Callback<Class<?>, Object> controllerFactory
     ) {
         this.workOrderService = workOrderService;
-        this.userService      = userService;
-        this.itemService      = itemService;
-        this.controllerFactory= controllerFactory;
+        this.userService = userService;
+        this.itemService = itemService;
+        this.controllerFactory = controllerFactory;
     }
 
     @FXML
@@ -98,6 +129,7 @@ public class WorkOrderController {
     private void setupAssignColumn() {
         assignColumn.setCellFactory(col -> new TableCell<>() {
             private final Button btn = new Button("Create JO");
+
             {
                 btn.setOnAction(e -> {
                     Item item = getTableView().getItems().get(getIndex());
@@ -210,11 +242,15 @@ public class WorkOrderController {
         workOrderTable.setRowFactory(tv -> {
             TableRow<WorkOrder> row = new TableRow<>();
             ContextMenu menu = new ContextMenu();
-            MenuItem ni = new MenuItem("New"); ni.setOnAction(e -> clearForm());
-            MenuItem ed = new MenuItem("Edit"); ed.setOnAction(e -> showDetails(row.getItem()));
-            MenuItem del = new MenuItem("Delete"); del.setOnAction(e -> {
+            MenuItem ni = new MenuItem("New");
+            ni.setOnAction(e -> clearForm());
+            MenuItem ed = new MenuItem("Edit");
+            ed.setOnAction(e -> showDetails(row.getItem()));
+            MenuItem del = new MenuItem("Delete");
+            del.setOnAction(e -> {
                 workOrderService.delete(row.getItem().getId());
-                refreshTable(); clearForm();
+                refreshTable();
+                clearForm();
             });
             menu.getItems().addAll(ni, ed, del);
             row.setOnContextMenuRequested((ContextMenuEvent e) -> {
@@ -237,12 +273,14 @@ public class WorkOrderController {
                     getClass().getResource("/fxml/new_workorder.fxml"));
             loader.setControllerFactory(controllerFactory);
             Parent form = loader.load();
-            Stage dlg = new Stage(); dlg.initModality(Modality.APPLICATION_MODAL);
+            Stage dlg = new Stage();
+            dlg.initModality(Modality.APPLICATION_MODAL);
             dlg.setTitle("New Work Order");
             dlg.getIcons().add(new Image(
                     getClass().getResourceAsStream("/icons/new_workorder.png")
             ));
-            dlg.setScene(new Scene(form)); dlg.showAndWait();
+            dlg.setScene(new Scene(form));
+            dlg.showAndWait();
             refreshTable();
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -251,7 +289,10 @@ public class WorkOrderController {
 
     private void updateWorkOrder() {
         WorkOrder sel = workOrderTable.getSelectionModel().getSelectedItem();
-        if (sel == null) { alert("No selection", "Select a work order to update."); return; }
+        if (sel == null) {
+            alert("No selection", "Select a work order to update.");
+            return;
+        }
         sel.setWorkOrderNumber(numberField.getText().trim());
         sel.setWell(wellField.getText().trim());
         sel.setDeliveryDate(deliveryDatePicker.getValue());
@@ -262,26 +303,40 @@ public class WorkOrderController {
 
     private void deleteWorkOrder() {
         WorkOrder sel = workOrderTable.getSelectionModel().getSelectedItem();
-        if (sel == null) { alert("No selection", "Select a work order to delete."); return; }
-        for( Long id: sel.getItemsId()) {
+        if (sel == null) {
+            alert("No selection", "Select a work order to delete.");
+            return;
+        }
+        for (Long id : sel.getItemsId()) {
             if (itemService.getById(id).getJobOrderId() != null) {
                 alert("Job Order presence", "Selected WorkOrder have associated Job Orders.");
                 return;
             }
         }
         workOrderService.delete(sel.getId());
-        refreshTable(); clearForm();
+        refreshTable();
+        clearForm();
     }
 
     private void clearForm() {
-        showDetails(null); numberField.clear(); wellField.clear(); deliveryDatePicker.setValue(null); commentsArea.clear();
+        showDetails(null);
+        numberField.clear();
+        wellField.clear();
+        deliveryDatePicker.setValue(null);
+        commentsArea.clear();
     }
 
     private void showDetails(WorkOrder order) {
         if (order == null) {
-            detailNumberLabel.setText(""); detailClientLabel.setText(""); detailWellLabel.setText("");
-            detailRequestDateLabel.setText(""); detailDeliveryDateLabel.setText(""); detailStatusLabel.setText("");
-            detailRequestorLabel.setText(""); detailCommentsArea.clear(); equipmentTable.getItems().clear();
+            detailNumberLabel.setText("");
+            detailClientLabel.setText("");
+            detailWellLabel.setText("");
+            detailRequestDateLabel.setText("");
+            detailDeliveryDateLabel.setText("");
+            detailStatusLabel.setText("");
+            detailRequestorLabel.setText("");
+            detailCommentsArea.clear();
+            equipmentTable.getItems().clear();
         } else {
             detailNumberLabel.setText(order.getWorkOrderNumber());
             detailClientLabel.setText(order.getClient().name());
@@ -298,6 +353,8 @@ public class WorkOrderController {
 
     private void alert(String h, String c) {
         Alert a = new Alert(Alert.AlertType.INFORMATION);
-        a.setHeaderText(h); a.setContentText(c); a.showAndWait();
+        a.setHeaderText(h);
+        a.setContentText(c);
+        a.showAndWait();
     }
 }

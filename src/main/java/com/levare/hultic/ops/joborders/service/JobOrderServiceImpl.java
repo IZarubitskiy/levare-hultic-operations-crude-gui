@@ -1,10 +1,10 @@
 package com.levare.hultic.ops.joborders.service;
 
-import com.levare.hultic.ops.items.service.ItemService;
 import com.levare.hultic.ops.joborders.dao.JobOrderDao;
 import com.levare.hultic.ops.joborders.entity.JobOrder;
 import com.levare.hultic.ops.joborders.entity.JobOrderStatus;
-import com.levare.hultic.ops.workorders.service.WorkOrderService;
+import com.levare.hultic.ops.tracking.model.ActionType;
+import com.levare.hultic.ops.tracking.service.TrackingRecordService;
 
 import java.util.List;
 import java.util.Objects;
@@ -15,15 +15,17 @@ import java.util.Objects;
 public class JobOrderServiceImpl implements JobOrderService {
 
     private final JobOrderDao jobOrderDao;
+    private final TrackingRecordService trackingRecordService;
 
-    public JobOrderServiceImpl(JobOrderDao jobOrderDao, WorkOrderService workOrderService, ItemService itemService) {
+    public JobOrderServiceImpl(JobOrderDao jobOrderDao, TrackingRecordService trackingRecordService) {
         this.jobOrderDao = jobOrderDao;
+        this.trackingRecordService = trackingRecordService;
     }
 
     @Override
     public JobOrder create(JobOrder jobOrder) {
         jobOrder.setStatus(JobOrderStatus.CREATED);
-        jobOrderDao.insert(jobOrder);
+        trackingRecordService.jobOrderTracking(jobOrderDao.insert(jobOrder), ActionType.CREATION, "New Jo creation");
         return jobOrder;
     }
 

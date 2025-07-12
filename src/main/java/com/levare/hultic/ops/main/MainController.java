@@ -1,9 +1,9 @@
 package com.levare.hultic.ops.main;
 
 import com.levare.hultic.ops.joborders.controller.JobOrderController;
-import com.levare.hultic.ops.workorders.controller.WorkOrderController;
 import com.levare.hultic.ops.tracking.controller.TrackingRecordController;
 import com.levare.hultic.ops.users.entity.User;
+import com.levare.hultic.ops.workorders.controller.WorkOrderController;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -16,9 +16,12 @@ import javafx.util.Callback;
 
 public class MainController {
 
-    @FXML private Label userLabel;
-    @FXML private TabPane tabPane;
-    @FXML private AnchorPane contentArea;
+    @FXML
+    private Label userLabel;
+    @FXML
+    private TabPane tabPane;
+    @FXML
+    private AnchorPane contentArea;
 
     private final Callback<Class<?>, Object> controllerFactory;
     private User currentUser;

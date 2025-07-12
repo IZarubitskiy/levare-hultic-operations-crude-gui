@@ -3,7 +3,6 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.levare.hultic.ops.iteminfos.controller.ItemInfoSelectionController"
@@ -71,10 +70,10 @@
             <!-- Сама таблица -->
             <TableView fx:id="tableView" prefHeight="300" VBox.vgrow="ALWAYS">
                 <columns>
-                    <TableColumn fx:id="colPartNumber" text="Part Number"   prefWidth="120"/>
-                    <TableColumn fx:id="colDescription" text="Description"   prefWidth="200"/>
-                    <TableColumn fx:id="colItemType"    text="Item Type"     prefWidth="100"/>
-                    <TableColumn fx:id="colComments"    text="Comments"      prefWidth="180"/>
+                    <TableColumn fx:id="colPartNumber" text="Part Number" prefWidth="120"/>
+                    <TableColumn fx:id="colDescription" text="Description" prefWidth="200"/>
+                    <TableColumn fx:id="colItemType" text="Item Type" prefWidth="100"/>
+                    <TableColumn fx:id="colComments" text="Comments" prefWidth="180"/>
                 </columns>
             </TableView>
         </VBox>

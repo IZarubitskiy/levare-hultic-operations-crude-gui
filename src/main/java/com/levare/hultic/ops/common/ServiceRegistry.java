@@ -60,9 +60,10 @@ public final class ServiceRegistry {
             USER_SERVICE = new UserServiceImpl(USER_DAO);
             ITEM_INFO_SERVICE = new ItemInfoServiceImpl(ITEM_INFO_DAO);
             ITEM_SERVICE = new ItemServiceImpl(ITEM_DAO, ITEM_INFO_SERVICE, SERIAL_NUMBER_DAO);
-            WORK_ORDER_SERVICE = new WorkOrderServiceImpl(WORK_ORDER_DAO, USER_SERVICE, ITEM_SERVICE);
-            JOB_ORDER_SERVICE = new JobOrderServiceImpl(JOB_ORDER_DAO, WORK_ORDER_SERVICE, ITEM_SERVICE);
-            TRACKING_RECORD_SERVICE = new TrackingRecordServiceImpl(TRACKING_RECORD_DAO);
+            TRACKING_RECORD_SERVICE = new TrackingRecordServiceImpl(TRACKING_RECORD_DAO, ITEM_SERVICE);
+            WORK_ORDER_SERVICE = new WorkOrderServiceImpl(WORK_ORDER_DAO, USER_SERVICE, ITEM_SERVICE, TRACKING_RECORD_SERVICE);
+            JOB_ORDER_SERVICE = new JobOrderServiceImpl(JOB_ORDER_DAO, TRACKING_RECORD_SERVICE);
+
 
         } catch (SQLException e) {
             throw new ExceptionInInitializerError("ServiceRegistry init failed: " + e.getMessage());

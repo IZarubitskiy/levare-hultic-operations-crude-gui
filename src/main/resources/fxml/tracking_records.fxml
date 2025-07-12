@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.geometry.Insets?>
-<?import javafx.geometry.Pos?>
+
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.levare.hultic.ops.tracking.controller.TrackingRecordController"
@@ -49,23 +47,23 @@
         <HBox spacing="10" alignment="CENTER_RIGHT"
               GridPane.rowIndex="4" GridPane.columnIndex="0" GridPane.columnSpan="4">
             <Button fx:id="searchButton" text="Search"/>
-            <Button fx:id="clearButton"  text="Clear"/>
+            <Button fx:id="clearButton" text="Clear"/>
         </HBox>
     </GridPane>
 
     <!-- Таблица TrackingRecord -->
     <TableView fx:id="trackingTable" VBox.vgrow="ALWAYS">
         <columns>
-            <TableColumn fx:id="idColumn"     text="ID"                prefWidth="60"/>
-            <TableColumn fx:id="dateColumn"   text="Date"              prefWidth="100"/>
-            <TableColumn fx:id="targetColumn" text="Action Target"     prefWidth="120"/>
-            <TableColumn fx:id="typeColumn"   text="Action Type"       prefWidth="120"/>
-            <TableColumn fx:id="woColumn"     text="WorkOrder ID"       prefWidth="100"/>
-            <TableColumn fx:id="joColumn"     text="JobOrder ID"        prefWidth="100"/>
-            <TableColumn fx:id="pnColumn"     text="Part Number"       prefWidth="120"/>
-            <TableColumn fx:id="snColumn"     text="Serial Number"     prefWidth="120"/>
-            <TableColumn fx:id="descColumn"   text="Description"       prefWidth="150"/>
-            <TableColumn fx:id="reasonColumn" text="Reason"            prefWidth="150"/>
+            <TableColumn fx:id="idColumn" text="ID" prefWidth="60"/>
+            <TableColumn fx:id="dateColumn" text="Date" prefWidth="100"/>
+            <TableColumn fx:id="targetColumn" text="Action Target" prefWidth="120"/>
+            <TableColumn fx:id="typeColumn" text="Action Type" prefWidth="120"/>
+            <TableColumn fx:id="woColumn" text="WorkOrder ID" prefWidth="100"/>
+            <TableColumn fx:id="joColumn" text="JobOrder ID" prefWidth="100"/>
+            <TableColumn fx:id="pnColumn" text="Part Number" prefWidth="120"/>
+            <TableColumn fx:id="snColumn" text="Serial Number" prefWidth="120"/>
+            <TableColumn fx:id="descColumn" text="Description" prefWidth="150"/>
+            <TableColumn fx:id="reasonColumn" text="Reason" prefWidth="150"/>
         </columns>
     </TableView>
 
