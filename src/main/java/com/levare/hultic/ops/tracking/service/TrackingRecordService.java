@@ -28,6 +28,6 @@ public interface TrackingRecordService {
 
     TrackingRecord jobOrderTracking(JobOrder jobOrder, Item item, ActionType actionType, String reason);
 
-    TrackingRecord itemOrderTracking(Item item, ActionType actionType, String reason);
+    TrackingRecord itemTracking(Item item, ActionType actionType, String reason);
 
 }

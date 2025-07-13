@@ -6,7 +6,9 @@ import com.levare.hultic.ops.tracking.model.TrackingRecord;
 import com.levare.hultic.ops.workorders.entity.Client;
 
 import java.sql.*;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -139,18 +141,31 @@ public class TrackingRecordDao {
     }
 
     private TrackingRecord mapRow(ResultSet rs) throws SQLException {
-        return new TrackingRecord(
-                rs.getLong("id"),
-                rs.getDate("record_date").toLocalDate(),
-                ActionTarget.valueOf(rs.getString("action_target")),
-                ActionType.valueOf(rs.getString("action_type")),
-                Client.valueOf(rs.getString("client")),
-                rs.getObject("target_work_order_id", Long.class),
-                rs.getObject("target_job_order_id", Long.class),
-                rs.getString("target_pn"),
-                rs.getString("target_sn"),
-                rs.getString("target_description"),
-                rs.getString("reason")
-        );
+        TrackingRecord rec = new TrackingRecord();
+        rec.setId(rs.getLong("id"));
+
+        // Считываем epoch миллисекунд и преобразуем в LocalDate
+        long epochMilli = rs.getLong("record_date");
+        LocalDate recordDate = Instant.ofEpochMilli(epochMilli)
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate();
+        rec.setRecordDate(recordDate);
+
+        // Остальные поля
+        rec.setActionTarget(ActionTarget.valueOf(rs.getString("action_target")));
+        rec.setActionType(ActionType.valueOf(rs.getString("action_type")));
+
+        long woId = rs.getLong("target_work_order_id");
+        rec.setTargetWorkOrderId(rs.wasNull() ? null : woId);
+
+        long joId = rs.getLong("target_job_order_id");
+        rec.setTargetJobOrderId(rs.wasNull() ? null : joId);
+
+        rec.setTargetPN(rs.getString("target_pn"));
+        rec.setTargetSN(rs.getString("target_sn"));
+        rec.setTargetDescription(rs.getString("target_description"));
+        rec.setReason(rs.getString("reason"));
+
+        return rec;
     }
 }

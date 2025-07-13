@@ -40,7 +40,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public Item create(Item item) {
         itemDao.insert(item);
-        trackingRecordService.itemOrderTracking(item, ActionType.CREATION, "New assembly initiated");
+
         return item;
     }
 
@@ -58,7 +58,7 @@ public class ItemServiceImpl implements ItemService {
         Item itemUpdated = getById(itemId);
         itemUpdated.setJobOrderId(jobOrderId);
         itemDao.update(itemUpdated);
-        trackingRecordService.itemOrderTracking(itemUpdated, ActionType.STATUS_CHANGE, "Jo set for Item");
+        trackingRecordService.itemTracking(itemUpdated, ActionType.STATUS_CHANGE, "Jo set for Item");
     }
 
 
@@ -110,6 +110,7 @@ public class ItemServiceImpl implements ItemService {
         item.setItemStatus(ItemStatus.NEW_ASSEMBLY_BOOKED);
         item.setSerialNumber(generateSerialNumber(item));
         itemDao.insert(item);
+        trackingRecordService.itemTracking(item, ActionType.CREATION, "New assembly initiated");
         return item;
     }
 
@@ -119,7 +120,7 @@ public class ItemServiceImpl implements ItemService {
         ItemStatus oldStatus = existing.getItemStatus();
         existing.setItemStatus(newStatus);
         itemDao.update(existing);
-        trackingRecordService.itemOrderTracking(
+        trackingRecordService.itemTracking(
                 item,
                 ActionType.STATUS_CHANGE,
                 "Item status was changed from" + oldStatus.name() + " to " + newStatus.name() );

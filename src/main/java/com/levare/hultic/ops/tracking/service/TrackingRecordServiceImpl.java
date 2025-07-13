@@ -76,7 +76,7 @@ public class TrackingRecordServiceImpl implements TrackingRecordService {
     }
 
     @Override
-    public TrackingRecord itemOrderTracking(Item item, ActionType actionType, String reason){
+    public TrackingRecord itemTracking(Item item, ActionType actionType, String reason){
         TrackingRecord itemOrderTrackingRecord = new TrackingRecord();
         itemOrderTrackingRecord.setRecordDate(LocalDate.now(ZoneId.of("Africa/Cairo")));
         itemOrderTrackingRecord.setActionTarget(ActionTarget.ITEM);
