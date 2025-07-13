@@ -64,7 +64,7 @@
                 <ComboBox fx:id="statusFilterCombo" promptText="All statuses" prefWidth="200"/>
                 <Button fx:id="refreshButton" text="Refresh"/>
                 <Button fx:id="createButton" text="New"/>
-                <Button fx:id="updateButton" text="Update"/>
+                <Button fx:id="editButton" text="Update"/>
                 <Button fx:id="deleteButton" text="Delete"/>
                 <Button fx:id="clearButton" text="Clear"/>
             </HBox>

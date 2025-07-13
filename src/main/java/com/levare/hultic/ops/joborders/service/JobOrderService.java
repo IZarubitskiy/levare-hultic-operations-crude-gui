@@ -16,7 +16,7 @@ public interface JobOrderService {
 
     JobOrder changeStatus(Long id, JobOrderStatus newStatus);
 
-    void delete(Long id);
+    void delete(Long id, String reason);
 
     JobOrder getById(Long id);
 

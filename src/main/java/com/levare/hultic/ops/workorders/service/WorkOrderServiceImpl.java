@@ -1,8 +1,11 @@
 package com.levare.hultic.ops.workorders.service;
 
 import com.levare.hultic.ops.items.entity.Item;
+import com.levare.hultic.ops.items.entity.ItemCondition;
 import com.levare.hultic.ops.items.entity.ItemStatus;
 import com.levare.hultic.ops.items.service.ItemService;
+import com.levare.hultic.ops.joborders.entity.JobOrder;
+import com.levare.hultic.ops.joborders.service.JobOrderService;
 import com.levare.hultic.ops.tracking.model.ActionType;
 import com.levare.hultic.ops.tracking.service.TrackingRecordService;
 import com.levare.hultic.ops.users.entity.User;
@@ -10,28 +13,37 @@ import com.levare.hultic.ops.users.service.UserService;
 import com.levare.hultic.ops.workorders.dao.WorkOrderDao;
 import com.levare.hultic.ops.workorders.entity.WorkOrder;
 import com.levare.hultic.ops.workorders.entity.WorkOrderStatus;
+import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
 
+import static lombok.AccessLevel.PRIVATE;
+
 /**
  * Implementation of WorkOrderService for JavaFX, using WorkOrder entity as defined.
  */
+@FieldDefaults(level = PRIVATE, makeFinal = true)
 public class WorkOrderServiceImpl implements WorkOrderService {
 
-    private final WorkOrderDao workOrderDao;
-    private final ItemService itemService;
-    private final UserService userService;
-    private final TrackingRecordService trackingRecordService;
+    WorkOrderDao workOrderDao;
+    ItemService itemService;
+    UserService userService;
+    JobOrderService jobOrderService;
+    TrackingRecordService trackingRecordService;
+
+
 
     public WorkOrderServiceImpl(WorkOrderDao workOrderDao,
                                 UserService userService,
                                 ItemService itemService,
+                                JobOrderService jobOrderService,
                                 TrackingRecordService trackingRecordService) {
         this.workOrderDao = workOrderDao;
         this.userService = userService;
         this.itemService = itemService;
+        this.jobOrderService = jobOrderService;
         this.trackingRecordService = trackingRecordService;
     }
 
@@ -72,9 +84,29 @@ public class WorkOrderServiceImpl implements WorkOrderService {
     }
 
     @Override
-    public void delete(Long id) {
-        // Ensure exists
-        getById(id);
+    public void delete(Long id, String reason) {
+
+        // modifying items
+        for (Long itemId : getById(id).getItemsId()) {
+            Item item = itemService.getById(itemId);
+            if (item.getJobOrderId() == null){
+                switch (item.getItemStatus()){
+                    case REPAIR_BOOKED -> {
+                        if (item.getItemCondition() != ItemCondition.NEW || item.getItemCondition() != ItemCondition.REPAIRED) {
+                            itemService.updateStatus(item, ItemStatus.ON_STOCK);
+                        }
+                    }
+                    case STOCK_BOOKED -> itemService.updateStatus(item, ItemStatus.ON_STOCK);
+                    case NEW_ASSEMBLY_BOOKED -> itemService.delete(item.getId());
+                    default -> throw new IllegalStateException(
+                            "Unexpected item Status: " + item.getItemStatus());
+                    }
+            } else {
+                JobOrder joUpdate = jobOrderService.getById(item.getJobOrderId());
+                joUpdate.setWorkOrderId(null);
+                jobOrderService.update(item.getJobOrderId(), joUpdate);
+            }}
+        trackingRecordService.workOrderTracking(getById(id), ActionType.REMOVAL, reason);
         workOrderDao.deleteById(id);
     }
 

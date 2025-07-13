@@ -7,31 +7,40 @@ import com.levare.hultic.ops.items.dao.SerialNumberDao;
 import com.levare.hultic.ops.items.entity.Item;
 import com.levare.hultic.ops.items.entity.ItemCondition;
 import com.levare.hultic.ops.items.entity.ItemStatus;
+import com.levare.hultic.ops.tracking.model.ActionType;
+import com.levare.hultic.ops.tracking.service.TrackingRecordService;
 import com.levare.hultic.ops.workorders.entity.Client;
+import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static lombok.AccessLevel.PRIVATE;
+
 /**
  * Implementation of ItemService using manual DAO and domain objects.
  */
+@FieldDefaults(level = PRIVATE, makeFinal = true)
 public class ItemServiceImpl implements ItemService {
 
-    private final ItemDao itemDao;
-    private final ItemInfoService itemInfoService;
-    private final SerialNumberDao serialNumberDao;
+    ItemDao itemDao;
+    ItemInfoService itemInfoService;
+    SerialNumberDao serialNumberDao;
+    TrackingRecordService trackingRecordService;
 
-    public ItemServiceImpl(ItemDao itemDao, ItemInfoService itemInfoService, SerialNumberDao serialNumberDao) {
+    public ItemServiceImpl(ItemDao itemDao, ItemInfoService itemInfoService, SerialNumberDao serialNumberDao,TrackingRecordService trackingRecordService) {
         this.itemDao = itemDao;
         this.itemInfoService = itemInfoService;
         this.serialNumberDao = serialNumberDao;
+        this.trackingRecordService = trackingRecordService;
     }
 
     @Override
     public Item create(Item item) {
         itemDao.insert(item);
+        trackingRecordService.itemOrderTracking(item, ActionType.CREATION, "New assembly initiated");
         return item;
     }
 
@@ -49,6 +58,7 @@ public class ItemServiceImpl implements ItemService {
         Item itemUpdated = getById(itemId);
         itemUpdated.setJobOrderId(jobOrderId);
         itemDao.update(itemUpdated);
+        trackingRecordService.itemOrderTracking(itemUpdated, ActionType.STATUS_CHANGE, "Jo set for Item");
     }
 
 
@@ -106,8 +116,13 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public Item updateStatus(Item item, ItemStatus newStatus) {
         Item existing = getById(item.getId());
+        ItemStatus oldStatus = existing.getItemStatus();
         existing.setItemStatus(newStatus);
         itemDao.update(existing);
+        trackingRecordService.itemOrderTracking(
+                item,
+                ActionType.STATUS_CHANGE,
+                "Item status was changed from" + oldStatus.name() + " to " + newStatus.name() );
         return existing;
     }
 

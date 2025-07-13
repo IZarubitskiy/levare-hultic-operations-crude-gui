@@ -25,6 +25,7 @@ import javafx.util.Callback;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -33,76 +34,41 @@ import java.util.stream.Collectors;
 public class WorkOrderController {
 
     private final WorkOrderService workOrderService;
-    private final UserService userService;
-    private final ItemService itemService;
+    private final UserService      userService;
+    private final ItemService      itemService;
     private final Callback<Class<?>, Object> controllerFactory;
 
-    @FXML
-    private Label detailNumberLabel;
-    @FXML
-    private Label detailClientLabel;
-    @FXML
-    private Label detailWellLabel;
-    @FXML
-    private Label detailRequestDateLabel;
-    @FXML
-    private Label detailDeliveryDateLabel;
-    @FXML
-    private Label detailStatusLabel;
-    @FXML
-    private Label detailRequestorLabel;
-    @FXML
-    private TextArea detailCommentsArea;
+    @FXML private Label detailNumberLabel;
+    @FXML private Label detailClientLabel;
+    @FXML private Label detailWellLabel;
+    @FXML private Label detailRequestDateLabel;
+    @FXML private Label detailDeliveryDateLabel;
+    @FXML private Label detailStatusLabel;
+    @FXML private Label detailRequestorLabel;
+    @FXML private TextArea detailCommentsArea;
 
-    @FXML
-    private TableView<Item> equipmentTable;
-    @FXML
-    private TableColumn<Item, String> eqPartColumn;
-    @FXML
-    private TableColumn<Item, String> eqDescColumn;
-    @FXML
-    private TableColumn<Item, String> eqSerialColumn;
-    @FXML
-    private TableColumn<Item, String> eqConditionColumn;
-    @FXML
-    private TableColumn<Item, String> eqStatusColumn;
-    @FXML
-    private TableColumn<Item, String> eqJobOrderColumn;
-    @FXML
-    private TableColumn<Item, Void> assignColumn;
+    @FXML private TableView<Item> equipmentTable;
+    @FXML private TableColumn<Item, String> eqPartColumn;
+    @FXML private TableColumn<Item, String> eqDescColumn;
+    @FXML private TableColumn<Item, String> eqSerialColumn;
+    @FXML private TableColumn<Item, String> eqConditionColumn;
+    @FXML private TableColumn<Item, String> eqStatusColumn;
+    @FXML private TableColumn<Item, String> eqJobOrderColumn;
+    @FXML private TableColumn<Item, Void>   assignColumn;
 
-    @FXML
-    private TableView<WorkOrder> workOrderTable;
-    @FXML
-    private TableColumn<WorkOrder, Long> idColumn;
-    @FXML
-    private TableColumn<WorkOrder, String> numberColumn;
-    @FXML
-    private TableColumn<WorkOrder, String> clientColumn;
-    @FXML
-    private TableColumn<WorkOrder, String> wellColumn;
-    @FXML
-    private TableColumn<WorkOrder, LocalDate> requestDateColumn;
-    @FXML
-    private TableColumn<WorkOrder, LocalDate> deliveryDateColumn;
-    @FXML
-    private TableColumn<WorkOrder, WorkOrderStatus> statusColumn;
-    @FXML
-    private TableColumn<WorkOrder, String> requestorColumn;
-    @FXML
-    private TableColumn<WorkOrder, String> commentsColumn;
+    @FXML private TableView<WorkOrder> workOrderTable;
+    @FXML private TableColumn<WorkOrder, Long>           idColumn;
+    @FXML private TableColumn<WorkOrder, String>         numberColumn;
+    @FXML private TableColumn<WorkOrder, String>         clientColumn;
+    @FXML private TableColumn<WorkOrder, String>         wellColumn;
+    @FXML private TableColumn<WorkOrder, LocalDate>      requestDateColumn;
+    @FXML private TableColumn<WorkOrder, LocalDate>      deliveryDateColumn;
+    @FXML private TableColumn<WorkOrder, WorkOrderStatus> statusColumn;
+    @FXML private TableColumn<WorkOrder, String>         requestorColumn;
+    @FXML private TableColumn<WorkOrder, String>         commentsColumn;
 
-    @FXML
-    private ComboBox<WorkOrderStatus> statusFilterCombo;
-    @FXML
-    private Button createButton, updateButton, deleteButton, clearButton, refreshButton;
-
-    @FXML
-    private TextField numberField, wellField;
-    @FXML
-    private DatePicker deliveryDatePicker;
-    @FXML
-    private TextArea commentsArea;
+    @FXML private ComboBox<WorkOrderStatus> statusFilterCombo;
+    @FXML private Button createButton, editButton, deleteButton, clearButton, refreshButton;
 
     public WorkOrderController(
             WorkOrderService workOrderService,
@@ -111,9 +77,9 @@ public class WorkOrderController {
             Callback<Class<?>, Object> controllerFactory
     ) {
         this.workOrderService = workOrderService;
-        this.userService = userService;
-        this.itemService = itemService;
-        this.controllerFactory = controllerFactory;
+        this.userService      = userService;
+        this.itemService      = itemService;
+        this.controllerFactory= controllerFactory;
     }
 
     @FXML
@@ -129,7 +95,6 @@ public class WorkOrderController {
     private void setupAssignColumn() {
         assignColumn.setCellFactory(col -> new TableCell<>() {
             private final Button btn = new Button("Create JO");
-
             {
                 btn.setOnAction(e -> {
                     Item item = getTableView().getItems().get(getIndex());
@@ -142,7 +107,6 @@ public class WorkOrderController {
                     }
                 });
             }
-
             @Override
             protected void updateItem(Void v, boolean empty) {
                 super.updateItem(v, empty);
@@ -164,8 +128,8 @@ public class WorkOrderController {
             loader.setControllerFactory(controllerFactory);
             Parent form = loader.load();
 
-            NewJobOrderController ctrl = loader.getController();
-            ctrl.initForWorkAndItem(workOrderId, itemId);
+            var ctrl = loader.getController();
+            ((NewJobOrderController)ctrl).initForWorkAndItem(workOrderId, itemId);
 
             Stage dlg = new Stage();
             dlg.initModality(Modality.APPLICATION_MODAL);
@@ -191,14 +155,13 @@ public class WorkOrderController {
             protected void updateItem(LocalDate date, boolean empty) {
                 super.updateItem(date, empty);
                 if (empty || date == null) {
-                    setText(null);
-                    setStyle("");
+                    setText(null); setStyle("");
                 } else {
                     setText(date.toString());
                     long days = ChronoUnit.DAYS.between(LocalDate.now(), date);
-                    if (days <= 2) setStyle("-fx-background-color: tomato;");
+                    if (days <= 2)      setStyle("-fx-background-color: tomato;");
                     else if (days <= 3) setStyle("-fx-background-color: khaki;");
-                    else setStyle("");
+                    else                setStyle("");
                 }
             }
         });
@@ -230,29 +193,29 @@ public class WorkOrderController {
     private void setupActions() {
         statusFilterCombo.setItems(FXCollections.observableArrayList(WorkOrderStatus.values()));
         refreshButton.setOnAction(e -> refreshTable());
-        createButton.setOnAction(e -> handleNewWorkOrder());
-        updateButton.setOnAction(e -> updateWorkOrder());
+        createButton.setOnAction(e -> openFormForNew());
+        editButton  .setOnAction(e -> openFormForEdit());
         deleteButton.setOnAction(e -> deleteWorkOrder());
-        clearButton.setOnAction(e -> clearForm());
+        clearButton .setOnAction(e -> clearForm());
         workOrderTable.getSelectionModel().selectedItemProperty()
-                .addListener((obs, oldV, newV) -> showDetails(newV));
+                .addListener((obs, o, n) -> showDetails(n));
     }
 
     private void setupContextMenu() {
         workOrderTable.setRowFactory(tv -> {
             TableRow<WorkOrder> row = new TableRow<>();
             ContextMenu menu = new ContextMenu();
-            MenuItem ni = new MenuItem("New");
-            ni.setOnAction(e -> clearForm());
-            MenuItem ed = new MenuItem("Edit");
-            ed.setOnAction(e -> showDetails(row.getItem()));
-            MenuItem del = new MenuItem("Delete");
-            del.setOnAction(e -> {
-                workOrderService.delete(row.getItem().getId());
-                refreshTable();
-                clearForm();
-            });
-            menu.getItems().addAll(ni, ed, del);
+
+            MenuItem miNew  = new MenuItem("New");
+            miNew.setOnAction(e -> openFormForNew());
+
+            MenuItem miEdit = new MenuItem("Edit");
+            miEdit.setOnAction(e -> openFormForEdit());
+
+            MenuItem miDel  = new MenuItem("Delete");
+            miDel.setOnAction(e -> deleteWorkOrder());
+
+            menu.getItems().addAll(miNew, miEdit, miDel);
             row.setOnContextMenuRequested((ContextMenuEvent e) -> {
                 if (!row.isEmpty()) menu.show(row, e.getScreenX(), e.getScreenY());
             });
@@ -267,38 +230,43 @@ public class WorkOrderController {
         workOrderTable.setItems(FXCollections.observableArrayList(data));
     }
 
-    private void handleNewWorkOrder() {
+    /** Открыть форму создания нового WorkOrder */
+    private void openFormForNew() {
+        openForm(null, "New Work Order");
+    }
+
+    /** Открыть форму редактирования выделенного WorkOrder */
+    private void openFormForEdit() {
+        WorkOrder sel = workOrderTable.getSelectionModel().getSelectedItem();
+        if (sel == null) {
+            alert("No selection", "Select a work order to edit.");
+            return;
+        }
+        openForm(sel, "Edit Work Order");
+    }
+
+    private void openForm(WorkOrder order, String title) {
         try {
             FXMLLoader loader = new FXMLLoader(
-                    getClass().getResource("/fxml/new_workorder.fxml"));
+                    getClass().getResource("/fxml/workorder_form.fxml"));
             loader.setControllerFactory(controllerFactory);
             Parent form = loader.load();
+            WorkOrderFormController ctrl = loader.getController();
+            if (order != null) {
+                ctrl.initForEdit(order);
+            }
             Stage dlg = new Stage();
             dlg.initModality(Modality.APPLICATION_MODAL);
-            dlg.setTitle("New Work Order");
+            dlg.setTitle(title);
             dlg.getIcons().add(new Image(
-                    getClass().getResourceAsStream("/icons/new_workorder.png")
-            ));
+                    getClass().getResourceAsStream("/icons/new_workorder.png")));
             dlg.setScene(new Scene(form));
             dlg.showAndWait();
             refreshTable();
         } catch (Exception ex) {
             ex.printStackTrace();
+            alert("Error", "Cannot open WorkOrder form:\n" + ex.getMessage());
         }
-    }
-
-    private void updateWorkOrder() {
-        WorkOrder sel = workOrderTable.getSelectionModel().getSelectedItem();
-        if (sel == null) {
-            alert("No selection", "Select a work order to update.");
-            return;
-        }
-        sel.setWorkOrderNumber(numberField.getText().trim());
-        sel.setWell(wellField.getText().trim());
-        sel.setDeliveryDate(deliveryDatePicker.getValue());
-        sel.setComments(commentsArea.getText().trim());
-        workOrderService.update(sel);
-        refreshTable();
     }
 
     private void deleteWorkOrder() {
@@ -307,23 +275,35 @@ public class WorkOrderController {
             alert("No selection", "Select a work order to delete.");
             return;
         }
-        for (Long id : sel.getItemsId()) {
-            if (itemService.getById(id).getJobOrderId() != null) {
-                alert("Job Order presence", "Selected WorkOrder have associated Job Orders.");
+        // проверка наличия связанных JO
+        for (Long itemId : sel.getItemsId()) {
+            if (itemService.getById(itemId).getJobOrderId() != null) {
+                alert("Job Order presence", "This WorkOrder has associated JobOrders.");
                 return;
             }
         }
-        workOrderService.delete(sel.getId());
+
+        // запрашиваем причину удаления
+        TextInputDialog reasonDialog = new TextInputDialog();
+        reasonDialog.setTitle("Delete Work Order");
+        reasonDialog.setHeaderText("Please enter reason for deletion:");
+        reasonDialog.setContentText("Reason:");
+
+        Optional<String> maybeReason = reasonDialog.showAndWait();
+        if (maybeReason.isEmpty() || maybeReason.get().trim().isEmpty()) {
+            return; // отмена или пустая причина
+        }
+        String reason = maybeReason.get().trim();
+
+        // вызываем сервисный метод с причиной
+        workOrderService.delete(sel.getId(), reason);
+
         refreshTable();
         clearForm();
     }
 
     private void clearForm() {
         showDetails(null);
-        numberField.clear();
-        wellField.clear();
-        deliveryDatePicker.setValue(null);
-        commentsArea.clear();
     }
 
     private void showDetails(WorkOrder order) {
@@ -344,17 +324,20 @@ public class WorkOrderController {
             detailRequestDateLabel.setText(order.getRequestDate().toString());
             detailDeliveryDateLabel.setText(order.getDeliveryDate().toString());
             detailStatusLabel.setText(order.getStatus().name());
-            detailRequestorLabel.setText(order.getRequestor() != null ? order.getRequestor().getName() : "");
+            detailRequestorLabel.setText(order.getRequestor() != null
+                    ? order.getRequestor().getName() : "");
             detailCommentsArea.setText(order.getComments());
-            List<Item> items = order.getItemsId().stream().map(itemService::getById).collect(Collectors.toList());
+            var items = order.getItemsId().stream()
+                    .map(itemService::getById)
+                    .collect(Collectors.toList());
             equipmentTable.setItems(FXCollections.observableArrayList(items));
         }
     }
 
-    private void alert(String h, String c) {
+    private void alert(String header, String content) {
         Alert a = new Alert(Alert.AlertType.INFORMATION);
-        a.setHeaderText(h);
-        a.setContentText(c);
+        a.setHeaderText(header);
+        a.setContentText(content);
         a.showAndWait();
     }
 }

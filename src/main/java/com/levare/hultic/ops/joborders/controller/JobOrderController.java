@@ -141,15 +141,35 @@ public class JobOrderController {
         jobOrderTable.setItems(FXCollections.observableArrayList(list));
     }
 
+    @FXML
     private void deleteSelected() {
         JobOrder sel = jobOrderTable.getSelectionModel().getSelectedItem();
-        if (sel != null) {
+        if (sel == null) {
+            showAlert("No selection", "Please select a job order to delete.");
+            return;
+        }
+
+        // Открываем диалог для ввода причины удаления
+        TextInputDialog reasonDialog = new TextInputDialog();
+        reasonDialog.setTitle("Delete Job Order");
+        reasonDialog.setHeaderText("Please provide a reason for deletion:");
+        reasonDialog.setContentText("Reason:");
+
+        // Ждём ввода от пользователя
+        var result = reasonDialog.showAndWait();
+        if (result.isPresent()) {
+            String reason = result.get().trim();
+            if (reason.isEmpty()) {
+                showAlert("Validation", "Deletion reason cannot be empty.");
+                return;
+            }
+
+            // Сначала отвязываем Item от JobOrder
             itemService.updateWithJobOrder(sel.getItemId(), null);
-            jobOrderService.delete(sel.getId());
+            // Вызываем новый метод удаления с передачей причины
+            jobOrderService.delete(sel.getId(), reason);
 
             refreshTable();
-        } else {
-            showAlert("No selection", "Please select a job order to delete.");
         }
     }
 

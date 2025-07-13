@@ -15,11 +15,9 @@ import java.util.List;
 
 public class TrackingRecordServiceImpl implements TrackingRecordService {
     private final TrackingRecordDao dao;
-    private final ItemService itemService;
 
-    public TrackingRecordServiceImpl(TrackingRecordDao dao, ItemService itemService) {
+    public TrackingRecordServiceImpl(TrackingRecordDao dao) {
         this.dao = dao;
-        this.itemService = itemService;
     }
 
     @Override
@@ -62,9 +60,8 @@ public class TrackingRecordServiceImpl implements TrackingRecordService {
     }
 
     @Override
-    public TrackingRecord jobOrderTracking(JobOrder jobOrder, ActionType actionType, String reason) {
+    public TrackingRecord jobOrderTracking(JobOrder jobOrder, Item item, ActionType actionType, String reason) {
         TrackingRecord jobOrderTrackingRecord = new TrackingRecord();
-        Item item = (itemService.getById(jobOrder.getItemId()));
 
         jobOrderTrackingRecord.setRecordDate(LocalDate.now(ZoneId.of("Africa/Cairo")));
         jobOrderTrackingRecord.setActionTarget(ActionTarget.JOB_ORDER);
@@ -77,4 +74,19 @@ public class TrackingRecordServiceImpl implements TrackingRecordService {
         dao.insert(jobOrderTrackingRecord);
         return jobOrderTrackingRecord;
     }
+
+    @Override
+    public TrackingRecord itemOrderTracking(Item item, ActionType actionType, String reason){
+        TrackingRecord itemOrderTrackingRecord = new TrackingRecord();
+        itemOrderTrackingRecord.setRecordDate(LocalDate.now(ZoneId.of("Africa/Cairo")));
+        itemOrderTrackingRecord.setActionTarget(ActionTarget.ITEM);
+        itemOrderTrackingRecord.setActionType(actionType);
+        itemOrderTrackingRecord.setReason(reason);
+        itemOrderTrackingRecord.setTargetPN(item.getItemInfo().getPartNumber());
+        itemOrderTrackingRecord.setTargetDescription(item.getItemInfo().getDescription());
+        itemOrderTrackingRecord.setTargetSN(item.getSerialNumber());
+        dao.insert(itemOrderTrackingRecord);
+        return itemOrderTrackingRecord;
+    }
+
 }

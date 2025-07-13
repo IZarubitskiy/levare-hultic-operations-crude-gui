@@ -1,5 +1,6 @@
 package com.levare.hultic.ops.tracking.service;
 
+import com.levare.hultic.ops.items.entity.Item;
 import com.levare.hultic.ops.joborders.entity.JobOrder;
 import com.levare.hultic.ops.tracking.model.ActionTarget;
 import com.levare.hultic.ops.tracking.model.ActionType;
@@ -25,5 +26,8 @@ public interface TrackingRecordService {
 
     TrackingRecord workOrderTracking(WorkOrder workOrder, ActionType actionType, String reason);
 
-    TrackingRecord jobOrderTracking(JobOrder jobOrder, ActionType actionType, String reason);
+    TrackingRecord jobOrderTracking(JobOrder jobOrder, Item item, ActionType actionType, String reason);
+
+    TrackingRecord itemOrderTracking(Item item, ActionType actionType, String reason);
+
 }

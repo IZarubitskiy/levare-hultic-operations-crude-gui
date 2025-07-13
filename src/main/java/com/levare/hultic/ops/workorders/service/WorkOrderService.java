@@ -14,7 +14,7 @@ public interface WorkOrderService {
 
     WorkOrder update(WorkOrder workOrder);
 
-    void delete(Long id);
+    void delete(Long id, String reason);
 
     WorkOrder getById(Long id);
 
