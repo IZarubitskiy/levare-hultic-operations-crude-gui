@@ -2,6 +2,7 @@ package com.levare.hultic.ops.joborders.dao;
 
 import com.levare.hultic.ops.joborders.entity.JobOrder;
 import com.levare.hultic.ops.joborders.entity.JobOrderStatus;
+import com.levare.hultic.ops.joborders.entity.JobOrderType;
 import com.levare.hultic.ops.users.dao.UserDao;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -81,8 +82,8 @@ public class JobOrderDao {
      * Insert a new JobOrder
      */
     public JobOrder insert(JobOrder jobOrder) {
-        String sql = "INSERT INTO job_orders (work_order_id, item_id, status, responsible_user_id, comments) " +
-                "VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO job_orders (work_order_id, item_id, type, status, responsible_user_id, comments) " +
+                "VALUES (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             if (jobOrder.getWorkOrderId() != null) {
                 stmt.setLong(1, jobOrder.getWorkOrderId());
@@ -90,9 +91,10 @@ public class JobOrderDao {
                 stmt.setNull(1, java.sql.Types.BIGINT);
             }
             stmt.setLong(2, jobOrder.getItemId());
-            stmt.setString(3, jobOrder.getStatus().name());
-            stmt.setLong(4, jobOrder.getResponsibleUser().getId());
-            stmt.setString(5, jobOrder.getComments());
+            stmt.setString(3, jobOrder.getJobOrderType().name());
+            stmt.setString(4, jobOrder.getStatus().name());
+            stmt.setLong(5, jobOrder.getResponsibleUser().getId());
+            stmt.setString(6, jobOrder.getComments());
 
             stmt.executeUpdate();
             try (ResultSet keys = stmt.getGeneratedKeys()) {
@@ -146,6 +148,7 @@ public class JobOrderDao {
         jobOrder.setId(rs.getLong("id"));
         jobOrder.setWorkOrderId(rs.getLong("work_order_id"));
         jobOrder.setItemId(rs.getLong("item_id"));
+        jobOrder.setJobOrderType(JobOrderType.valueOf(rs.getString("type")));
         jobOrder.setStatus(JobOrderStatus.valueOf(rs.getString("status")));
 
         long userId = rs.getLong("responsible_user_id");

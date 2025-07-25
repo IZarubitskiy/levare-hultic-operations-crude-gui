@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS items (
     item_info_id INTEGER NOT NULL REFERENCES item_info(id),
     client_part_number TEXT,
     serial_number TEXT NOT NULL UNIQUE,
+    old_serial_number TEXT NOT NULL UNIQUE,
     ownership TEXT NOT NULL, -- enum Client
     item_condition TEXT NOT NULL, -- enum ItemCondition
     item_status TEXT NOT NULL, -- enum ItemStatus
@@ -41,7 +42,8 @@ CREATE TABLE IF NOT EXISTS job_orders (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     work_order_id INTEGER REFERENCES work_orders(id),
     item_id INTEGER NOT NULL REFERENCES items(id),
-    status TEXT NOT NULL, -- enum JobOrderStatus
+    status TEXT NOT NULL,
+    type TEXT NOT NULL,
     responsible_user_id INTEGER REFERENCES users(id),
     comments TEXT
 );
@@ -56,6 +58,16 @@ CREATE TABLE IF NOT EXISTS serial_numbers (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   serial_number  NVARCHAR(20) NOT NULL UNIQUE,
   part_number    NVARCHAR(50) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS serial_number_history (
+    id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+    item_id             INTEGER NOT NULL REFERENCES items(id),
+    old_serial_number   TEXT    NOT NULL,
+    new_serial_number   TEXT    NOT NULL,
+    changed_at          INTEGER NOT NULL, -- epoch-ms
+    reason              TEXT,
+    changed_by          INTEGER REFERENCES users(id)
 );
 
 CREATE TABLE IF NOT EXISTS tracking_records (

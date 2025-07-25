@@ -39,6 +39,7 @@ public final class ServiceRegistry {
     public static final WorkOrderService WORK_ORDER_SERVICE;
     public static final JobOrderService JOB_ORDER_SERVICE;
     public static final TrackingRecordService TRACKING_RECORD_SERVICE;
+    public static final ExcelTemplateService EXCEL_SERVICE;
 
     static {
         try {
@@ -75,6 +76,7 @@ public final class ServiceRegistry {
                     ITEM_SERVICE,
                     JOB_ORDER_SERVICE,
                     TRACKING_RECORD_SERVICE);
+            EXCEL_SERVICE = new ExcelTemplateService();
 
         } catch (SQLException e) {
             throw new ExceptionInInitializerError("ServiceRegistry init failed: " + e.getMessage());

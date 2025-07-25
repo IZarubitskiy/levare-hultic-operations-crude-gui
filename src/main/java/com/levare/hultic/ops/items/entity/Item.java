@@ -27,6 +27,11 @@ public class Item {
     private String serialNumber;
 
     /**
+     * Serial number of the item
+     */
+    private String oldSerialNumber;
+
+    /**
      * Ownership classification of the item
      */
     private Client ownership;
