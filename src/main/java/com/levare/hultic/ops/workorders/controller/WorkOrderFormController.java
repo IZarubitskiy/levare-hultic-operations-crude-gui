@@ -130,7 +130,7 @@ public class WorkOrderFormController {
                 List.of(ItemStatus.ON_STOCK)
         ));
         stockButton.setOnAction(e -> openFilteredDialog(
-                List.of(clientComboBox.getValue()),
+                List.of(clientComboBox.getValue(), Client.RNE, Client.STOCK, Client.CORPORATE),
                 List.of(ItemCondition.NEW, ItemCondition.REPAIRED),
                 List.of(ItemStatus.ON_STOCK)
         ));

@@ -11,6 +11,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class TrackingRecordController {
@@ -26,7 +28,7 @@ public class TrackingRecordController {
     @FXML
     private TableColumn<TrackingRecord, Long> idColumn;
     @FXML
-    private TableColumn<TrackingRecord, LocalDate> dateColumn;
+    private TableColumn<TrackingRecord, LocalDateTime> dateColumn;
     @FXML
     private TableColumn<TrackingRecord, ActionTarget> targetColumn;
     @FXML
@@ -58,8 +60,22 @@ public class TrackingRecordController {
     @FXML
     public void initialize() {
         // колонки
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
         idColumn.setCellValueFactory(c -> new ReadOnlyObjectWrapper<>(c.getValue().getId()));
         dateColumn.setCellValueFactory(c -> new ReadOnlyObjectWrapper<>(c.getValue().getRecordDate()));
+
+        dateColumn.setCellFactory(col -> new TableCell<TrackingRecord, LocalDateTime>() {
+            @Override
+            protected void updateItem(LocalDateTime item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText("");
+                } else {
+                    setText(dtf.format(item));
+                }
+            }
+        });
+
         targetColumn.setCellValueFactory(c -> new ReadOnlyObjectWrapper<>(c.getValue().getActionTarget()));
         typeColumn.setCellValueFactory(c -> new ReadOnlyObjectWrapper<>(c.getValue().getActionType()));
         woColumn.setCellValueFactory(c -> new ReadOnlyObjectWrapper<>(c.getValue().getTargetWorkOrderId()));

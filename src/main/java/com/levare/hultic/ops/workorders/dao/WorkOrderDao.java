@@ -1,5 +1,6 @@
 package com.levare.hultic.ops.workorders.dao;
 
+import com.levare.hultic.ops.common.DateUtils;
 import com.levare.hultic.ops.users.dao.UserDao;
 import com.levare.hultic.ops.workorders.entity.Client;
 import com.levare.hultic.ops.workorders.entity.WorkOrder;
@@ -17,6 +18,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static com.levare.hultic.ops.common.DateUtils.epochToLocalDate;
 import static lombok.AccessLevel.PRIVATE;
 
 /**
@@ -96,12 +98,6 @@ public class WorkOrderDao {
         order.setItemsId(ids);
 
         return order;
-    }
-
-    private LocalDate epochToLocalDate(long epochMilli) {
-        return Instant.ofEpochMilli(epochMilli)
-                .atZone(ZoneId.systemDefault())
-                .toLocalDate();
     }
 
     private List<Long> findItemIdsByWorkOrderId(long workOrderId) {

@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+import java.util.Date;
+
 /**
  * Represents an individual JobOrder which executes part of a WorkOrder.
  */
@@ -14,35 +17,15 @@ import lombok.NoArgsConstructor;
 public class JobOrder {
 
     private Long id;
-
-    /**
-     * WorkOrder to which this JobOrder belongs
-     */
     private Long workOrderId;
-
-    /**
-     * Equipment item associated with this JobOrder
-     */
     private Long itemId;
-
-    /**
-     * Current status of the JobOrder
-     */
     private JobOrderStatus status;
-
-    /**
-     * User responsible for executing this JobOrder
-     */
-    private User responsibleUser;
-
-    /**
-     * Type of JobOrder
-     */
     private JobOrderType jobOrderType;
-
-    /**
-     * Free-form comments about this JobOrder
-     */
+    private LocalDate plannedDate;
+    private LocalDate plannedDateUpdated;
+    private LocalDate finishedDate;
     private String comments;
+
+
 
 }

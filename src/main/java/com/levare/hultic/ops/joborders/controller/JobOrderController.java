@@ -9,7 +9,6 @@ import com.levare.hultic.ops.joborders.entity.JobOrder;
 import com.levare.hultic.ops.joborders.entity.JobOrderStatus;
 import com.levare.hultic.ops.joborders.entity.JobOrderType;
 import com.levare.hultic.ops.joborders.service.JobOrderService;
-import com.levare.hultic.ops.users.entity.User;
 import com.levare.hultic.ops.users.service.UserService;
 import com.levare.hultic.ops.workorders.entity.Client;
 import com.levare.hultic.ops.workorders.entity.WorkOrder;
@@ -59,7 +58,8 @@ public class JobOrderController {
     @FXML private TableColumn<JobOrder, String> clientColumn;
     @FXML private TableColumn<JobOrder, JobOrderType> jobTypeColumn;
     @FXML private TableColumn<JobOrder, JobOrderStatus> statusColumn;
-    @FXML private TableColumn<JobOrder, String> responsibleColumn;
+    @FXML private TableColumn<JobOrder, String> wellColumn;
+    @FXML private TableColumn<JobOrder, String> plannedDateColumn;
     @FXML private TableColumn<JobOrder, LocalDate> deliveryColumn;
     @FXML private TableColumn<JobOrder, String> commentsColumn;
 
@@ -68,6 +68,8 @@ public class JobOrderController {
     @FXML private Button deleteButton;
     @FXML private Button createButton;
     @FXML private Button updateButton;
+    @FXML private Button finishButton;
+    @FXML private Button cancelButton;
     @FXML private Button printButton;
 
     @FXML
@@ -108,10 +110,25 @@ public class JobOrderController {
         statusColumn.setCellValueFactory(c ->
                 new SimpleObjectProperty<>(c.getValue().getStatus())
         );
-        responsibleColumn.setCellValueFactory(c -> {
-            User u = c.getValue().getResponsibleUser();
-            return new SimpleStringProperty(u != null ? u.getName() : "");
+
+        wellColumn.setCellValueFactory(c -> {
+            Long woId = c.getValue().getWorkOrderId();
+            if (woId == null || woId == 0) {
+                return new SimpleStringProperty("");
+            }
+            WorkOrder wo = workOrderService.getById(woId);
+            return new SimpleStringProperty(wo.getWell());
         });
+        plannedDateColumn.setCellValueFactory(c ->
+        {
+            if (c.getValue().getPlannedDate().isAfter(c.getValue().getPlannedDateUpdated())) {
+                return new SimpleObjectProperty<> (c.getValue().getPlannedDate().toString());
+            } else {
+                return new SimpleObjectProperty<> (c.getValue().getPlannedDateUpdated().toString());
+            }
+        }
+        );
+
         commentsColumn.setCellValueFactory(c ->
                 new SimpleStringProperty(c.getValue().getComments())
         );
@@ -120,9 +137,9 @@ public class JobOrderController {
         statusFilterCombo.getItems().add(0, null);
 
         refreshButton.setOnAction(e -> refreshTable());
-        deleteButton.setOnAction(e -> deleteSelected());
         createButton.setOnAction(e -> createNew());
         updateButton.setOnAction(e -> updateSelected());
+        deleteButton.setOnAction(e -> deleteSelected());
         printButton.setOnAction(e -> handlePrint());
 
         refreshTable();
@@ -134,62 +151,6 @@ public class JobOrderController {
                 : jobOrderService.getAll();
         jobOrderTable.setItems(FXCollections.observableArrayList(list));
     }
-
-    private void handlePrint() {
-        JobOrder sel = jobOrderTable.getSelectionModel().getSelectedItem();
-        if (sel == null) {
-            showAlert("No selection", "Please select a job order to print.");
-            return;
-        }
-
-        Map<String, Object> data = new HashMap<>();
-        data.put("orderId", sel.getId());
-        Item it = itemService.getById(sel.getItemId());
-        data.put("partNumber", it.getItemInfo().getPartNumber());
-        data.put("serialNumber", it.getSerialNumber());
-        data.put("description", sel.getComments());
-        data.put("clientName", it.getOwnership().name());
-        data.put("status", sel.getStatus().toString());
-        data.put("responsible", sel.getResponsibleUser() != null
-                ? sel.getResponsibleUser().getName() : "");
-        data.put("deliveryDate", workOrderService.getById(sel.getWorkOrderId()).getDeliveryDate());
-        data.put("comments", sel.getComments());
-
-        String templateName = "JobOrderTemplate.xlsx";
-        Path output = Paths.get(System.getProperty("user.dir"), "out",
-                "JobOrder_" + sel.getId() + ".xlsx");
-
-        try {
-            Path result = excelService.generate(templateName, data, output);
-            Desktop.getDesktop().open(result.toFile());
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            showAlert("Error", "Cannot generate or open file: " + ex.getMessage());
-        }
-    }
-
-    @FXML
-    private void deleteSelected() {
-        JobOrder sel = jobOrderTable.getSelectionModel().getSelectedItem();
-        if (sel == null) {
-            showAlert("No selection", "Please select a job order to delete.");
-            return;
-        }
-        TextInputDialog reasonDialog = new TextInputDialog();
-        reasonDialog.setTitle("Delete Job Order");
-        reasonDialog.setHeaderText("Please provide a reason for deletion:");
-        reasonDialog.setContentText("Reason:");
-        var result = reasonDialog.showAndWait();
-        if (result.isPresent() && !result.get().trim().isEmpty()) {
-            String reason = result.get().trim();
-            itemService.updateWithJobOrder(sel.getItemId(), null);
-            jobOrderService.delete(sel.getId(), reason);
-            refreshTable();
-        } else {
-            showAlert("Validation", "Deletion reason cannot be empty.");
-        }
-    }
-
     @FXML
     private void createNew() {
         try {
@@ -239,16 +200,175 @@ public class JobOrderController {
         }
     }
 
+    private void handlePrint() {
+        JobOrder sel = jobOrderTable.getSelectionModel().getSelectedItem();
+        if (sel == null) {
+            showAlert("No selection", "Please select a job order to print.");
+            return;
+        }
+
+        Map<String, Object> data = new HashMap<>();
+        StringBuilder joNumber = new StringBuilder(11);
+
+        joNumber.append("JO");
+        switch (String.valueOf(sel.getId()).length()) {
+            case 1 -> joNumber.append("0000");
+            case 2 -> joNumber.append("000");
+            case 3 -> joNumber.append("00");
+            case 4 -> joNumber.append("0");
+            case 5 -> joNumber.append("");
+            default -> throw new IllegalStateException(
+                    "Unexpected JobOrder number : " + sel.getId());
+        }
+        joNumber.append(sel.getId());
+        data.put("orderId",joNumber);
+
+        Item it = itemService.getById(sel.getItemId());
+        data.put("partNumber", it.getItemInfo().getPartNumber());
+        data.put("serialNumber", it.getSerialNumber());
+        data.put("description", it.getItemInfo().getDescription());
+        data.put("clientName", it.getOwnership().name());
+        data.put("date", LocalDate.now());
+        String wellNumber = sel.getWorkOrderId() == 0
+                ? ""
+                : workOrderService.getById(sel.getWorkOrderId()).getWorkOrderNumber();
+        data.put("wellNumber", wellNumber);
+
+        data.put("comments", sel.getComments());
+
+        String templateName = "";
+        switch (it.getItemInfo().getItemType()) {
+            case PUMP, VAPRO -> {
+                    switch (sel.getJobOrderType()){
+                        case DISMANTLE -> templateName = "jo_pump_dismantle_template.xlsx";
+                        case ASSEMBLY -> templateName = "jo_pump_assembly_template.xlsx";
+                        case INSPECTION -> templateName = "jo_pump_inspection_template.xlsx";
+                        default -> throw new IllegalStateException(
+                                "Unexpected JobOrder type : " + sel.getJobOrderType());
+                    }
+            }
+            case BOI, GAS_SEPARATOR -> {
+                switch (sel.getJobOrderType()){
+                case DISMANTLE -> templateName = "jo_intake_device_dismantle_template.xlsx";
+                case ASSEMBLY -> templateName = "jo_intake_device_assembly_template.xlsx";
+                case INSPECTION -> templateName = "jo_intake_device_inspection_template.xlsx";
+                default -> throw new IllegalStateException(
+                        "Unexpected JobOrder type : " + sel.getJobOrderType());
+                }
+            }
+            case SEAL -> {
+                switch (sel.getJobOrderType()){
+                    case DISMANTLE -> templateName = "jo_seal_dismantle_template.xlsx";
+                    case ASSEMBLY -> templateName = "jo_seal_assembly_template.xlsx";
+                    case INSPECTION -> templateName = "jo_seal_inspection_template.xlsx";
+                    case TANDEM -> templateName = "jo_seal_tandem_template.xlsx";
+                    default -> throw new IllegalStateException(
+                            "Unexpected JobOrder type : " + sel.getJobOrderType());
+                }
+            }
+            case MOTOR -> {
+                switch (sel.getJobOrderType()){
+                    case DISMANTLE -> templateName = "jo_motor_dismantle_template.xlsx";
+                    case ASSEMBLY -> templateName = "jo_motor_assembly_template.xlsx";
+                    case INSPECTION -> templateName = "jo_motor_inspection_template.xlsx";
+                    default -> throw new IllegalStateException(
+                            "Unexpected JobOrder type : " + sel.getJobOrderType());
+                }
+            }
+
+            case SENSOR -> {
+                switch (sel.getJobOrderType()){
+                    case INSPECTION -> templateName = "jo_sensor_inspection_template.xlsx";
+                    case SENSOR_CONNECTION -> templateName = "jo_sensor_connection_template.xlsx";
+                    default -> throw new IllegalStateException(
+                            "Unexpected JobOrder type : " + sel.getJobOrderType());
+                }
+            }
+            case MLE -> {
+                switch (sel.getJobOrderType()){
+                    case CABLE_CUT -> templateName = "jo_mle_cable_cut_template.xlsx";
+                    case ASSEMBLY -> templateName = "jo_mle_assembly_template.xlsx";
+                    case INSPECTION -> templateName = "jo_mle_inspection_template.xlsx";
+                    default -> throw new IllegalStateException(
+                            "Unexpected JobOrder type : " + sel.getJobOrderType());
+                }
+            }
+            case CABLE -> {
+                switch (sel.getJobOrderType()){
+                    case CABLE_REPAIR -> templateName = "jo_cable_repair_template.xlsx";
+                    case INSPECTION -> templateName = "jo_cable_inspection_template.xlsx";
+                    default -> throw new IllegalStateException(
+                            "Unexpected JobOrder type : " + sel.getJobOrderType());
+                }
+            }
+        }
+
+        Path output = Paths.get(System.getProperty("user.dir"), "out",
+                "JobOrder_" + sel.getId() + ".xlsx");
+
+        try {
+            Path result = excelService.generate(templateName, data, output);
+            Desktop.getDesktop().open(result.toFile());
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            showAlert("Error", "Cannot generate or open file: " + ex.getMessage());
+        }
+
+        jobOrderService.changeStatus(sel.getId(), JobOrderStatus.IN_PROGRESS);
+    }
+
     private void updateSelected() {
         JobOrder sel = jobOrderTable.getSelectionModel().getSelectedItem();
-        if (sel != null) {
-            sel.setComments(sel.getComments() + " (updated)");
-            jobOrderService.update(sel.getId(), sel);
+        if (sel == null) {
+            showAlert("No selection", "Please select a Job Order first.");
+            return;
+        }
+
+        Dialog<LocalDate> dialog = new Dialog<>();
+        dialog.setTitle("Change Planned Date");
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        DatePicker picker = new DatePicker(sel.getPlannedDate());
+        dialog.getDialogPane().setContent(picker);
+
+        dialog.setResultConverter(btn -> btn == ButtonType.OK ? picker.getValue() : null);
+        dialog.showAndWait().ifPresent(newDate -> {
+            if (newDate != null) {
+                if (newDate.isAfter(workOrderService.getById(sel.getWorkOrderId()).getDeliveryDate()))
+                {
+                    showAlert("Wrong date", "Planned date is later than delivery date.");
+                    return;
+                    }
+                sel.setPlannedDateUpdated(newDate);
+                jobOrderService.update(sel.getId(), sel);
+                refreshTable();
+            }
+        });
+    }
+
+    @FXML
+    private void deleteSelected() {
+        JobOrder sel = jobOrderTable.getSelectionModel().getSelectedItem();
+        if (sel == null) {
+            showAlert("No selection", "Please select a job order to delete.");
+            return;
+        }
+        TextInputDialog reasonDialog = new TextInputDialog();
+        reasonDialog.setTitle("Delete Job Order");
+        reasonDialog.setHeaderText("Please provide a reason for deletion:");
+        reasonDialog.setContentText("Reason:");
+        var result = reasonDialog.showAndWait();
+        if (result.isPresent() && !result.get().trim().isEmpty()) {
+            String reason = result.get().trim();
+            itemService.updateWithJobOrder(sel.getItemId(), null);
+            jobOrderService.delete(sel.getId(), reason);
             refreshTable();
         } else {
-            showAlert("No selection", "Please select a job order to update.");
+            showAlert("Validation", "Deletion reason cannot be empty.");
         }
     }
+
+
 
     private void showAlert(String title, String content) {
         Alert a = new Alert(Alert.AlertType.INFORMATION);

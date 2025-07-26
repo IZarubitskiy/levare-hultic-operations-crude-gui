@@ -39,9 +39,7 @@ public class NewJobOrderController {
     @FXML
     private ComboBox<JobOrderType> jobTypeCombo;
     @FXML
-    private ComboBox<User> responsibleCombo;
-    @FXML
-    private Button availableStockButton;
+    private DatePicker plannedDatePicker;
     @FXML
     private Button saveButton;
     @FXML
@@ -77,15 +75,30 @@ public class NewJobOrderController {
         ownerCombo.setItems(FXCollections.observableArrayList(Client.values()));
         ownerCombo.setValue(item.getOwnership());
 
-        jobTypeCombo.setItems(FXCollections.observableArrayList(JobOrderType.values()));
+        // Ограничиваем список JobOrderType в зависимости от типа оборудования
+        switch (item.getItemInfo().getItemType()) {
+            case TYPE_A:
+                jobTypeCombo.setItems(FXCollections.observableArrayList(
+                        /* JobOrderType.TYPE_1, JobOrderType.TYPE_2, … */
+                ));
+                break;
+
+            case TYPE_B:
+                jobTypeCombo.setItems(FXCollections.observableArrayList(
+                        /* JobOrderType.TYPE_3, JobOrderType.TYPE_4, … */
+                ));
+                break;
+
+            // … другие кейсы …
+
+            default:
+                // если не подходит ни один кейс, показываем все типы
+                jobTypeCombo.setItems(FXCollections.observableArrayList(JobOrderType.values()));
+                break;
+        }
+
         jobTypeCombo.getSelectionModel().selectFirst();
-
-        responsibleCombo.setItems(FXCollections.observableArrayList(userService.getAll()));
         commentsArea.clear();
-
-        availableStockButton.setOnAction(e -> {
-            // TODO: открыть диалог доступного склада
-        });
     }
 
     /**
@@ -93,15 +106,6 @@ public class NewJobOrderController {
      */
     @FXML
     private void initialize() {
-        // Настройка отображения списка пользователей
-        responsibleCombo.setCellFactory(lv -> new ListCell<>() {
-            @Override
-            protected void updateItem(User u, boolean empty) {
-                super.updateItem(u, empty);
-                setText(empty || u == null ? null : u.getName());
-            }
-        });
-        responsibleCombo.setButtonCell(responsibleCombo.getCellFactory().call(null));
 
         // Привязка действий к кнопкам
         saveButton.setOnAction(e -> handleSave());
@@ -113,18 +117,15 @@ public class NewJobOrderController {
      */
     @FXML
     private void handleSave() {
-        User resp = responsibleCombo.getValue();
-        if (resp == null) {
-            showAlert("Validation Error", "Select a responsible user.");
-            return;
-        }
+
         var jo = new JobOrder();
         jo.setWorkOrderId(workOrderId);
         jo.setItemId(itemId);
         jo.setStatus(JobOrderStatus.CREATED);
-        jo.setResponsibleUser(resp);
         jo.setJobOrderType(jobTypeCombo.getValue());
         jo.setComments(commentsArea.getText());
+        System.out.println(plannedDatePicker.getValue().toString());
+        jo.setPlannedDate(plannedDatePicker.getValue());
 
         Long jobOrderId = jobOrderService.create(jo).getId();
         itemService.updateWithJobOrder(itemId, jobOrderId);

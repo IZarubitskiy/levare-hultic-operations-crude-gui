@@ -24,5 +24,6 @@ public enum Client {
     PETROZENIMA,
     CORPORATE,
     RNE,
+    STOCK,
     EMPTY
 }

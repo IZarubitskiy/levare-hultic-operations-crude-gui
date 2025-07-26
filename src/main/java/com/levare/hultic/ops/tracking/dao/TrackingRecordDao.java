@@ -8,6 +8,7 @@ import com.levare.hultic.ops.workorders.entity.Client;
 import java.sql.*;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +29,7 @@ public class TrackingRecordDao {
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """;
         try (PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            ps.setDate(1, Date.valueOf(record.getRecordDate()));
+            ps.setTimestamp(1, Timestamp.valueOf(record.getRecordDate()));
             ps.setString(2, record.getActionTarget().name());
             ps.setString(3, record.getActionType().name());
             if (record.getTargetWorkOrderId() != null)
@@ -146,9 +147,9 @@ public class TrackingRecordDao {
 
         // Считываем epoch миллисекунд и преобразуем в LocalDate
         long epochMilli = rs.getLong("record_date");
-        LocalDate recordDate = Instant.ofEpochMilli(epochMilli)
+        LocalDateTime recordDate = Instant.ofEpochMilli(epochMilli)
                 .atZone(ZoneId.systemDefault())
-                .toLocalDate();
+                .toLocalDateTime();
         rec.setRecordDate(recordDate);
 
         // Остальные поля

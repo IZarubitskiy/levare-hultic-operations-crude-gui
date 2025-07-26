@@ -6,7 +6,9 @@ package com.levare.hultic.ops.joborders.entity;
 public enum JobOrderType {
     DISMANTLE,
     ASSEMBLY,
-    RECEIVING_INSPECTION,
+    INSPECTION,
+    TANDEM,
     SENSOR_CONNECTION,
-    RETESTING
+    CABLE_CUT,
+    CABLE_REPAIR
 }

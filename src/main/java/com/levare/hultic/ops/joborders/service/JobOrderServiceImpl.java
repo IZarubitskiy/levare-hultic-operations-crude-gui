@@ -56,9 +56,8 @@ public class JobOrderServiceImpl implements JobOrderService {
         JobOrder jobOrder = getById(id);
         JobOrderStatus oldStatus = jobOrder.getStatus();
         jobOrder.setStatus(newStatus);
-        jobOrderDao.update(jobOrder);
         trackingRecordService.jobOrderTracking(
-                jobOrderDao.insert(jobOrder),
+                update(id, jobOrder),
                 itemService.getById(jobOrder.getId()),
                 ActionType.STATUS_CHANGE,
                 "Status Changed from " + oldStatus.name() + " to " + newStatus.name());
@@ -69,9 +68,8 @@ public class JobOrderServiceImpl implements JobOrderService {
     public void delete(Long id, String reason) {
         getById(id); // throws if not found
 
-
         trackingRecordService.jobOrderTracking(
-                jobOrderDao.insert(getById(id)),
+                getById(id),
                 itemService.getById(getById(id).getId()),
                 ActionType.REMOVAL,
                 reason);

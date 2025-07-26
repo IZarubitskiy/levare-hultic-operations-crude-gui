@@ -9,9 +9,11 @@ import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
 import java.sql.*;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.levare.hultic.ops.common.DateUtils.epochToLocalDate;
 import static lombok.AccessLevel.PRIVATE;
 
 /**
@@ -82,7 +84,8 @@ public class JobOrderDao {
      * Insert a new JobOrder
      */
     public JobOrder insert(JobOrder jobOrder) {
-        String sql = "INSERT INTO job_orders (work_order_id, item_id, type, status, responsible_user_id, comments) " +
+
+        String sql = "INSERT INTO job_orders (work_order_id, item_id, type, status, planned_date, comments) " +
                 "VALUES (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             if (jobOrder.getWorkOrderId() != null) {
@@ -93,7 +96,7 @@ public class JobOrderDao {
             stmt.setLong(2, jobOrder.getItemId());
             stmt.setString(3, jobOrder.getJobOrderType().name());
             stmt.setString(4, jobOrder.getStatus().name());
-            stmt.setLong(5, jobOrder.getResponsibleUser().getId());
+            stmt.setLong(5, jobOrder.getPlannedDate().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli());
             stmt.setString(6, jobOrder.getComments());
 
             stmt.executeUpdate();
@@ -113,12 +116,14 @@ public class JobOrderDao {
      */
     public void update(JobOrder jobOrder) {
         String sql = "UPDATE job_orders SET work_order_id = ?, item_id = ?, status = ?, " +
-                "responsible_user_id = ?, comments = ? WHERE id = ?";
+                " updated_date = ?, comments = ? WHERE id = ?";
+        System.out.println(jobOrder);
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setLong(1, jobOrder.getWorkOrderId());
             stmt.setLong(2, jobOrder.getItemId());
             stmt.setString(3, jobOrder.getStatus().name());
-            stmt.setLong(4, jobOrder.getResponsibleUser().getId());
+            stmt.setLong(4, jobOrder.getPlannedDateUpdated()
+                    .atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli());
             stmt.setString(5, jobOrder.getComments());
             stmt.setLong(6, jobOrder.getId());
             stmt.executeUpdate();
@@ -150,13 +155,9 @@ public class JobOrderDao {
         jobOrder.setItemId(rs.getLong("item_id"));
         jobOrder.setJobOrderType(JobOrderType.valueOf(rs.getString("type")));
         jobOrder.setStatus(JobOrderStatus.valueOf(rs.getString("status")));
-
-        long userId = rs.getLong("responsible_user_id");
-        if (rs.wasNull()) {
-            jobOrder.setResponsibleUser(null);
-        } else {
-            jobOrder.setResponsibleUser(userDao.findById(userId));
-        }
+        jobOrder.setPlannedDate(epochToLocalDate(rs.getLong("planned_date")));
+        jobOrder.setPlannedDateUpdated(epochToLocalDate(rs.getLong("updated_date")));
+        jobOrder.setFinishedDate(epochToLocalDate(rs.getLong("finished_date")));
 
         jobOrder.setComments(rs.getString("comments"));
         return jobOrder;

@@ -52,8 +52,8 @@ public class ExcelTemplateService {
         try (InputStream in = Files.newInputStream(tpl);
              Workbook wb = new XSSFWorkbook(in)) {
 
-            fillByNamedRanges(wb, data);
-            // Или: fillByPlaceholders(wb, data);
+            //fillByNamedRanges(wb, data);
+            fillByPlaceholders(wb, data);
 
             Files.createDirectories(outputFile.getParent());
             try (OutputStream out = Files.newOutputStream(outputFile)) {

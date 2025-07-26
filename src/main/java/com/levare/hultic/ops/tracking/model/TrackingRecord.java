@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -13,7 +14,7 @@ import java.time.LocalDate;
 public class TrackingRecord {
 
     private Long id;
-    private LocalDate recordDate;
+    private LocalDateTime recordDate;
     private ActionTarget actionTarget;
     private ActionType actionType;
     private Client client;

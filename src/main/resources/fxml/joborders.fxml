@@ -23,7 +23,9 @@
             <ComboBox fx:id="statusFilterCombo" promptText="All statuses"/>
             <Button fx:id="refreshButton" text="Refresh"/>
             <Button fx:id="createButton" text="New"/>
-            <Button fx:id="updateButton" text="Update"/>
+            <Button fx:id="updateButton" text="Change Date"/>
+            <Button fx:id="finishButton" text="Done"/>
+            <Button fx:id="cancelButton" text="Cancel"/>
             <Button fx:id="deleteButton" text="Delete"/>
         </HBox>
 
@@ -39,15 +41,16 @@
     <!-- Таблица JobOrder -->
     <TableView fx:id="jobOrderTable" VBox.vgrow="ALWAYS">
         <columns>
-            <TableColumn fx:id="idColumn" text="ID" prefWidth="60"/>
-            <TableColumn fx:id="partNumberColumn" text="Part Number" prefWidth="120"/>
-            <TableColumn fx:id="serialColumn" text="Serial #" prefWidth="100"/>
-            <TableColumn fx:id="descriptionColumn" text="Description" prefWidth="150"/>
-            <TableColumn fx:id="clientColumn" text="Client" prefWidth="100"/>
-            <TableColumn fx:id="jobTypeColumn" text="Job Type" prefWidth="120"/>
-            <TableColumn fx:id="statusColumn" text="Status" prefWidth="100"/>
-            <TableColumn fx:id="responsibleColumn" text="Responsible" prefWidth="120"/>
-            <TableColumn fx:id="deliveryColumn" text="Planned Delivery" prefWidth="120"/>
+            <TableColumn fx:id="idColumn" text="ID" prefWidth="60" style="-fx-alignment: CENTER;"/>
+            <TableColumn fx:id="partNumberColumn" text="Part Number" prefWidth="120" style="-fx-alignment: CENTER;"/>
+            <TableColumn fx:id="serialColumn" text="Serial #" prefWidth="100" style="-fx-alignment: CENTER;"/>
+            <TableColumn fx:id="descriptionColumn" text="Description" prefWidth="200"/>
+            <TableColumn fx:id="clientColumn" text="Client" prefWidth="100" style="-fx-alignment: CENTER;"/>
+            <TableColumn fx:id="jobTypeColumn" text="Job Type" prefWidth="120" style="-fx-alignment: CENTER;"/>
+            <TableColumn fx:id="statusColumn" text="Status" prefWidth="100" style="-fx-alignment: CENTER;"/>
+            <TableColumn fx:id="wellColumn" text="Well" prefWidth="120" style="-fx-alignment: CENTER;"/>
+            <TableColumn fx:id="plannedDateColumn" text="Plan" prefWidth="120" style="-fx-alignment: CENTER;"/>
+            <TableColumn fx:id="deliveryColumn" text="Planned Delivery" prefWidth="120" style="-fx-alignment: CENTER;"/>
             <TableColumn fx:id="commentsColumn" text="Comments" prefWidth="150"/>
         </columns>
     </TableView>

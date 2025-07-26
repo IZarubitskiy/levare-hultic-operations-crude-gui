@@ -44,7 +44,9 @@ CREATE TABLE IF NOT EXISTS job_orders (
     item_id INTEGER NOT NULL REFERENCES items(id),
     status TEXT NOT NULL,
     type TEXT NOT NULL,
-    responsible_user_id INTEGER REFERENCES users(id),
+    planned_date DATE,
+    updated_date DATE,
+    finished_date DATE,
     comments TEXT
 );
 

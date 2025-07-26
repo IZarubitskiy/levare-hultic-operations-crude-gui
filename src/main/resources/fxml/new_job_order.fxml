@@ -2,6 +2,7 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.levare.hultic.ops.joborders.controller.NewJobOrderController"
@@ -50,22 +51,17 @@
         <ComboBox fx:id="jobTypeCombo"
                   GridPane.rowIndex="5" GridPane.columnIndex="1"/>
 
-        <!-- Responsible User -->
-        <Label text="Responsible:" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
-        <ComboBox fx:id="responsibleCombo"
-                  GridPane.rowIndex="6" GridPane.columnIndex="1"/>
-
-        <!-- Available Stock Button -->
-        <Button fx:id="availableStockButton" text="Available Stock"
-                GridPane.rowIndex="7" GridPane.columnIndex="1"
-                alignment="CENTER_RIGHT"/>
+        <!-- Planned Date -->
+        <Label text="Planned Date:" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
+        <DatePicker fx:id="plannedDatePicker"
+                    GridPane.rowIndex="6" GridPane.columnIndex="1"/>
     </GridPane>
 
     <!-- Comments -->
     <Label text="Comments:"/>
     <TextArea fx:id="commentsArea" wrapText="true" prefRowCount="3"/>
 
-    <!-- Кнопки Сохранить/Отмена -->
+    <!-- Кнопки Save/Cancel -->
     <HBox spacing="10" alignment="CENTER_RIGHT">
         <Button fx:id="saveButton" text="Save"/>
         <Button fx:id="cancelButton" text="Cancel"/>

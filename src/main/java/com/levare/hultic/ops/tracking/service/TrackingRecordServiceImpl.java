@@ -10,6 +10,7 @@ import com.levare.hultic.ops.tracking.model.TrackingRecord;
 import com.levare.hultic.ops.workorders.entity.WorkOrder;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 
@@ -49,7 +50,7 @@ public class TrackingRecordServiceImpl implements TrackingRecordService {
     @Override
     public TrackingRecord workOrderTracking(WorkOrder workOrder, ActionType actionType, String reason) {
         TrackingRecord workOrderTrackingRecord = new TrackingRecord();
-        workOrderTrackingRecord.setRecordDate(LocalDate.now(ZoneId.of("Africa/Cairo")));
+        workOrderTrackingRecord.setRecordDate(LocalDateTime.now(ZoneId.of("Africa/Cairo")));
         workOrderTrackingRecord.setActionTarget(ActionTarget.WORK_ORDER);
         workOrderTrackingRecord.setActionType(actionType);
         workOrderTrackingRecord.setTargetWorkOrderId(workOrder.getId());
@@ -63,7 +64,7 @@ public class TrackingRecordServiceImpl implements TrackingRecordService {
     public TrackingRecord jobOrderTracking(JobOrder jobOrder, Item item, ActionType actionType, String reason) {
         TrackingRecord jobOrderTrackingRecord = new TrackingRecord();
 
-        jobOrderTrackingRecord.setRecordDate(LocalDate.now(ZoneId.of("Africa/Cairo")));
+        jobOrderTrackingRecord.setRecordDate(LocalDateTime.now(ZoneId.of("Africa/Cairo")));
         jobOrderTrackingRecord.setActionTarget(ActionTarget.JOB_ORDER);
         jobOrderTrackingRecord.setActionType(actionType);
         jobOrderTrackingRecord.setTargetJobOrderId(jobOrder.getId());
@@ -78,7 +79,7 @@ public class TrackingRecordServiceImpl implements TrackingRecordService {
     @Override
     public TrackingRecord itemTracking(Item item, ActionType actionType, String reason){
         TrackingRecord itemOrderTrackingRecord = new TrackingRecord();
-        itemOrderTrackingRecord.setRecordDate(LocalDate.now(ZoneId.of("Africa/Cairo")));
+        itemOrderTrackingRecord.setRecordDate(LocalDateTime.now(ZoneId.of("Africa/Cairo")));
         itemOrderTrackingRecord.setActionTarget(ActionTarget.ITEM);
         itemOrderTrackingRecord.setActionType(actionType);
         itemOrderTrackingRecord.setReason(reason);

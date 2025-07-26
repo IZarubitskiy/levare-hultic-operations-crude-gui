@@ -42,7 +42,7 @@
 
         <HBox spacing="10" alignment="CENTER_LEFT">
             <Button fx:id="newItemButton" text="NEW" onAction="#onNewItem"/>
-            <Button fx:id="repairButton" text="REPAIR"/>
+            <Button fx:id="repairButton" text="OUTSTANDING"/>
             <Button fx:id="stockButton" text="STOCK"/>
             <Button fx:id="rneButton" text="RNE"/>
             <Button fx:id="wipButton" text="WIP" onAction="#onWip"/>
