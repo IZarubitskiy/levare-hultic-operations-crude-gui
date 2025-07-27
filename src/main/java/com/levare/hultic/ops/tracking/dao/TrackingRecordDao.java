@@ -3,7 +3,6 @@ package com.levare.hultic.ops.tracking.dao;
 import com.levare.hultic.ops.tracking.model.ActionTarget;
 import com.levare.hultic.ops.tracking.model.ActionType;
 import com.levare.hultic.ops.tracking.model.TrackingRecord;
-import com.levare.hultic.ops.workorders.entity.Client;
 
 import java.sql.*;
 import java.time.Instant;

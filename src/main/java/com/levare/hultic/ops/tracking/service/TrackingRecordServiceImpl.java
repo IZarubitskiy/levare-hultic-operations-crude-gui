@@ -1,7 +1,6 @@
 package com.levare.hultic.ops.tracking.service;
 
 import com.levare.hultic.ops.items.entity.Item;
-import com.levare.hultic.ops.items.service.ItemService;
 import com.levare.hultic.ops.joborders.entity.JobOrder;
 import com.levare.hultic.ops.tracking.dao.TrackingRecordDao;
 import com.levare.hultic.ops.tracking.model.ActionTarget;
@@ -77,7 +76,7 @@ public class TrackingRecordServiceImpl implements TrackingRecordService {
     }
 
     @Override
-    public TrackingRecord itemTracking(Item item, ActionType actionType, String reason){
+    public TrackingRecord itemTracking(Item item, ActionType actionType, String reason) {
         TrackingRecord itemOrderTrackingRecord = new TrackingRecord();
         itemOrderTrackingRecord.setRecordDate(LocalDateTime.now(ZoneId.of("Africa/Cairo")));
         itemOrderTrackingRecord.setActionTarget(ActionTarget.ITEM);

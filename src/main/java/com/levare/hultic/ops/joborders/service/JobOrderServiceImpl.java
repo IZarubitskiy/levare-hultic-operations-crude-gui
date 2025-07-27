@@ -1,7 +1,9 @@
 package com.levare.hultic.ops.joborders.service;
 
+import com.levare.hultic.ops.items.entity.Item;
+import com.levare.hultic.ops.items.entity.ItemCondition;
+import com.levare.hultic.ops.items.entity.ItemStatus;
 import com.levare.hultic.ops.items.service.ItemService;
-import com.levare.hultic.ops.items.service.ItemServiceImpl;
 import com.levare.hultic.ops.joborders.dao.JobOrderDao;
 import com.levare.hultic.ops.joborders.entity.JobOrder;
 import com.levare.hultic.ops.joborders.entity.JobOrderStatus;
@@ -9,6 +11,7 @@ import com.levare.hultic.ops.tracking.model.ActionType;
 import com.levare.hultic.ops.tracking.service.TrackingRecordService;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
@@ -43,25 +46,41 @@ public class JobOrderServiceImpl implements JobOrderService {
     }
 
     @Override
-    public JobOrder update(Long id, JobOrder updatedJobOrder) {
-        JobOrder existing = getById(id);
-
-        updatedJobOrder.setId(existing.getId());
-        jobOrderDao.update(updatedJobOrder);
-        return updatedJobOrder;
+    public void updatePlanDate(Long id, LocalDate newDate) {
+        JobOrder jo = getById(id);
+        LocalDate oldDate = jo.getPlannedDate();
+        jo.setPlannedDateUpdated(newDate);
+        jobOrderDao.update(jo);
+        trackingRecordService.jobOrderTracking(
+                jo,
+                itemService.getById(jo.getId()),
+                ActionType.STATUS_CHANGE,
+                "PLan date Changed from " + oldDate + " to " + newDate);
     }
 
     @Override
-    public JobOrder changeStatus(Long id, JobOrderStatus newStatus) {
-        JobOrder jobOrder = getById(id);
-        JobOrderStatus oldStatus = jobOrder.getStatus();
-        jobOrder.setStatus(newStatus);
+    public void changeStatus(Long id, JobOrderStatus newStatus) {
+        JobOrder jo = getById(id);
+        JobOrderStatus oldStatus = jo.getStatus();
+        jo.setStatus(newStatus);
+        jobOrderDao.update(jo);
         trackingRecordService.jobOrderTracking(
-                update(id, jobOrder),
-                itemService.getById(jobOrder.getId()),
+                jo,
+                itemService.getById(jo.getId()),
                 ActionType.STATUS_CHANGE,
                 "Status Changed from " + oldStatus.name() + " to " + newStatus.name());
-        return jobOrder;
+    }
+
+    @Override
+    public void finish(Long id, LocalDate finishDate) {
+        JobOrder jo = getById(id);
+        jo.setStatus(JobOrderStatus.DONE);
+        jo.setFinishedDate(finishDate);
+        trackingRecordService.jobOrderTracking(
+                jo,
+                itemService.getById(jo.getId()),
+                ActionType.FINALIZING,
+                "Job order is finalized.");
     }
 
     @Override

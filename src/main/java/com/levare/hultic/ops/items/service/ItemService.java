@@ -36,8 +36,9 @@ public interface ItemService {
 
     Item newItemFromCatalog(String itemInfoId, Client client);
 
-    Item updateStatus(Item item, ItemStatus newStatus);
+    void updateStatus(Item item, ItemStatus newStatus);
 
     void updateWithJobOrder(Long itemId, Long jobOrderId);
+
     String generateSerialNumber(Item item);
 }

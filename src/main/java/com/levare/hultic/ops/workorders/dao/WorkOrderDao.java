@@ -1,6 +1,5 @@
 package com.levare.hultic.ops.workorders.dao;
 
-import com.levare.hultic.ops.common.DateUtils;
 import com.levare.hultic.ops.users.dao.UserDao;
 import com.levare.hultic.ops.workorders.entity.Client;
 import com.levare.hultic.ops.workorders.entity.WorkOrder;
@@ -10,8 +9,6 @@ import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
 import java.sql.*;
-import java.time.Instant;
-import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashSet;

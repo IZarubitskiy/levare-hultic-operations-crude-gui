@@ -30,7 +30,7 @@ public class ItemServiceImpl implements ItemService {
     SerialNumberDao serialNumberDao;
     TrackingRecordService trackingRecordService;
 
-    public ItemServiceImpl(ItemDao itemDao, ItemInfoService itemInfoService, SerialNumberDao serialNumberDao,TrackingRecordService trackingRecordService) {
+    public ItemServiceImpl(ItemDao itemDao, ItemInfoService itemInfoService, SerialNumberDao serialNumberDao, TrackingRecordService trackingRecordService) {
         this.itemDao = itemDao;
         this.itemInfoService = itemInfoService;
         this.serialNumberDao = serialNumberDao;
@@ -60,7 +60,6 @@ public class ItemServiceImpl implements ItemService {
         itemDao.update(itemUpdated);
         trackingRecordService.itemTracking(itemUpdated, ActionType.STATUS_CHANGE, "Jo set for Item");
     }
-
 
     @Override
     public void delete(Long id) {
@@ -115,7 +114,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Item updateStatus(Item item, ItemStatus newStatus) {
+    public void updateStatus(Item item, ItemStatus newStatus) {
         Item existing = getById(item.getId());
         ItemStatus oldStatus = existing.getItemStatus();
         existing.setItemStatus(newStatus);
@@ -123,8 +122,7 @@ public class ItemServiceImpl implements ItemService {
         trackingRecordService.itemTracking(
                 item,
                 ActionType.STATUS_CHANGE,
-                "Item status was changed from" + oldStatus.name() + " to " + newStatus.name() );
-        return existing;
+                "Item status was changed from" + oldStatus.name() + " to " + newStatus.name());
     }
 
     @Override

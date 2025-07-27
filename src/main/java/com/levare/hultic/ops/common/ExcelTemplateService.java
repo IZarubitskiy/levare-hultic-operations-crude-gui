@@ -6,14 +6,24 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
-import java.nio.file.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 public class ExcelTemplateService {
     private static final Logger logger = LoggerFactory.getLogger(ExcelTemplateService.class);
 
-    /** Директория с .xlsx-шаблонами (папка “templates” в рабочем каталоге) */
+    /**
+     * Директория с .xlsx-шаблонами (папка “templates” в рабочем каталоге)
+     */
     private final Path templatesDir;
 
     public ExcelTemplateService() {
@@ -65,7 +75,9 @@ public class ExcelTemplateService {
         }
     }
 
-    /** Заполнение ячеек по именованным диапазонам (Named ranges) */
+    /**
+     * Заполнение ячеек по именованным диапазонам (Named ranges)
+     */
     private void fillByNamedRanges(Workbook wb, Map<String, Object> data) {
         for (Name name : wb.getAllNames()) {
             String key = name.getNameName();
@@ -74,7 +86,7 @@ public class ExcelTemplateService {
             String ref = name.getRefersToFormula();     // вида 'Sheet1'!$B$3
             String[] parts = ref.split("!");
             String sheetName = parts[0].replace("'", "");
-            String cellRef   = parts[1].replace("$", "");
+            String cellRef = parts[1].replace("$", "");
 
             Sheet sheet = wb.getSheet(sheetName);
             if (sheet == null) continue;
@@ -90,7 +102,9 @@ public class ExcelTemplateService {
         }
     }
 
-    /** Заполнение плейсхолдеров вида ${key} в текстовых ячейках */
+    /**
+     * Заполнение плейсхолдеров вида ${key} в текстовых ячейках
+     */
     @SuppressWarnings("unused")
     private void fillByPlaceholders(Workbook wb, Map<String, Object> data) {
         for (Sheet sheet : wb) {
@@ -111,7 +125,9 @@ public class ExcelTemplateService {
         }
     }
 
-    /** Устанавливает значение в ячейку, подбирая тип */
+    /**
+     * Устанавливает значение в ячейку, подбирая тип
+     */
     private void setCellValue(Cell cell, Object value) {
         if (value == null) {
             cell.setBlank();

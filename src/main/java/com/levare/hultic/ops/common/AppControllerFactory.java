@@ -8,8 +8,8 @@ import com.levare.hultic.ops.main.MainController;
 import com.levare.hultic.ops.tracking.controller.TrackingRecordController;
 import com.levare.hultic.ops.users.controller.UserController;
 import com.levare.hultic.ops.users.entity.User;
-import com.levare.hultic.ops.workorders.controller.WorkOrderFormController;
 import com.levare.hultic.ops.workorders.controller.WorkOrderController;
+import com.levare.hultic.ops.workorders.controller.WorkOrderFormController;
 import javafx.util.Callback;
 
 public class AppControllerFactory implements Callback<Class<?>, Object> {

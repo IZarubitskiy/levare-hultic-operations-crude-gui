@@ -59,6 +59,8 @@ public class NewJobOrderController {
     /**
      * Инициализация формы данными выбранного item.
      */
+
+
     public void initializeRealEquipment(Long workOrderId, Long itemId) {
         this.workOrderId = workOrderId;
         this.itemId = itemId;
@@ -84,9 +86,13 @@ public class NewJobOrderController {
         switch (item.getItemStatus()) {
             case REPAIR_BOOKED, RNE_BOOKED -> {
                 if (item.getItemCondition() == ItemCondition.USED) {
-                    switch ()
-                    jobTypeCombo.setItems(FXCollections
-                            .observableArrayList(JobOrderType.DISMANTLE, JobOrderType.CABLE_REPAIR, JobOrderType.SENSOR_TEST));
+                    switch (item.getItemInfo().getItemType()) {
+                        case CABLE -> jobTypeCombo.setItems(FXCollections
+                                .observableArrayList(JobOrderType.CABLE_REPAIR));
+                        case SENSOR ->
+                                jobTypeCombo.setItems(FXCollections.observableArrayList(JobOrderType.SENSOR_TEST));
+                        default -> jobTypeCombo.setItems(FXCollections.observableArrayList(JobOrderType.DISMANTLE));
+                    }
                 } else if (item.getItemCondition() == ItemCondition.DISMANTLED) {
                     jobTypeCombo.setItems(FXCollections
                             .observableArrayList(JobOrderType.ASSEMBLY));
@@ -94,8 +100,14 @@ public class NewJobOrderController {
             }
             case DISMANTLE_BOOKED -> jobTypeCombo.setItems(FXCollections
                     .observableArrayList(JobOrderType.DISMANTLE));
-            case INSPECTION_BOOKED -> jobTypeCombo.setItems(FXCollections
-                    .observableArrayList(JobOrderType.INSPECTION, JobOrderType.SENSOR_TEST));
+            case INSPECTION_BOOKED -> {
+                switch (item.getItemInfo().getItemType()) {
+                    case SENSOR ->
+                            jobTypeCombo.setItems(FXCollections.observableArrayList(JobOrderType.SENSOR_TEST, JobOrderType.SENSOR_CONNECTION));
+                    default -> jobTypeCombo.setItems(FXCollections.observableArrayList(JobOrderType.INSPECTION));
+                }
+            }
+
             default -> {
                 jobTypeCombo.setItems(FXCollections
                         .observableArrayList(JobOrderType.values()));
@@ -135,20 +147,12 @@ public class NewJobOrderController {
     }
 
 
-    /**
-     * Настройка графики и кнопок.
-     */
     @FXML
     private void initialize() {
-
-        // Привязка действий к кнопкам
         saveButton.setOnAction(e -> handleSave());
         cancelButton.setOnAction(e -> handleCancel());
     }
 
-    /**
-     * Сохранение новой JobOrder.
-     */
     @FXML
     private void handleSave() {
 
@@ -166,9 +170,6 @@ public class NewJobOrderController {
         close();
     }
 
-    /**
-     * Отмена и закрытие формы.
-     */
     @FXML
     private void handleCancel() {
         close();

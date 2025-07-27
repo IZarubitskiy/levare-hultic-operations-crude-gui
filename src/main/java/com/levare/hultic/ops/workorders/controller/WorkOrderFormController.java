@@ -34,9 +34,9 @@ import java.util.List;
 public class WorkOrderFormController {
 
     private final WorkOrderService workOrderService;
-    private final ItemInfoService  itemInfoService;
-    private final ItemService      itemService;
-    private final UserService      userService;
+    private final ItemInfoService itemInfoService;
+    private final ItemService itemService;
+    private final UserService userService;
 
     // флаг режима: false = create, true = edit
     private boolean editMode = false;
@@ -44,33 +44,56 @@ public class WorkOrderFormController {
 
     private final ObservableList<Item> selectedItems = FXCollections.observableArrayList();
 
-    @FXML private TextField numberField;
-    @FXML private ComboBox<Client> clientComboBox;
-    @FXML private TextField wellField;
-    @FXML private DatePicker deliveryDatePicker;
+    @FXML
+    private TextField numberField;
+    @FXML
+    private ComboBox<Client> clientComboBox;
+    @FXML
+    private TextField wellField;
+    @FXML
+    private DatePicker deliveryDatePicker;
 
-    @FXML private ComboBox<User> requestorComboBox;
-    @FXML private TextArea commentsField;
+    @FXML
+    private ComboBox<User> requestorComboBox;
+    @FXML
+    private TextArea commentsField;
 
-    @FXML private TableView<Item> itemsTable;
-    @FXML private TableColumn<Item,String> partNumberColumn;
-    @FXML private TableColumn<Item,String> descriptionColumn;
-    @FXML private TableColumn<Item,String> serialNumberColumn;
-    @FXML private TableColumn<Item,String> ownershipColumn;
-    @FXML private TableColumn<Item,String> conditionColumn;
-    @FXML private TableColumn<Item,String> statusColumn;
-    @FXML private TableColumn<Item,String> jobOrderColumn;
-    @FXML private TableColumn<Item,String> commentsColumn;
+    @FXML
+    private TableView<Item> itemsTable;
+    @FXML
+    private TableColumn<Item, String> partNumberColumn;
+    @FXML
+    private TableColumn<Item, String> descriptionColumn;
+    @FXML
+    private TableColumn<Item, String> serialNumberColumn;
+    @FXML
+    private TableColumn<Item, String> ownershipColumn;
+    @FXML
+    private TableColumn<Item, String> conditionColumn;
+    @FXML
+    private TableColumn<Item, String> statusColumn;
+    @FXML
+    private TableColumn<Item, String> jobOrderColumn;
+    @FXML
+    private TableColumn<Item, String> commentsColumn;
 
-    @FXML private Button newItemButton;
-    @FXML private Button deleteItemButton;
-    @FXML private Button repairButton;
-    @FXML private Button stockButton;
-    @FXML private Button rneButton;
-    @FXML private Button wipButton;
+    @FXML
+    private Button newItemButton;
+    @FXML
+    private Button deleteItemButton;
+    @FXML
+    private Button repairButton;
+    @FXML
+    private Button stockButton;
+    @FXML
+    private Button rneButton;
+    @FXML
+    private Button wipButton;
 
-    @FXML private Button saveButton;
-    @FXML private Button cancelButton;
+    @FXML
+    private Button saveButton;
+    @FXML
+    private Button cancelButton;
 
     @FXML
     private void initialize() {
@@ -81,7 +104,8 @@ public class WorkOrderFormController {
         // Реквесторы
         requestorComboBox.setItems(FXCollections.observableArrayList(userService.getAll()));
         requestorComboBox.setCellFactory(lv -> new ListCell<>() {
-            @Override protected void updateItem(User u, boolean empty) {
+            @Override
+            protected void updateItem(User u, boolean empty) {
                 super.updateItem(u, empty);
                 setText(empty || u == null ? null : u.getName());
             }
@@ -149,13 +173,17 @@ public class WorkOrderFormController {
         cancelButton.setOnAction(e -> handleCancel());
     }
 
-    /** Подготовить форму в режиме создания */
+    /**
+     * Подготовить форму в режиме создания
+     */
     public void initForCreate() {
         editMode = false;
         saveButton.setText("Create");
     }
 
-    /** Подготовить форму в режиме редактирования существующего */
+    /**
+     * Подготовить форму в режиме редактирования существующего
+     */
     public void initForEdit(WorkOrder order) {
         editMode = true;
         editingOrder = order;

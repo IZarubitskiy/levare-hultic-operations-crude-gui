@@ -26,12 +26,14 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Dialog;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import lombok.RequiredArgsConstructor;
 
-import java.awt.Desktop;
+import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -51,33 +53,55 @@ public class JobOrderController {
     private final WorkOrderService workOrderService;
     private final ExcelTemplateService excelService;
     private final Callback<Class<?>, Object> controllerFactory;
-     // теперь через конструктор
+    // теперь через конструктор
 
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
-    @FXML private TableView<JobOrder> jobOrderTable;
-    @FXML private TableColumn<JobOrder, Long> idColumn;
-    @FXML private TableColumn<JobOrder, String> partNumberColumn;
-    @FXML private TableColumn<JobOrder, String> serialColumn;
-    @FXML private TableColumn<JobOrder, String> descriptionColumn;
-    @FXML private TableColumn<JobOrder, String> clientColumn;
-    @FXML private TableColumn<JobOrder, JobOrderType> jobTypeColumn;
-    @FXML private TableColumn<JobOrder, JobOrderStatus> statusColumn;
-    @FXML private TableColumn<JobOrder, String> wellColumn;
-    @FXML private TableColumn<JobOrder, String> plannedDateColumn;
-    @FXML private TableColumn<JobOrder, LocalDate> deliveryColumn;
-    @FXML private TableColumn<JobOrder, String> commentsColumn;
+    @FXML
+    private TableView<JobOrder> jobOrderTable;
+    @FXML
+    private TableColumn<JobOrder, Long> idColumn;
+    @FXML
+    private TableColumn<JobOrder, String> partNumberColumn;
+    @FXML
+    private TableColumn<JobOrder, String> serialColumn;
+    @FXML
+    private TableColumn<JobOrder, String> descriptionColumn;
+    @FXML
+    private TableColumn<JobOrder, String> clientColumn;
+    @FXML
+    private TableColumn<JobOrder, JobOrderType> jobTypeColumn;
+    @FXML
+    private TableColumn<JobOrder, JobOrderStatus> statusColumn;
+    @FXML
+    private TableColumn<JobOrder, String> wellColumn;
+    @FXML
+    private TableColumn<JobOrder, String> plannedDateColumn;
+    @FXML
+    private TableColumn<JobOrder, LocalDate> deliveryColumn;
+    @FXML
+    private TableColumn<JobOrder, String> commentsColumn;
 
-    @FXML private ComboBox<JobOrderStatus> statusFilterCombo;
-    @FXML private Button refreshButton;
-    @FXML private Button deleteButton;
-    @FXML private Button newAssemblyRequest;
-    @FXML private Button repairAssemblyRequest;
-    @FXML private Button rneRequest;
-    @FXML private Button updateButton;
-    @FXML private Button finishButton;
-    @FXML private Button cancelButton;
-    @FXML private Button printButton;
+    @FXML
+    private ComboBox<JobOrderStatus> statusFilterCombo;
+    @FXML
+    private Button refreshButton;
+    @FXML
+    private Button deleteButton;
+    @FXML
+    private Button newAssemblyButton;
+    @FXML
+    private Button repairAssemblyButton;
+    @FXML
+    private Button rneButton;
+    @FXML
+    private Button updateButton;
+    @FXML
+    private Button finishButton;
+    @FXML
+    private Button cancelButton;
+    @FXML
+    private Button printButton;
 
     @FXML
     public void initialize() {
@@ -127,13 +151,13 @@ public class JobOrderController {
             return new SimpleStringProperty(wo.getWell());
         });
         plannedDateColumn.setCellValueFactory(c ->
-        {
-            if (c.getValue().getPlannedDate().isAfter(c.getValue().getPlannedDateUpdated())) {
-                return new SimpleObjectProperty<> (c.getValue().getPlannedDate().toString());
-            } else {
-                return new SimpleObjectProperty<> (c.getValue().getPlannedDateUpdated().toString());
-            }
-        }
+                {
+                    if (c.getValue().getPlannedDate().isAfter(c.getValue().getPlannedDateUpdated())) {
+                        return new SimpleObjectProperty<>(c.getValue().getPlannedDate().toString());
+                    } else {
+                        return new SimpleObjectProperty<>(c.getValue().getPlannedDateUpdated().toString());
+                    }
+                }
         );
 
         commentsColumn.setCellValueFactory(c ->
@@ -145,10 +169,11 @@ public class JobOrderController {
 
         // Button handlers
         refreshButton.setOnAction(e -> refreshTable());
-        rneRequest.setOnAction(e -> onRNE());
-        newAssemblyRequest.setOnAction(e -> onNewAssemblyRequest());
-        repairAssemblyRequest.setOnAction(e -> onRepairAssemblyRequest());
+        rneButton.setOnAction(e -> onRneButton());
+        newAssemblyButton.setOnAction(e -> onNewAssemblyButton());
+        repairAssemblyButton.setOnAction(e -> onRepairAssemblyButton());
         updateButton.setOnAction(e -> updateSelected());
+        finishButton.setOnAction(e -> onFinishButton());
         deleteButton.setOnAction(e -> deleteSelected());
         printButton.setOnAction(e -> handlePrint());
 
@@ -161,8 +186,9 @@ public class JobOrderController {
                 : jobOrderService.getAll();
         jobOrderTable.setItems(FXCollections.observableArrayList(list));
     }
+
     // Открывает диалог выбора ItemInfo и создаёт запись для новой сборки
-    private void onNewAssemblyRequest() {
+    private void onNewAssemblyButton() {
         try {
             // 1) выбор ItemInfo
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/item_info_selection.fxml"));
@@ -201,7 +227,7 @@ public class JobOrderController {
             FXMLLoader joLoader = new FXMLLoader(getClass().getResource("/fxml/new_job_order.fxml"));
             joLoader.setControllerFactory(controllerFactory);
             Parent joRoot = joLoader.load();
-            NewJobOrderController joCtrl = joLoader.<NewJobOrderController>getController();
+            NewJobOrderController joCtrl = joLoader.getController();
             joCtrl.initializeRealEquipment(null, it.getId());
 
             Stage joStage = new Stage();
@@ -219,7 +245,7 @@ public class JobOrderController {
     }
 
     // Открывает диалог выбора ItemInfo и создаёт запись для ремонта сборки
-    private void onRepairAssemblyRequest() {
+    private void onRepairAssemblyButton() {
         try {
             // 1) выбор ItemInfo
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/item_info_selection.fxml"));
@@ -258,7 +284,7 @@ public class JobOrderController {
             FXMLLoader joLoader = new FXMLLoader(getClass().getResource("/fxml/new_job_order.fxml"));
             joLoader.setControllerFactory(controllerFactory);
             Parent joRoot = joLoader.load();
-            NewJobOrderController joCtrl = joLoader.<NewJobOrderController>getController();
+            NewJobOrderController joCtrl = joLoader.getController();
             joCtrl.initializeRealEquipment(null, it.getId());
 
             Stage joStage = new Stage();
@@ -276,7 +302,7 @@ public class JobOrderController {
     }
 
     @FXML
-    private void onRNE() {
+    private void onRneButton() {
         try {
             FXMLLoader pickLoader = new FXMLLoader(
                     getClass().getResource("/fxml/filtered_item_selection.fxml")
@@ -286,7 +312,7 @@ public class JobOrderController {
                     return new FilteredItemSelectionController(
                             itemService,
                             List.of(Client.RNE, Client.CORPORATE),
-                            List.of(ItemCondition.USED,ItemCondition.DISMANTLED),
+                            List.of(ItemCondition.USED, ItemCondition.DISMANTLED),
                             List.of(ItemStatus.ON_STOCK)
                     );
                 }
@@ -325,6 +351,95 @@ public class JobOrderController {
         }
     }
 
+    private void onFinishButton() {
+        JobOrder sel = jobOrderTable.getSelectionModel().getSelectedItem();
+        if (sel == null) {
+            showAlert("No selection", "Please select a Job Order to finish.");
+            return;
+        }
+
+        // 1) Диалог выбора даты окончания
+        Dialog<LocalDate> dialog = new Dialog<>();
+        dialog.setTitle("Finish Job Order");
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        DatePicker picker = new DatePicker(LocalDate.now());
+        dialog.getDialogPane().setContent(picker);
+
+        dialog.setResultConverter(btn -> btn == ButtonType.OK ? picker.getValue() : null);
+        dialog.showAndWait().ifPresent(finishDate -> {
+            if (finishDate == null) return;
+
+            // 2) Записываем дату завершения
+            // Допустим, у вас есть метод finish в сервисе:
+            jobOrderService.finish(sel.getId(), finishDate);
+            JobOrder jo = jobOrderService.getById(sel.getId());
+
+            Item item = itemService.getById(jo.getItemId());
+
+            switch (item.getItemStatus()){
+                case DISMANTLE_BOOKED -> ;
+                case RNE_BOOKED, REPAIR_BOOKED ->;
+                case ASSEMBLY_BOOKED -> ;
+                case INSPECTION_BOOKED -> ;
+
+            }
+
+            switch (item.getItemCondition()) {
+                case USED -> {
+                    switch (jo.getJobOrderType()) {
+                        case DISMANTLE -> item.setItemCondition(ItemCondition.DISMANTLED);
+                    }
+                }
+                case DISMANTLED, RNE_ASSEMBLY -> {
+                    switch (jo.getJobOrderType()) {
+                        case ASSEMBLY -> item.setItemCondition(ItemCondition.REPAIRED);
+                    }
+                }
+                case NEW_ASSEMBLY -> {
+                    switch (jo.getJobOrderType()) {
+                        case ASSEMBLY -> item.setItemCondition(ItemCondition.NEW);
+                    }
+                }
+                case DISMANTLED_FOR_PARTS -> {
+                    switch (jo.getJobOrderType()) {
+                        case DISMANTLE -> {
+                            item.setItemCondition(ItemCondition.DISMANTLED_FOR_PARTS);
+                            item.setItemStatus(ItemStatus.ABOLISHED);
+                        }
+                    }
+                }
+            }
+
+            // 3) В зависимости от статуса/состояния оборудования — создаём новый продолжающий JobOrder
+            Item item = itemService.getById(sel.getItemId());
+            switch (item.getItemStatus()) {
+                case /* YOUR_STATUS_1 */:
+                    // TODO: выставить нужный JobOrderType и ItemCondition
+                    JobOrder next1 = new JobOrder();
+                    next1.setItemId(item.getId());
+                    next1.setWorkOrderId(sel.getWorkOrderId());
+                    next1.setType(/* JobOrderType.YOUR_NEXT_TYPE_1 */);
+                    next1.setCondition(/* ItemCondition.YOUR_CONDITION_1 */);
+                    next1.setPlannedDate(finishDate.plusDays(/* ... */));
+                    next1.setStatus(JobOrderStatus.CREATED);
+                    jobOrderService.create(next1);
+                    break;
+
+                case /* YOUR_STATUS_2 */:
+                    // TODO: аналогично для другого статуса
+                    break;
+
+                default:
+                    // ничего не создаём
+                    break;
+            }
+
+            // 4) Обновляем таблицу
+            refreshTable();
+        });
+    }
+
     private void handlePrint() {
         JobOrder sel = jobOrderTable.getSelectionModel().getSelectedItem();
         if (sel == null) {
@@ -333,20 +448,8 @@ public class JobOrderController {
         }
 
         Map<String, Object> data = new HashMap<>();
-        StringBuilder joNumber = new StringBuilder(11);
-
-        joNumber.append("JO");
-        switch (String.valueOf(sel.getId()).length()) {
-            case 1 -> joNumber.append("0000");
-            case 2 -> joNumber.append("000");
-            case 3 -> joNumber.append("00");
-            case 4 -> joNumber.append("0");
-            case 5 -> joNumber.append("");
-            default -> throw new IllegalStateException(
-                    "Unexpected JobOrder number : " + sel.getId());
-        }
-        joNumber.append(sel.getId());
-        data.put("orderId",joNumber);
+        StringBuilder joNumber = getStringBuilder(sel);
+        data.put("orderId", joNumber);
 
         Item it = itemService.getById(sel.getItemId());
         data.put("partNumber", it.getItemInfo().getPartNumber());
@@ -364,25 +467,25 @@ public class JobOrderController {
         String templateName = "";
         switch (it.getItemInfo().getItemType()) {
             case PUMP, VAPRO -> {
-                    switch (sel.getJobOrderType()){
-                        case DISMANTLE -> templateName = "jo_pump_dismantle_template.xlsx";
-                        case ASSEMBLY -> templateName = "jo_pump_assembly_template.xlsx";
-                        case INSPECTION -> templateName = "jo_pump_inspection_template.xlsx";
-                        default -> throw new IllegalStateException(
-                                "Unexpected JobOrder type : " + sel.getJobOrderType());
-                    }
+                switch (sel.getJobOrderType()) {
+                    case DISMANTLE -> templateName = "jo_pump_dismantle_template.xlsx";
+                    case ASSEMBLY -> templateName = "jo_pump_assembly_template.xlsx";
+                    case INSPECTION -> templateName = "jo_pump_inspection_template.xlsx";
+                    default -> throw new IllegalStateException(
+                            "Unexpected JobOrder type : " + sel.getJobOrderType());
+                }
             }
             case BOI, GAS_SEPARATOR -> {
-                switch (sel.getJobOrderType()){
-                case DISMANTLE -> templateName = "jo_intake_device_dismantle_template.xlsx";
-                case ASSEMBLY -> templateName = "jo_intake_device_assembly_template.xlsx";
-                case INSPECTION -> templateName = "jo_intake_device_inspection_template.xlsx";
-                default -> throw new IllegalStateException(
-                        "Unexpected JobOrder type : " + sel.getJobOrderType());
+                switch (sel.getJobOrderType()) {
+                    case DISMANTLE -> templateName = "jo_intake_device_dismantle_template.xlsx";
+                    case ASSEMBLY -> templateName = "jo_intake_device_assembly_template.xlsx";
+                    case INSPECTION -> templateName = "jo_intake_device_inspection_template.xlsx";
+                    default -> throw new IllegalStateException(
+                            "Unexpected JobOrder type : " + sel.getJobOrderType());
                 }
             }
             case SEAL -> {
-                switch (sel.getJobOrderType()){
+                switch (sel.getJobOrderType()) {
                     case DISMANTLE -> templateName = "jo_seal_dismantle_template.xlsx";
                     case ASSEMBLY -> templateName = "jo_seal_assembly_template.xlsx";
                     case INSPECTION -> templateName = "jo_seal_inspection_template.xlsx";
@@ -392,7 +495,7 @@ public class JobOrderController {
                 }
             }
             case MOTOR -> {
-                switch (sel.getJobOrderType()){
+                switch (sel.getJobOrderType()) {
                     case DISMANTLE -> templateName = "jo_motor_dismantle_template.xlsx";
                     case ASSEMBLY -> templateName = "jo_motor_assembly_template.xlsx";
                     case INSPECTION -> templateName = "jo_motor_inspection_template.xlsx";
@@ -402,7 +505,7 @@ public class JobOrderController {
             }
 
             case SENSOR -> {
-                switch (sel.getJobOrderType()){
+                switch (sel.getJobOrderType()) {
                     case INSPECTION -> templateName = "jo_sensor_inspection_template.xlsx";
                     case SENSOR_CONNECTION -> templateName = "jo_sensor_connection_template.xlsx";
                     default -> throw new IllegalStateException(
@@ -410,7 +513,7 @@ public class JobOrderController {
                 }
             }
             case MLE -> {
-                switch (sel.getJobOrderType()){
+                switch (sel.getJobOrderType()) {
                     case CABLE_CUT -> templateName = "jo_mle_cable_cut_template.xlsx";
                     case ASSEMBLY -> templateName = "jo_mle_assembly_template.xlsx";
                     case INSPECTION -> templateName = "jo_mle_inspection_template.xlsx";
@@ -419,7 +522,7 @@ public class JobOrderController {
                 }
             }
             case CABLE -> {
-                switch (sel.getJobOrderType()){
+                switch (sel.getJobOrderType()) {
                     case CABLE_REPAIR -> templateName = "jo_cable_repair_template.xlsx";
                     case INSPECTION -> templateName = "jo_cable_inspection_template.xlsx";
                     default -> throw new IllegalStateException(
@@ -442,6 +545,23 @@ public class JobOrderController {
         jobOrderService.changeStatus(sel.getId(), JobOrderStatus.IN_PROGRESS);
     }
 
+    private static StringBuilder getStringBuilder(JobOrder sel) {
+        StringBuilder joNumber = new StringBuilder(12);
+
+        joNumber.append("JO");
+        switch (String.valueOf(sel.getId()).length()) {
+            case 1 -> joNumber.append("00000");
+            case 2 -> joNumber.append("0000");
+            case 3 -> joNumber.append("000");
+            case 4 -> joNumber.append("00");
+            case 5 -> joNumber.append("0");
+            default -> throw new IllegalStateException(
+                    "Unexpected JobOrder number : " + sel.getId());
+        }
+        joNumber.append(sel.getId());
+        return joNumber;
+    }
+
     private void updateSelected() {
         JobOrder sel = jobOrderTable.getSelectionModel().getSelectedItem();
         if (sel == null) {
@@ -459,13 +579,11 @@ public class JobOrderController {
         dialog.setResultConverter(btn -> btn == ButtonType.OK ? picker.getValue() : null);
         dialog.showAndWait().ifPresent(newDate -> {
             if (newDate != null) {
-                if (newDate.isAfter(workOrderService.getById(sel.getWorkOrderId()).getDeliveryDate()))
-                {
+                if (newDate.isAfter(workOrderService.getById(sel.getWorkOrderId()).getDeliveryDate())) {
                     showAlert("Wrong date", "Planned date is later than delivery date.");
                     return;
-                    }
-                sel.setPlannedDateUpdated(newDate);
-                jobOrderService.update(sel.getId(), sel);
+                }
+                jobOrderService.updatePlanDate(sel.getId(), newDate);
                 refreshTable();
             }
         });
@@ -492,8 +610,6 @@ public class JobOrderController {
             showAlert("Validation", "Deletion reason cannot be empty.");
         }
     }
-
-
 
     private void showAlert(String title, String content) {
         Alert a = new Alert(Alert.AlertType.INFORMATION);

@@ -77,7 +77,7 @@ public class ItemInfoController {
     private void handleUpdate() {
         ItemInfo selected = itemTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
-            showAlert("Selection error", "Please select an item to update.");
+            showAlert("Selection error", "Please select an item to updatePlanDate.");
             return;
         }
 

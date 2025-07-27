@@ -34,7 +34,6 @@ public class WorkOrderServiceImpl implements WorkOrderService {
     TrackingRecordService trackingRecordService;
 
 
-
     public WorkOrderServiceImpl(WorkOrderDao workOrderDao,
                                 UserService userService,
                                 ItemService itemService,
@@ -89,9 +88,9 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         // modifying items
         for (Long itemId : getById(id).getItemsId()) {
             Item item = itemService.getById(itemId);
-            if (item.getJobOrderId() == null){
-                switch (item.getItemStatus()){
-                    case REPAIR_BOOKED -> {
+            if (item.getJobOrderId() == null) {
+                switch (item.getItemStatus()) {
+                    case REPAIR_BOOKED, RNE_BOOKED -> {
                         if (item.getItemCondition() != ItemCondition.NEW || item.getItemCondition() != ItemCondition.REPAIRED) {
                             itemService.updateStatus(item, ItemStatus.ON_STOCK);
                         }
@@ -100,12 +99,13 @@ public class WorkOrderServiceImpl implements WorkOrderService {
                     case ASSEMBLY_BOOKED -> itemService.delete(item.getId());
                     default -> throw new IllegalStateException(
                             "Unexpected item Status: " + item.getItemStatus());
-                    }
+                }
             } else {
                 JobOrder joUpdate = jobOrderService.getById(item.getJobOrderId());
                 joUpdate.setWorkOrderId(null);
-                jobOrderService.update(item.getJobOrderId(), joUpdate);
-            }}
+               // jobOrderService.updatePlanDate(item.getJobOrderId(), joUpdate);
+            }
+        }
         trackingRecordService.workOrderTracking(getById(id), ActionType.REMOVAL, reason);
         workOrderDao.deleteById(id);
     }

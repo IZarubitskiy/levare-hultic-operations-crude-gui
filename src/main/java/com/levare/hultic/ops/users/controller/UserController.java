@@ -84,7 +84,7 @@ public class UserController {
     private void handleUpdate() {
         User selected = userTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
-            showAlert("No selection", "Please select a user to update.");
+            showAlert("No selection", "Please select a user to updatePlanDate.");
             return;
         }
         selected.setName(nameField.getText().trim());
