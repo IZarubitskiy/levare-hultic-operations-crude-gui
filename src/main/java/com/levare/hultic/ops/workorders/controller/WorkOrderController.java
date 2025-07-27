@@ -129,7 +129,7 @@ public class WorkOrderController {
             Parent form = loader.load();
 
             var ctrl = loader.getController();
-            ((NewJobOrderController)ctrl).initForWorkAndItem(workOrderId, itemId);
+            ((NewJobOrderController)ctrl).initializeRealEquipment(workOrderId, itemId);
 
             Stage dlg = new Stage();
             dlg.initModality(Modality.APPLICATION_MODAL);

@@ -1,8 +1,12 @@
 package com.levare.hultic.ops.joborders.controller;
 
 import com.levare.hultic.ops.common.ExcelTemplateService;
+import com.levare.hultic.ops.iteminfos.controller.ItemInfoSelectionController;
+import com.levare.hultic.ops.iteminfos.entity.ItemInfo;
+import com.levare.hultic.ops.iteminfos.service.ItemInfoService;
 import com.levare.hultic.ops.items.controller.FilteredItemSelectionController;
 import com.levare.hultic.ops.items.entity.Item;
+import com.levare.hultic.ops.items.entity.ItemCondition;
 import com.levare.hultic.ops.items.entity.ItemStatus;
 import com.levare.hultic.ops.items.service.ItemService;
 import com.levare.hultic.ops.joborders.entity.JobOrder;
@@ -42,6 +46,7 @@ public class JobOrderController {
 
     private final JobOrderService jobOrderService;
     private final UserService userService;
+    private final ItemInfoService itemInfoService;
     private final ItemService itemService;
     private final WorkOrderService workOrderService;
     private final ExcelTemplateService excelService;
@@ -66,7 +71,9 @@ public class JobOrderController {
     @FXML private ComboBox<JobOrderStatus> statusFilterCombo;
     @FXML private Button refreshButton;
     @FXML private Button deleteButton;
-    @FXML private Button createButton;
+    @FXML private Button newAssemblyRequest;
+    @FXML private Button repairAssemblyRequest;
+    @FXML private Button rneRequest;
     @FXML private Button updateButton;
     @FXML private Button finishButton;
     @FXML private Button cancelButton;
@@ -136,8 +143,11 @@ public class JobOrderController {
         statusFilterCombo.setItems(FXCollections.observableArrayList(JobOrderStatus.values()));
         statusFilterCombo.getItems().add(0, null);
 
+        // Button handlers
         refreshButton.setOnAction(e -> refreshTable());
-        createButton.setOnAction(e -> createNew());
+        rneRequest.setOnAction(e -> onRNE());
+        newAssemblyRequest.setOnAction(e -> onNewAssemblyRequest());
+        repairAssemblyRequest.setOnAction(e -> onRepairAssemblyRequest());
         updateButton.setOnAction(e -> updateSelected());
         deleteButton.setOnAction(e -> deleteSelected());
         printButton.setOnAction(e -> handlePrint());
@@ -151,8 +161,122 @@ public class JobOrderController {
                 : jobOrderService.getAll();
         jobOrderTable.setItems(FXCollections.observableArrayList(list));
     }
+    // Открывает диалог выбора ItemInfo и создаёт запись для новой сборки
+    private void onNewAssemblyRequest() {
+        try {
+            // 1) выбор ItemInfo
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/item_info_selection.fxml"));
+            loader.setControllerFactory(cls -> {
+                if (cls == ItemInfoSelectionController.class) {
+                    return new ItemInfoSelectionController(itemInfoService);
+                }
+                try {
+                    return cls.getDeclaredConstructor().newInstance();
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex);
+                }
+            });
+            Parent root = loader.load();
+            Stage dlg = new Stage();
+            dlg.initModality(Modality.APPLICATION_MODAL);
+            dlg.setTitle("Select Item Info for Assembly");
+            dlg.setScene(new Scene(root));
+            dlg.showAndWait();
+
+            ItemInfo info = loader.<ItemInfoSelectionController>getController().getSelectedItem();
+            if (info == null) return;
+
+            // 2) создаём новый Item
+            Item it = new Item();
+            it.setItemInfo(info);
+            it.setOwnership(Client.STOCK);
+            it.setItemCondition(ItemCondition.NEW_ASSEMBLY);
+            it.setItemStatus(ItemStatus.ASSEMBLY_BOOKED);
+            it.setJobOrderId(null);
+            it.setComments("");
+            it.setSerialNumber(itemService.generateSerialNumber(it));
+            itemService.create(it);
+
+            // 3) открываем диалог создания JobOrder
+            FXMLLoader joLoader = new FXMLLoader(getClass().getResource("/fxml/new_job_order.fxml"));
+            joLoader.setControllerFactory(controllerFactory);
+            Parent joRoot = joLoader.load();
+            NewJobOrderController joCtrl = joLoader.<NewJobOrderController>getController();
+            joCtrl.initializeRealEquipment(null, it.getId());
+
+            Stage joStage = new Stage();
+            joStage.initModality(Modality.APPLICATION_MODAL);
+            joStage.setTitle("New Job Order");
+            joStage.setScene(new Scene(joRoot));
+            joStage.showAndWait();
+
+            refreshTable();
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            showAlert("Error", "Cannot create assembly request:\n" + ex.getMessage());
+        }
+    }
+
+    // Открывает диалог выбора ItemInfo и создаёт запись для ремонта сборки
+    private void onRepairAssemblyRequest() {
+        try {
+            // 1) выбор ItemInfo
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/item_info_selection.fxml"));
+            loader.setControllerFactory(cls -> {
+                if (cls == ItemInfoSelectionController.class) {
+                    return new ItemInfoSelectionController(itemInfoService);
+                }
+                try {
+                    return cls.getDeclaredConstructor().newInstance();
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex);
+                }
+            });
+            Parent root = loader.load();
+            Stage dlg = new Stage();
+            dlg.initModality(Modality.APPLICATION_MODAL);
+            dlg.setTitle("Select Item Info for Repair Assembly");
+            dlg.setScene(new Scene(root));
+            dlg.showAndWait();
+
+            ItemInfo info = loader.<ItemInfoSelectionController>getController().getSelectedItem();
+            if (info == null) return;
+
+            // 2) создаём новый Item
+            Item it = new Item();
+            it.setItemInfo(info);
+            it.setOwnership(Client.STOCK);
+            it.setItemCondition(ItemCondition.RNE_ASSEMBLY);
+            it.setItemStatus(ItemStatus.ASSEMBLY_BOOKED);
+            it.setJobOrderId(null);
+            it.setComments("");
+            it.setSerialNumber(itemService.generateSerialNumber(it));
+            itemService.create(it);
+
+            // 3) открываем диалог создания JobOrder
+            FXMLLoader joLoader = new FXMLLoader(getClass().getResource("/fxml/new_job_order.fxml"));
+            joLoader.setControllerFactory(controllerFactory);
+            Parent joRoot = joLoader.load();
+            NewJobOrderController joCtrl = joLoader.<NewJobOrderController>getController();
+            joCtrl.initializeRealEquipment(null, it.getId());
+
+            Stage joStage = new Stage();
+            joStage.initModality(Modality.APPLICATION_MODAL);
+            joStage.setTitle("New Job Order");
+            joStage.setScene(new Scene(joRoot));
+            joStage.showAndWait();
+
+            refreshTable();
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            showAlert("Error", "Cannot create repair assembly request:\n" + ex.getMessage());
+        }
+    }
+
     @FXML
-    private void createNew() {
+    private void onRNE() {
         try {
             FXMLLoader pickLoader = new FXMLLoader(
                     getClass().getResource("/fxml/filtered_item_selection.fxml")
@@ -162,7 +286,7 @@ public class JobOrderController {
                     return new FilteredItemSelectionController(
                             itemService,
                             List.of(Client.RNE, Client.CORPORATE),
-                            List.of(),
+                            List.of(ItemCondition.USED,ItemCondition.DISMANTLED),
                             List.of(ItemStatus.ON_STOCK)
                     );
                 }
@@ -185,7 +309,8 @@ public class JobOrderController {
             Parent joRoot = joLoader.load();
 
             var joCtrl = joLoader.<NewJobOrderController>getController();
-            joCtrl.initForWorkAndItem(null, chosen.getId());
+            itemService.updateStatus(chosen, ItemStatus.RNE_BOOKED);
+            joCtrl.initializeRealEquipment(null, chosen.getId());
 
             Stage joStage = new Stage();
             joStage.initModality(Modality.APPLICATION_MODAL);

@@ -22,7 +22,9 @@
             <Label text="Status:"/>
             <ComboBox fx:id="statusFilterCombo" promptText="All statuses"/>
             <Button fx:id="refreshButton" text="Refresh"/>
-            <Button fx:id="createButton" text="New"/>
+            <Button fx:id="newAssemblyRequest" text="New Assembly"/>
+            <Button fx:id="repairAssemblyRequest" text="Repair Assembly"/>
+            <Button fx:id="rneRequest" text="RNE"/>
             <Button fx:id="updateButton" text="Change Date"/>
             <Button fx:id="finishButton" text="Done"/>
             <Button fx:id="cancelButton" text="Cancel"/>

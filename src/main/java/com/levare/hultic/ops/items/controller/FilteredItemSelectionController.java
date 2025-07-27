@@ -47,7 +47,7 @@ public class FilteredItemSelectionController {
     @FXML
     private TableView<Item> tableView;
     @FXML
-    private TableColumn<Item, String> partColumn, descColumn, serialColumn, statusColumn;
+    private TableColumn<Item, String> partColumn, descColumn, serialColumn, statusColumn, conditionColumn;
     @FXML
     private Button selectButton, cancelButton;
 
@@ -69,8 +69,11 @@ public class FilteredItemSelectionController {
                 new ReadOnlyStringWrapper(c.getValue().getSerialNumber()));
         statusColumn.setCellValueFactory(c ->
                 new ReadOnlyStringWrapper(c.getValue().getItemStatus() != null
-                        ? c.getValue().getItemStatus().name() : "")
-        );
+                        ? c.getValue().getItemStatus().name() : ""));
+        conditionColumn.setCellValueFactory(c ->
+                new ReadOnlyStringWrapper(c.getValue().getItemCondition() != null
+                        ? c.getValue().getItemCondition().name() : ""));
+
 
         // загрузка и фильтрация
         List<Item> filtered = itemService.getAll().stream()

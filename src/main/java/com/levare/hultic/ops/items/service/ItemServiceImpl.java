@@ -107,7 +107,7 @@ public class ItemServiceImpl implements ItemService {
         item.setItemInfo(info);
         item.setOwnership(client);
         item.setItemCondition(ItemCondition.NEW_ASSEMBLY);
-        item.setItemStatus(ItemStatus.NEW_ASSEMBLY_BOOKED);
+        item.setItemStatus(ItemStatus.ASSEMBLY_BOOKED);
         item.setSerialNumber(generateSerialNumber(item));
         itemDao.insert(item);
         trackingRecordService.itemTracking(item, ActionType.CREATION, "New assembly initiated");
@@ -127,8 +127,9 @@ public class ItemServiceImpl implements ItemService {
         return existing;
     }
 
+    @Override
     public String generateSerialNumber(Item item) {
-        if (item.getItemStatus() == ItemStatus.NEW_ASSEMBLY_BOOKED && item.getItemCondition() == ItemCondition.NEW_ASSEMBLY) {
+        if (item.getItemStatus() == ItemStatus.ASSEMBLY_BOOKED) {
             StringBuilder sn = new StringBuilder(11);
             switch (item.getItemInfo().getItemType()) {
                 case MOTOR -> sn.append("1");

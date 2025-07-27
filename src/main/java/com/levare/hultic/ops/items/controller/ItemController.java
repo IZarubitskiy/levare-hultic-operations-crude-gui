@@ -58,7 +58,7 @@ public class ItemController {
 
     private void refreshTable() {
         List<ItemCondition> conditions = List.of(ItemCondition.NEW, ItemCondition.REPAIRED, ItemCondition.USED);
-        List<ItemStatus> statuses = List.of(ItemStatus.ON_STOCK, ItemStatus.STOCK_BOOKED, ItemStatus.REPAIR_BOOKED);
+        List<ItemStatus> statuses = List.of(ItemStatus.ON_STOCK, ItemStatus.INSPECTION_BOOKED, ItemStatus.REPAIR_BOOKED);
         Client selectedOwner = filterOwnership.getValue();
 
         List<Item> items;

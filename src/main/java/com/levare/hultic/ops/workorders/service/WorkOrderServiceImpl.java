@@ -56,14 +56,14 @@ public class WorkOrderServiceImpl implements WorkOrderService {
         // Validate and book each item by ID
         for (Long itemId : workOrder.getItemsId()) {
             Item item = itemService.getById(itemId);
-            if (item.getItemStatus() != ItemStatus.ON_STOCK && item.getItemStatus() != ItemStatus.NEW_ASSEMBLY_BOOKED) {
+            if (item.getItemStatus() != ItemStatus.ON_STOCK && item.getItemStatus() != ItemStatus.ASSEMBLY_BOOKED) {
                 System.out.println("Item " + itemId + " is not on stock");
                 throw new IllegalStateException();
             } else {
                 switch (item.getItemCondition()) {
                     case USED -> itemService.updateStatus(item, ItemStatus.REPAIR_BOOKED);
-                    case NEW, REPAIRED -> itemService.updateStatus(item, ItemStatus.STOCK_BOOKED);
-                    case NEW_ASSEMBLY -> itemService.updateStatus(item, ItemStatus.NEW_ASSEMBLY_BOOKED);
+                    case NEW, REPAIRED -> itemService.updateStatus(item, ItemStatus.INSPECTION_BOOKED);
+                    case NEW_ASSEMBLY -> itemService.updateStatus(item, ItemStatus.ASSEMBLY_BOOKED);
                     default -> throw new IllegalStateException(
                             "Unexpected item condition: " + item.getItemCondition());
                 }
@@ -96,8 +96,8 @@ public class WorkOrderServiceImpl implements WorkOrderService {
                             itemService.updateStatus(item, ItemStatus.ON_STOCK);
                         }
                     }
-                    case STOCK_BOOKED -> itemService.updateStatus(item, ItemStatus.ON_STOCK);
-                    case NEW_ASSEMBLY_BOOKED -> itemService.delete(item.getId());
+                    case INSPECTION_BOOKED -> itemService.updateStatus(item, ItemStatus.ON_STOCK);
+                    case ASSEMBLY_BOOKED -> itemService.delete(item.getId());
                     default -> throw new IllegalStateException(
                             "Unexpected item Status: " + item.getItemStatus());
                     }

@@ -205,7 +205,7 @@ public class WorkOrderFormController {
                 it.setOwnership(clientComboBox.getValue());
                 it.setSerialNumber("TBA");
                 it.setItemCondition(ItemCondition.NEW_ASSEMBLY);
-                it.setItemStatus(ItemStatus.NEW_ASSEMBLY_BOOKED);
+                it.setItemStatus(ItemStatus.ASSEMBLY_BOOKED);
                 it.setJobOrderId(null);
                 it.setComments("");
                 selectedItems.add(it);

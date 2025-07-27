@@ -6,7 +6,6 @@ import com.levare.hultic.ops.joborders.entity.JobOrder;
 import com.levare.hultic.ops.joborders.entity.JobOrderStatus;
 import com.levare.hultic.ops.joborders.entity.JobOrderType;
 import com.levare.hultic.ops.joborders.service.JobOrderService;
-import com.levare.hultic.ops.users.entity.User;
 import com.levare.hultic.ops.users.service.UserService;
 import com.levare.hultic.ops.workorders.entity.Client;
 import javafx.collections.FXCollections;
@@ -60,7 +59,54 @@ public class NewJobOrderController {
     /**
      * Инициализация формы данными выбранного item.
      */
-    public void initForWorkAndItem(Long workOrderId, Long itemId) {
+    public void initializeRealEquipment(Long workOrderId, Long itemId) {
+        this.workOrderId = workOrderId;
+        this.itemId = itemId;
+
+        var item = itemService.getById(itemId);
+        partNumberField.setText(item.getItemInfo().getPartNumber());
+        partNumberField.setDisable(true);
+        serialField.setText(item.getSerialNumber());
+        serialField.setDisable(true);
+        descriptionArea.setText(item.getItemInfo().getDescription());
+        descriptionArea.setDisable(true);
+
+        conditionCombo.setItems(FXCollections.observableArrayList(ItemCondition.values()));
+        conditionCombo.setValue(item.getItemCondition());
+        conditionCombo.setDisable(true);
+
+        ownerCombo.setItems(FXCollections.observableArrayList(Client.values()));
+        ownerCombo.setValue(item.getOwnership());
+        ownerCombo.setDisable(true);
+
+
+        // Ограничиваем список JobOrderType в зависимости от типа оборудования
+        switch (item.getItemStatus()) {
+            case REPAIR_BOOKED, RNE_BOOKED -> {
+                if (item.getItemCondition() == ItemCondition.USED) {
+                    switch ()
+                    jobTypeCombo.setItems(FXCollections
+                            .observableArrayList(JobOrderType.DISMANTLE, JobOrderType.CABLE_REPAIR, JobOrderType.SENSOR_TEST));
+                } else if (item.getItemCondition() == ItemCondition.DISMANTLED) {
+                    jobTypeCombo.setItems(FXCollections
+                            .observableArrayList(JobOrderType.ASSEMBLY));
+                }
+            }
+            case DISMANTLE_BOOKED -> jobTypeCombo.setItems(FXCollections
+                    .observableArrayList(JobOrderType.DISMANTLE));
+            case INSPECTION_BOOKED -> jobTypeCombo.setItems(FXCollections
+                    .observableArrayList(JobOrderType.INSPECTION, JobOrderType.SENSOR_TEST));
+            default -> {
+                jobTypeCombo.setItems(FXCollections
+                        .observableArrayList(JobOrderType.values()));
+            }
+        }
+
+        jobTypeCombo.getSelectionModel().selectFirst();
+        commentsArea.clear();
+    }
+
+    public void initializeFromJobOrderNew(Long workOrderId, Long itemId) {
         this.workOrderId = workOrderId;
         this.itemId = itemId;
 
@@ -77,19 +123,6 @@ public class NewJobOrderController {
 
         // Ограничиваем список JobOrderType в зависимости от типа оборудования
         switch (item.getItemInfo().getItemType()) {
-            case TYPE_A:
-                jobTypeCombo.setItems(FXCollections.observableArrayList(
-                        /* JobOrderType.TYPE_1, JobOrderType.TYPE_2, … */
-                ));
-                break;
-
-            case TYPE_B:
-                jobTypeCombo.setItems(FXCollections.observableArrayList(
-                        /* JobOrderType.TYPE_3, JobOrderType.TYPE_4, … */
-                ));
-                break;
-
-            // … другие кейсы …
 
             default:
                 // если не подходит ни один кейс, показываем все типы
@@ -100,6 +133,7 @@ public class NewJobOrderController {
         jobTypeCombo.getSelectionModel().selectFirst();
         commentsArea.clear();
     }
+
 
     /**
      * Настройка графики и кнопок.

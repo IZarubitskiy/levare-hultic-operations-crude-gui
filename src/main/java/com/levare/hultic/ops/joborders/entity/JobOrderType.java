@@ -8,6 +8,7 @@ public enum JobOrderType {
     ASSEMBLY,
     INSPECTION,
     TANDEM,
+    SENSOR_TEST,
     SENSOR_CONNECTION,
     CABLE_CUT,
     CABLE_REPAIR
