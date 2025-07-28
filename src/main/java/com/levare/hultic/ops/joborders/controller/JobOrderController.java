@@ -1,6 +1,7 @@
 package com.levare.hultic.ops.joborders.controller;
 
 import com.levare.hultic.ops.common.ExcelTemplateService;
+import com.levare.hultic.ops.common.ItemDialogHelper;
 import com.levare.hultic.ops.iteminfos.controller.ItemInfoSelectionController;
 import com.levare.hultic.ops.iteminfos.entity.ItemInfo;
 import com.levare.hultic.ops.iteminfos.service.ItemInfoService;
@@ -42,6 +43,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.levare.hultic.ops.common.DateUtils.pickDate;
 
 @RequiredArgsConstructor
 public class JobOrderController {
@@ -228,7 +231,7 @@ public class JobOrderController {
             joLoader.setControllerFactory(controllerFactory);
             Parent joRoot = joLoader.load();
             NewJobOrderController joCtrl = joLoader.getController();
-            joCtrl.initializeRealEquipment(null, it.getId());
+            joCtrl.initializeRealEquipment(null, it.getId(), "");
 
             Stage joStage = new Stage();
             joStage.initModality(Modality.APPLICATION_MODAL);
@@ -245,56 +248,37 @@ public class JobOrderController {
     }
 
     // Открывает диалог выбора ItemInfo и создаёт запись для ремонта сборки
+    @FXML
     private void onRepairAssemblyButton() {
         try {
-            // 1) выбор ItemInfo
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/item_info_selection.fxml"));
-            loader.setControllerFactory(cls -> {
-                if (cls == ItemInfoSelectionController.class) {
-                    return new ItemInfoSelectionController(itemInfoService);
-                }
-                try {
-                    return cls.getDeclaredConstructor().newInstance();
-                } catch (Exception ex) {
-                    throw new RuntimeException(ex);
-                }
-            });
-            Parent root = loader.load();
-            Stage dlg = new Stage();
-            dlg.initModality(Modality.APPLICATION_MODAL);
-            dlg.setTitle("Select Item Info for Repair Assembly");
-            dlg.setScene(new Scene(root));
-            dlg.showAndWait();
+            ItemDialogHelper.selectInfoAndCreateItem(
+                    "Select Item Info for Repair Assembly",
+                    itemInfoService,
+                    itemService,
+                    Client.STOCK,
+                    ItemCondition.REPAIR_ASSEMBLY,
+                    ItemStatus.ASSEMBLY_BOOKED,
+                    createdItem -> {
+                        // 3) открываем диалог создания JobOrder
+                        try {
+                            FXMLLoader joLoader = new FXMLLoader(getClass().getResource("/fxml/new_job_order.fxml"));
+                            joLoader.setControllerFactory(controllerFactory);
+                            Parent joRoot = joLoader.load();
+                            NewJobOrderController joCtrl = joLoader.getController();
+                            joCtrl.initializeRealEquipment(null, createdItem.getId(),"");
 
-            ItemInfo info = loader.<ItemInfoSelectionController>getController().getSelectedItem();
-            if (info == null) return;
-
-            // 2) создаём новый Item
-            Item it = new Item();
-            it.setItemInfo(info);
-            it.setOwnership(Client.STOCK);
-            it.setItemCondition(ItemCondition.RNE_ASSEMBLY);
-            it.setItemStatus(ItemStatus.ASSEMBLY_BOOKED);
-            it.setJobOrderId(null);
-            it.setComments("");
-            it.setSerialNumber(itemService.generateSerialNumber(it));
-            itemService.create(it);
-
-            // 3) открываем диалог создания JobOrder
-            FXMLLoader joLoader = new FXMLLoader(getClass().getResource("/fxml/new_job_order.fxml"));
-            joLoader.setControllerFactory(controllerFactory);
-            Parent joRoot = joLoader.load();
-            NewJobOrderController joCtrl = joLoader.getController();
-            joCtrl.initializeRealEquipment(null, it.getId());
-
-            Stage joStage = new Stage();
-            joStage.initModality(Modality.APPLICATION_MODAL);
-            joStage.setTitle("New Job Order");
-            joStage.setScene(new Scene(joRoot));
-            joStage.showAndWait();
-
-            refreshTable();
-
+                            Stage joStage = new Stage();
+                            joStage.initModality(Modality.APPLICATION_MODAL);
+                            joStage.setTitle("New Job Order");
+                            joStage.setScene(new Scene(joRoot));
+                            joStage.showAndWait();
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                            showAlert("Error", "Cannot open New JobOrder dialog:\n" + ex.getMessage());
+                        }
+                        refreshTable();
+                    }
+            );
         } catch (Exception ex) {
             ex.printStackTrace();
             showAlert("Error", "Cannot create repair assembly request:\n" + ex.getMessage());
@@ -336,7 +320,7 @@ public class JobOrderController {
 
             var joCtrl = joLoader.<NewJobOrderController>getController();
             itemService.updateStatus(chosen, ItemStatus.RNE_BOOKED);
-            joCtrl.initializeRealEquipment(null, chosen.getId());
+            joCtrl.initializeRealEquipment(null, chosen.getId(), "");
 
             Stage joStage = new Stage();
             joStage.initModality(Modality.APPLICATION_MODAL);
@@ -357,87 +341,107 @@ public class JobOrderController {
             showAlert("No selection", "Please select a Job Order to finish.");
             return;
         }
+        LocalDate finishDate = pickDate("Finish Job Order");
+        jobOrderService.finish(sel.getId(), finishDate);
+        JobOrder jo = jobOrderService.getById(sel.getId());
 
-        // 1) Диалог выбора даты окончания
-        Dialog<LocalDate> dialog = new Dialog<>();
-        dialog.setTitle("Finish Job Order");
-        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+        Item it = itemService.getById(jo.getItemId());
 
-        DatePicker picker = new DatePicker(LocalDate.now());
-        dialog.getDialogPane().setContent(picker);
-
-        dialog.setResultConverter(btn -> btn == ButtonType.OK ? picker.getValue() : null);
-        dialog.showAndWait().ifPresent(finishDate -> {
-            if (finishDate == null) return;
-
-            // 2) Записываем дату завершения
-            // Допустим, у вас есть метод finish в сервисе:
-            jobOrderService.finish(sel.getId(), finishDate);
-            JobOrder jo = jobOrderService.getById(sel.getId());
-
-            Item item = itemService.getById(jo.getItemId());
-
-            switch (item.getItemStatus()){
-                case DISMANTLE_BOOKED -> ;
-                case RNE_BOOKED, REPAIR_BOOKED ->;
-                case ASSEMBLY_BOOKED -> ;
-                case INSPECTION_BOOKED -> ;
-
-            }
-
-            switch (item.getItemCondition()) {
-                case USED -> {
-                    switch (jo.getJobOrderType()) {
-                        case DISMANTLE -> item.setItemCondition(ItemCondition.DISMANTLED);
+        switch (jo.getJobOrderType()){
+            case DISMANTLE -> {
+                switch (it.getItemStatus()){
+                    case REPAIR_BOOKED -> {
+                        LocalDate plannedDateForAssembly = pickDate("Choose Assembly Date");
+                        JobOrder newJo = new JobOrder();
+                        newJo.setItemId(it.getId());
+                        newJo.setWorkOrderId(sel.getWorkOrderId());
+                        newJo.setJobOrderType(JobOrderType.ASSEMBLY);
+                        newJo.setPlannedDate(plannedDateForAssembly);
+                        newJo.setStatus(JobOrderStatus.CREATED);
+                        jobOrderService.create(newJo);
                     }
-                }
-                case DISMANTLED, RNE_ASSEMBLY -> {
-                    switch (jo.getJobOrderType()) {
-                        case ASSEMBLY -> item.setItemCondition(ItemCondition.REPAIRED);
-                    }
-                }
-                case NEW_ASSEMBLY -> {
-                    switch (jo.getJobOrderType()) {
-                        case ASSEMBLY -> item.setItemCondition(ItemCondition.NEW);
-                    }
-                }
-                case DISMANTLED_FOR_PARTS -> {
-                    switch (jo.getJobOrderType()) {
-                        case DISMANTLE -> {
-                            item.setItemCondition(ItemCondition.DISMANTLED_FOR_PARTS);
-                            item.setItemStatus(ItemStatus.ABOLISHED);
+                    case RNE_BOOKED ->{
+                        try {
+                            ItemDialogHelper.selectInfoAndCreateItem(
+                                    "Select Item Info for Repair Assembly",
+                                    itemInfoService,
+                                    itemService,
+                                    it.getOwnership(),
+                                    ItemCondition.RNE_ASSEMBLY,
+                                    ItemStatus.ASSEMBLY_BOOKED,
+                                    createdItem -> {
+                                        try {
+                                            FXMLLoader joLoader = new FXMLLoader(getClass().getResource("/fxml/new_job_order.fxml"));
+                                            joLoader.setControllerFactory(controllerFactory);
+                                            Parent joRoot = joLoader.load();
+                                            NewJobOrderController joCtrl = joLoader.getController();
+                                            joCtrl.initializeRealEquipment(it.getWorkOrderId(),
+                                                    createdItem.getId(),
+                                                    "Assembled using parts from " +
+                                                            it.getSerialNumber());
+
+                                            Stage joStage = new Stage();
+                                            joStage.initModality(Modality.APPLICATION_MODAL);
+                                            joStage.setTitle("New Job Order for RNE item");
+                                            joStage.setScene(new Scene(joRoot));
+                                            joStage.showAndWait();
+                                        } catch (Exception ex) {
+                                            ex.printStackTrace();
+                                            showAlert("Error", "Cannot open New JobOrder dialog:\n" + ex.getMessage());
+                                        }
+                                        refreshTable();
+                                    }
+                            );
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                            showAlert("Error", "Cannot create repair assembly request:\n" + ex.getMessage());
                         }
                     }
+                    case DISMANTLE_BOOKED -> itemService.abolishItem(it.getId(), ItemCondition.DISMANTLED_FOR_PARTS);
+                    case DIFA ->
                 }
             }
+            case ASSEMBLY -> ;
+            case SENSOR_TEST ->;
+            case INSPECTION -> ;
+            case CABLE_REPAIR -> ;
+        }
 
-            // 3) В зависимости от статуса/состояния оборудования — создаём новый продолжающий JobOrder
-            Item item = itemService.getById(sel.getItemId());
-            switch (item.getItemStatus()) {
-                case /* YOUR_STATUS_1 */:
-                    // TODO: выставить нужный JobOrderType и ItemCondition
-                    JobOrder next1 = new JobOrder();
-                    next1.setItemId(item.getId());
-                    next1.setWorkOrderId(sel.getWorkOrderId());
-                    next1.setType(/* JobOrderType.YOUR_NEXT_TYPE_1 */);
-                    next1.setCondition(/* ItemCondition.YOUR_CONDITION_1 */);
-                    next1.setPlannedDate(finishDate.plusDays(/* ... */));
-                    next1.setStatus(JobOrderStatus.CREATED);
-                    jobOrderService.create(next1);
-                    break;
 
-                case /* YOUR_STATUS_2 */:
-                    // TODO: аналогично для другого статуса
-                    break;
 
-                default:
-                    // ничего не создаём
-                    break;
+        switch (it.getItemStatus()){
+            case DISMANTLE_BOOKED -> ;
+            case RNE_BOOKED, REPAIR_BOOKED ->;
+            case ASSEMBLY_BOOKED -> ;
+            case INSPECTION_BOOKED -> ;
+
+        }
+
+        switch (it.getItemCondition()) {
+            case USED -> {
+                switch (jo.getJobOrderType()) {
+                    case DISMANTLE -> it.setItemCondition(ItemCondition.DISMANTLED);
+                }
             }
-
-            // 4) Обновляем таблицу
-            refreshTable();
-        });
+            case DISMANTLED, RNE_ASSEMBLY -> {
+                switch (jo.getJobOrderType()) {
+                    case ASSEMBLY -> it.setItemCondition(ItemCondition.REPAIRED);
+                }
+            }
+            case NEW_ASSEMBLY -> {
+                switch (jo.getJobOrderType()) {
+                    case ASSEMBLY -> it.setItemCondition(ItemCondition.NEW);
+                }
+            }
+            case DISMANTLED_FOR_PARTS -> {
+                switch (jo.getJobOrderType()) {
+                    case DISMANTLE -> {
+                        it.setItemCondition(ItemCondition.DISMANTLED_FOR_PARTS);
+                        it.setItemStatus(ItemStatus.ABOLISHED);
+                    }
+                }
+            }
+        }
     }
 
     private void handlePrint() {

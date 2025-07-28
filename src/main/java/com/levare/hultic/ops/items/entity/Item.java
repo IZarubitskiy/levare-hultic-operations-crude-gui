@@ -27,11 +27,6 @@ public class Item {
     private String serialNumber;
 
     /**
-     * Serial number of the item
-     */
-    private String oldSerialNumber;
-
-    /**
      * Ownership classification of the item
      */
     private Client ownership;
@@ -54,6 +49,8 @@ public class Item {
     /**
      * Comments regarding this item
      */
+
+    private Long qty;
 
     private Long workOrderId;
 

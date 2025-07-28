@@ -7,6 +7,7 @@ public enum ItemCondition {
     REPAIRED,
     NEW_ASSEMBLY,
     RNE_ASSEMBLY,
+    REPAIR_ASSEMBLY,
     DISMANTLED_FOR_PARTS,
     SCRAPED,
     CANCEL

@@ -6,14 +6,10 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
-/**
- * Represents an individual JobOrder which executes part of a WorkOrder.
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class JobOrder {
-
     private Long id;
     private Long workOrderId;
     private Long itemId;
@@ -23,6 +19,4 @@ public class JobOrder {
     private LocalDate plannedDateUpdated;
     private LocalDate finishedDate;
     private String comments;
-
-
 }

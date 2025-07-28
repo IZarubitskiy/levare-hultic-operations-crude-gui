@@ -1,5 +1,11 @@
 package com.levare.hultic.ops.common;
 
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.Dialog;
+import javafx.stage.Modality;
+
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -24,5 +30,38 @@ public final class DateUtils {
         return Instant.ofEpochMilli(epochMilli)
                 .atZone(ZoneId.systemDefault())
                 .toLocalDate();
+    }
+
+    /**
+     * Открывает модальный диалог с DatePicker и возвращает выбранную дату.
+     * Если пользователь отменил или не выбрал дату — диалог будет повторяться
+     * до тех пор, пока не будет выбрана корректная дата.
+     *
+     * @param title заголовок диалога
+     * @return выбранная LocalDate
+     */
+    public static LocalDate pickDate(String title) {
+        while (true) {
+            Dialog<LocalDate> dialog = new Dialog<>();
+            dialog.setTitle(title);
+            dialog.initModality(Modality.APPLICATION_MODAL);
+            dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+            DatePicker picker = new DatePicker(LocalDate.now());
+            dialog.getDialogPane().setContent(picker);
+
+            dialog.setResultConverter(button -> button == ButtonType.OK ? picker.getValue() : null);
+
+            LocalDate result = dialog.showAndWait().orElse(null);
+            if (result != null) {
+                return result;
+            }
+
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Validation");
+            alert.setHeaderText(null);
+            alert.setContentText("Please select a date.");
+            alert.showAndWait();
+        }
     }
 }

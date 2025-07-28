@@ -62,14 +62,12 @@ CREATE TABLE IF NOT EXISTS serial_numbers (
   part_number    NVARCHAR(50) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS serial_number_history (
+CREATE TABLE IF NOT EXISTS item_history (
     id                  INTEGER PRIMARY KEY AUTOINCREMENT,
-    item_id             INTEGER NOT NULL REFERENCES items(id),
-    old_serial_number   TEXT    NOT NULL,
-    new_serial_number   TEXT    NOT NULL,
+    old_item_id   TEXT    NOT NULL,
+    new_item_id  TEXT    NOT NULL,
     changed_at          INTEGER NOT NULL, -- epoch-ms
-    reason              TEXT,
-    changed_by          INTEGER REFERENCES users(id)
+    reason              TEXT
 );
 
 CREATE TABLE IF NOT EXISTS tracking_records (

@@ -8,5 +8,6 @@ public enum ItemStatus {
     REPAIR_BOOKED,
     RNE_BOOKED,
     ASSEMBLY_BOOKED,
+    BOOKED,
     ABOLISHED
 }

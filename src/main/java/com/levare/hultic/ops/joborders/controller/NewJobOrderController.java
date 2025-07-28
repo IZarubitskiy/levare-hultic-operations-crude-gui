@@ -61,7 +61,7 @@ public class NewJobOrderController {
      */
 
 
-    public void initializeRealEquipment(Long workOrderId, Long itemId) {
+    public void initializeRealEquipment(Long workOrderId, Long itemId, String presetComment) {
         this.workOrderId = workOrderId;
         this.itemId = itemId;
 
@@ -81,10 +81,8 @@ public class NewJobOrderController {
         ownerCombo.setValue(item.getOwnership());
         ownerCombo.setDisable(true);
 
-
-        // Ограничиваем список JobOrderType в зависимости от типа оборудования
         switch (item.getItemStatus()) {
-            case REPAIR_BOOKED, RNE_BOOKED -> {
+            case REPAIR_BOOKED, RNE_BOOKED, DISMANTLE_BOOKED -> {
                 if (item.getItemCondition() == ItemCondition.USED) {
                     switch (item.getItemInfo().getItemType()) {
                         case CABLE -> jobTypeCombo.setItems(FXCollections
@@ -98,27 +96,22 @@ public class NewJobOrderController {
                             .observableArrayList(JobOrderType.ASSEMBLY));
                 }
             }
-            case DISMANTLE_BOOKED -> jobTypeCombo.setItems(FXCollections
-                    .observableArrayList(JobOrderType.DISMANTLE));
             case INSPECTION_BOOKED -> {
                 switch (item.getItemInfo().getItemType()) {
                     case SENSOR ->
-                            jobTypeCombo.setItems(FXCollections.observableArrayList(JobOrderType.SENSOR_TEST, JobOrderType.SENSOR_CONNECTION));
+                            jobTypeCombo.setItems(FXCollections.observableArrayList(JobOrderType.SENSOR_TEST));
                     default -> jobTypeCombo.setItems(FXCollections.observableArrayList(JobOrderType.INSPECTION));
                 }
             }
-
             default -> {
                 jobTypeCombo.setItems(FXCollections
                         .observableArrayList(JobOrderType.values()));
             }
         }
-
-        jobTypeCombo.getSelectionModel().selectFirst();
-        commentsArea.clear();
+        commentsArea.setText(presetComment);
     }
 
-    public void initializeFromJobOrderNew(Long workOrderId, Long itemId) {
+    public void initializeForecastedEquipment(Long workOrderId, Long itemId) {
         this.workOrderId = workOrderId;
         this.itemId = itemId;
 
@@ -146,7 +139,9 @@ public class NewJobOrderController {
         commentsArea.clear();
     }
 
+public void initializeEquipmentFromJobOrder (Long workOrderId, Long itemId){
 
+    }
     @FXML
     private void initialize() {
         saveButton.setOnAction(e -> handleSave());
@@ -162,7 +157,6 @@ public class NewJobOrderController {
         jo.setStatus(JobOrderStatus.CREATED);
         jo.setJobOrderType(jobTypeCombo.getValue());
         jo.setComments(commentsArea.getText());
-        System.out.println(plannedDatePicker.getValue().toString());
         jo.setPlannedDate(plannedDatePicker.getValue());
 
         Long jobOrderId = jobOrderService.create(jo).getId();

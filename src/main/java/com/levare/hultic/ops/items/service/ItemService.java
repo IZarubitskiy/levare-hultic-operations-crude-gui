@@ -40,5 +40,9 @@ public interface ItemService {
 
     void updateWithJobOrder(Long itemId, Long jobOrderId);
 
+    void abolishItem(Long itemId, ItemCondition itemCondition);
+
     String generateSerialNumber(Item item);
+
+    void serialNumberChange (String oldSerial, String newSerial, String Reason);
 }

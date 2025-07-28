@@ -4,6 +4,7 @@ import com.levare.hultic.ops.iteminfos.entity.ItemInfo;
 import com.levare.hultic.ops.iteminfos.service.ItemInfoService;
 import com.levare.hultic.ops.items.dao.ItemDao;
 import com.levare.hultic.ops.items.dao.SerialNumberDao;
+import com.levare.hultic.ops.items.dao.ItemHistoryDao;
 import com.levare.hultic.ops.items.entity.Item;
 import com.levare.hultic.ops.items.entity.ItemCondition;
 import com.levare.hultic.ops.items.entity.ItemStatus;
@@ -28,12 +29,18 @@ public class ItemServiceImpl implements ItemService {
     ItemDao itemDao;
     ItemInfoService itemInfoService;
     SerialNumberDao serialNumberDao;
+    ItemHistoryDao itemHistoryDao;
     TrackingRecordService trackingRecordService;
 
-    public ItemServiceImpl(ItemDao itemDao, ItemInfoService itemInfoService, SerialNumberDao serialNumberDao, TrackingRecordService trackingRecordService) {
+    public ItemServiceImpl(ItemDao itemDao,
+                           ItemInfoService itemInfoService,
+                           SerialNumberDao serialNumberDao,
+                           ItemHistoryDao itemHistoryDao,
+                           TrackingRecordService trackingRecordService) {
         this.itemDao = itemDao;
         this.itemInfoService = itemInfoService;
         this.serialNumberDao = serialNumberDao;
+        this.itemHistoryDao = itemHistoryDao;
         this.trackingRecordService = trackingRecordService;
     }
 
@@ -59,6 +66,15 @@ public class ItemServiceImpl implements ItemService {
         itemUpdated.setJobOrderId(jobOrderId);
         itemDao.update(itemUpdated);
         trackingRecordService.itemTracking(itemUpdated, ActionType.STATUS_CHANGE, "Jo set for Item");
+    }
+
+    @Override
+    public void abolishItem(Long itemId, ItemCondition itemCondition) {
+        Item abolishedItem = getById(itemId);
+        abolishedItem.setItemStatus(ItemStatus.ABOLISHED);
+        abolishedItem.setItemCondition(itemCondition);
+        itemDao.update(abolishedItem);
+        trackingRecordService.itemTracking(abolishedItem, ActionType.FINALIZING, "Item was abolished due to" + itemCondition);
     }
 
     @Override
@@ -205,5 +221,10 @@ public class ItemServiceImpl implements ItemService {
             throw new IllegalStateException("Unexpected item condition: " + item.getItemCondition());
         }
 
+    }
+
+    @Override
+    public void serialNumberChange(String old_item_id, String new_item_id, String reason) {
+        itemHistoryDao.insert(old_item_id, new_item_id, LocalDate.now(), reason);
     }
 }
